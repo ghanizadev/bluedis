@@ -2,18 +2,21 @@ import React from "react";
 import styled from "styled-components";
 import { SquareButton } from "./SquareButton";
 import { Separator } from "./Separator";
-
-import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-import { ReactComponent as RefreshIcon } from "../../assets/refresh.svg";
-import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
-import { ReactComponent as DownloadIcon } from "../../assets/download.svg";
-import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "../../redux/Types/State";
 import { Item } from "../../redux/Types/Item";
 import ItemDelete from "./ItemDelete";
 import { deleteKey, disconnect } from "../../services/mainProcess";
 import { actions } from "../../redux/store";
+import PickName from "./PickName";
+
+import { ReactComponent as AddIcon } from "../../assets/plus.svg";
+import { ReactComponent as RefreshIcon } from "../../assets/refresh.svg";
+import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
+import { ReactComponent as DownloadIcon } from "../../assets/download.svg";
+import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
+import { ReactComponent as FavoriteIcon } from "../../assets/star.svg";
+import { Connection } from "../../redux/Types/Connection";
 
 const Container = styled.div`
   margin: 8px;
@@ -31,8 +34,17 @@ type Props = {
 
 const Toolbar: React.FC<Props> = (props) => {
   const { onRefresh, onAddKey } = props;
+
   const selected = useSelector<State, string[]>((state) => state.selected);
   const data = useSelector<State, Item[]>((state) => state.data);
+  const favorites = useSelector<State, Connection[]>(
+    (state) => state.favorites
+  );
+  const currentConnection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
+
+  const[newName, setNewName] = React.useState(false);
   const [toDelete, setToDelete] = React.useState(false);
   const dispatch = useDispatch();
 
@@ -79,7 +91,23 @@ const Toolbar: React.FC<Props> = (props) => {
 
   const handleDisconnect = () => {
     disconnect();
+  };
+
+  const handleFavorite = () => {
+    setNewName(true);
+  };
+
+  const handleNewFavoriteName = (name: string) => {
+    if(currentConnection) {
+      dispatch(actions.addFavorite({...currentConnection, name}))
+      dispatch(actions.currentConnection({...currentConnection, name}))
+    }
+    setNewName(false);
   }
+
+  const handleNewNameCancel = () => {
+    setNewName(false);
+  };
 
   return (
     <>
@@ -107,13 +135,21 @@ const Toolbar: React.FC<Props> = (props) => {
           <DownloadIcon />
         </SquareButton>
         <Separator />
-        <SquareButton
-          title="Close this connection"
-          onClick={handleDisconnect}
-        >
+        <SquareButton title="Close this connection" onClick={handleDisconnect}>
           <DisconnectIcon />
         </SquareButton>
+        {!favorites.find(
+          (connection) => connection.id === currentConnection?.id
+        ) && (
+          <SquareButton
+            title="Favorite this connection"
+            onClick={handleFavorite}
+          >
+            <FavoriteIcon />
+          </SquareButton>
+        )}
       </Container>
+      {newName && <PickName onConfirm={handleNewFavoriteName} onCancel={handleNewNameCancel} />}
       {toDelete && (
         <ItemDelete
           onCancel={handleDeleteCancel}

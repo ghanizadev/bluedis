@@ -79,15 +79,11 @@ var DatabaseManager = /** @class */ (function () {
     DatabaseManager.prototype.connect = function (host, port, password, tls) {
         if (host === void 0) { host = "localhost"; }
         if (port === void 0) { port = 6379; }
-        try {
-            this._instance = redis_1["default"].createClient(port, host, {
-                auth_pass: password,
-                tls: tls
-            });
-        }
-        catch (e) {
-            console.log(e.message);
-        }
+        this._instance = redis_1["default"].createClient(port, host, {
+            auth_pass: password,
+            tls: tls,
+            retry_strategy: function () { return new Error("Host unreacheable"); }
+        });
     };
     DatabaseManager.prototype.disconnect = function () {
         this._instance.quit();

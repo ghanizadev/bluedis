@@ -1,91 +1,57 @@
 {
-  "name": "music-player",
-  "productName": "music-player",
+  "name": "bluedis",
+  "productName": "Bluedis",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": ".webpack/main",
+  "main": "./dist/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production electron .",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
     "lint": "eslint --ext .ts .",
-    "dev": "npm-run-all --parallel dev:**",
-    "dev:react": "electron-forge start",
-    "dev:electron": "yarn --cwd ./src/App start"
+    "dev": "gulp dev",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev:react": "yarn --cwd ./src/App start",
+    "builder:pack": "electron-builder --dir",
+    "builder:dist": "electron-builder",
+    "build": "gulp build",
+    "dist": "gulp dist"
   },
   "keywords": [],
   "author": {
     "name": "Jean Felipe de Melo",
     "email": "jf.melo6@gmail.com"
   },
-  "license": "MIT",
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "music_player"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ],
-      "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
-            "mainConfig": "./webpack.main.config.js",
-            "renderer": {
-              "config": "./webpack.renderer.config.js",
-              "entryPoints": [
-                {
-                  "html": "./src/App/build/index.html",
-                  "js": "./src/renderer.ts",
-                  "name": "main_window"
-                }
-              ]
-            }
-          }
-        ]
-      ]
+  "build": {
+    "appId": "com.ghanizadev.bluedis",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "extends": null,
+    "nsis": {
+      "installerIcon": "assets/icon.png",
+      "uninstallerIcon": "assets/icon.png"
     }
   },
+  "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.54",
-    "@electron-forge/maker-deb": "^6.0.0-beta.54",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
-    "@electron-forge/maker-zip": "^6.0.0-beta.54",
-    "@electron-forge/plugin-webpack": "6.0.0-beta.54",
-    "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
     "@types/dotenv": "^8.2.0",
+    "@types/electron": "^1.6.10",
     "@types/redis": "^2.8.28",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
     "@typescript-eslint/parser": "^4.0.1",
-    "css-loader": "^4.2.1",
     "electron": "11.1.0",
+    "electron-builder": "^22.9.1",
+    "electron-builder-squirrel-windows": "^22.10.3",
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.20.0",
-    "fork-ts-checker-webpack-plugin": "^5.0.14",
-    "node-loader": "^1.0.1",
-    "style-loader": "^1.2.1",
-    "ts-loader": "^8.0.2",
+    "gulp": "^4.0.2",
     "typescript": "^4.0.2"
   },
   "dependencies": {

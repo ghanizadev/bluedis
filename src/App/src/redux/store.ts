@@ -5,6 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { Appearence } from "./Types/Appearence";
+import { Connection } from "./Types/Connection";
 import { Item } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
@@ -20,7 +21,8 @@ const initialState: State = {
       fontSize: "14pt",
     },
   },
-  connected: false
+  connected: false,
+  favorites: []
 };
 
 const slice = createSlice({
@@ -61,6 +63,15 @@ const slice = createSlice({
     updatePreferences: (state, action) => {
       state.settings = action.payload;
     },
+    currentConnection: (state, action: PayloadAction<Connection>) => {
+      state.connection = action.payload;
+    },
+    addFavorite: (state, action: PayloadAction<Connection>) => {
+      state.favorites = [...state.favorites, action.payload];
+    },
+    removeFavorite: (state, action: PayloadAction<string>) => {
+      state.favorites = state.favorites.filter(favorite => favorite.id !== action.payload);
+    }
   },
 });
 

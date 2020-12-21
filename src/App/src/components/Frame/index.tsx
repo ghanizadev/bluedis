@@ -11,8 +11,15 @@ import { ButtonWrapper } from "./ButtonWrapper";
 import { ReactComponent as CloseIcon } from "../../assets/close.svg";
 import { ReactComponent as MinimizeIcon } from "../../assets/minus.svg";
 import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
+import { useSelector } from "react-redux";
+import { State } from "../../redux/Types/State";
+import { Connection } from "../../redux/Types/Connection";
 
 const Frame: React.FC = (props) => {
+  const connected = useSelector<State, boolean>((state) => state.connected);
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
 
   const handleClose = () => {
     close();
@@ -29,7 +36,18 @@ const Frame: React.FC = (props) => {
   return (
     <Background>
       <Bar>
-        <Title>Bluedis - v1.0.0</Title>
+        <div style={{display: "flex"}}>
+          <img
+            src={process.env.PUBLIC_URL + "/icon.png"}
+            alt=""
+            style={{ objectFit: "contain", width: 18, height: 18 }}
+          />
+          <Title>
+            Bluedis
+            {connected && ` - redis://${connection?.host}:${connection?.port}`}
+            {connected && connection?.name && ` | [${connection?.name}]`}
+          </Title>
+        </div>
         <ButtonWrapper>
           <Minimize onClick={handleMinimize}>
             <MinimizeIcon width={16} height={16} />

@@ -14,7 +14,7 @@ export interface AppearenceSettings {
 
 export const DarkTheme : ColorSchema = {
   background: "#1f1f1f",
-  foreground: "#4389fa",
+  foreground: "#2ad4c3",
   text: "#fff",
   innertext: "#fff",
   title: "#fff",
@@ -23,7 +23,7 @@ export const DarkTheme : ColorSchema = {
 
 export const LightTheme : ColorSchema = {
   background: "#fdfdfd",
-  foreground: "#4389fa",
+  foreground: "#2ad4c3",
   text: "#333",
   innertext: "#fff",
   title: "#333",

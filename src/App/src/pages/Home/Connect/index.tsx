@@ -1,9 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import Checkbox from "../../../components/Checkbox";
+import { nanoid } from "nanoid";
 
-import { ReactComponent as CloseIcon } from "../../../assets/close.svg";
 import { connect } from "../../../services/mainProcess";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "../../../redux/store";
+import { State } from "../../../redux/Types/State";
+import { Connection } from "../../../redux/Types/Connection";
+import Favorite from "./Favorite";
 
 const Container = styled.div`
   flex: 1;
@@ -13,10 +18,10 @@ const Container = styled.div`
 `;
 
 const Content = styled.div`
-  width: 60%;
-  height: 400px;
+  height: 300px;
   display: flex;
   align-items: center;
+  justify-content: center;
 `;
 
 const Recent = styled.div`
@@ -26,6 +31,7 @@ const Recent = styled.div`
   border-left: 1px solid gray;
   margin: 0 15px;
   padding: 0 15px;
+  width: 230px;
 `;
 
 const Form = styled.div`
@@ -37,18 +43,10 @@ const ConnectionsList = styled.ul`
   list-style: none;
 `;
 
-const Connection = styled.li`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 150px;
-  height: 30px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: ${(props) => props.theme.foreground};
-  }
+const ListWrapper = styled.div`
+  flex: 1;
+  flex-basis: 0;
+  overflow: hidden auto;
 `;
 
 const LoginButton = styled.button`
@@ -73,19 +71,22 @@ const Connect = () => {
     password: "",
     tls: false,
   });
+  const favorites = useSelector<State, Connection[]>(
+    (state) => state.favorites
+  );
+  const dispatch = useDispatch();
 
-  const handleRemoveFromHistory = (
-    e: React.MouseEvent<SVGSVGElement, MouseEvent>
-  ) => {
-    e.stopPropagation();
-    alert("remove");
+  const handleRemoveFromHistory = (connection: Connection) => {
+    dispatch(actions.removeFavorite(connection.id));
   };
 
-  const handleConnectFromHistory = () => {
-    alert("item");
+  const handleConnectFromHistory = (connection: Connection) => {
+    dispatch(actions.currentConnection(connection));
+    connect(connection);
   };
 
   const handleConnect = () => {
+    dispatch(actions.currentConnection({ ...connection, id: nanoid(8) }));
     connect(connection);
   };
 
@@ -131,16 +132,26 @@ const Connect = () => {
         </Form>
         <Recent>
           <p>History</p>
+          <ListWrapper>
           <ConnectionsList>
-            <Connection onClick={handleConnectFromHistory}>
-              <strong>locahost:6379</strong>
-              <CloseIcon
-                width={16}
-                height={16}
-                onClick={handleRemoveFromHistory}
-              />
-            </Connection>
+            {favorites.map((connection) => {
+              return (
+                <Favorite
+                  key={connection.id}
+                  connection={connection}
+                  onRemove={handleRemoveFromHistory}
+                  onConnect={handleConnectFromHistory}
+                />
+              );
+            })}
+            {favorites.length === 0 && (
+              <>
+                <br />
+                <p style={{ color: "gray" }}>No favorites so far...</p>
+              </>
+            )}
           </ConnectionsList>
+          </ListWrapper>
         </Recent>
       </Content>
     </Container>

@@ -1,3 +1,4 @@
+import { Connection } from './Connection';
 import { Item } from './Item';
 import { Page } from './Page';
 import { Settings } from './Settings';
@@ -8,5 +9,7 @@ export type State = {
   preview?: Item;
   selected: string[];
   currentPage: Page,
-  settings: Settings
+  settings: Settings,
+  connection?: Connection,
+  favorites: Connection[],
 };

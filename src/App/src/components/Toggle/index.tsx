@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import "./styles.css";
 
 const Container = styled.div`
   -webkit-app-region: no-drag;

@@ -12,14 +12,11 @@ class DatabaseManager {
     password?: string,
     tls?: boolean
   ) {
-    try{
-      this._instance = redis.createClient(port, host, {
-        auth_pass: password,
-        tls,
-      });
-    }catch(e) {
-      console.log(e.message)
-    }
+    this._instance = redis.createClient(port, host, {
+      auth_pass: password,
+      tls,
+      retry_strategy: () => new Error("Host unreacheable"),
+    });
   }
 
   public disconnect() {
