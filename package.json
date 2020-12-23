@@ -1,7 +1,7 @@
 {
   "name": "bluedis",
   "productName": "Bluedis",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "My Electron application description",
   "main": "./dist/index.js",
   "scripts": {
@@ -10,10 +10,11 @@
     "dev": "gulp dev",
     "dev:electron": "cross-env NODE_ENV=development electron .",
     "dev:react": "yarn --cwd ./src/App start",
-    "builder:pack": "electron-builder --dir",
-    "builder:dist": "electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
     "build": "gulp build",
-    "dist": "gulp dist"
+    "compile": "gulp dist",
+    "publish": "build --mac --win --linux -p always"
   },
   "keywords": [],
   "author": {
@@ -36,6 +37,11 @@
     "nsis": {
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico"
+    },
+    "win": {
+      "publish": [
+        "github"
+      ]
     }
   },
   "license": "MIT",
@@ -59,6 +65,7 @@
     "dotenv": "^8.2.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^6.0.1",
+    "electron-updater": "^4.3.5",
     "npm-run-all": "^4.1.5",
     "redis": "^3.0.2",
     "uuid": "^8.3.2"

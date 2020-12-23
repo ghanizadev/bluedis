@@ -14,7 +14,7 @@ gulp.task('compile-react', function (cb) {
 })
 
 gulp.task('dist', function (cb) {
-  exec('yarn builder:dist', function (err) {
+  exec('yarn dist', function (err) {
     cb(err);
   });
 })

@@ -8,10 +8,9 @@ import { Item } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-
 import { updateData, addKey } from "../../services/mainProcess";
 import AddKey from "../../components/AddKey";
-import Pagination from "../../components/Pagination";
+// import Pagination from "../../components/Pagination";
 import Connect from "./Connect";
 import { State } from "../../redux/Types/State";
 
