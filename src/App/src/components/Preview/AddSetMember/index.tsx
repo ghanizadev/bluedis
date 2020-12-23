@@ -1,28 +1,20 @@
 import React from "react";
-import styled from "styled-components";
 import Button from "../../Button";
-import { SquareButton } from "../SquareButton";
-import { ButtonWrapper } from "./ButtonWrapper";
-import { Container } from "./Container";
-import { Content } from "./Content";
-import { TextArea } from "./TextArea";
+import { MessageBackground } from "../../common/MessageBackground";
+import { MessageContent } from "../../common/MessageContent";
+import { MessageButtonWrapper } from "../../common/MessageButtonWrapper";
+import { TextArea } from "../../TextArea";
+import { PreviewActionButton } from "../../common/PreviewActionButton";
+import { PreviewActions } from "../../common/PreviewActions";
 
-import {ReactComponent as RemoveIcon} from "../../../assets/trash.svg";
-import {ReactComponent as CopyIcon} from "../../../assets/clipboard.svg";
-
-const Actions = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  margin-top: 10px;
-`;
+import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
+import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
 
 type Props = {
   onSubmit: (oldValue: string, newValue: string) => void;
   onDelete: (value: string) => void;
   onClose: () => void;
-  value: {isNew: boolean, value: string};
+  value: { isNew: boolean; value: string };
 };
 
 const AddSetMember: React.FC<Props> = (props) => {
@@ -35,7 +27,8 @@ const AddSetMember: React.FC<Props> = (props) => {
   };
 
   const handleSave = () => {
-    if (textAreaRef.current?.value) onSubmit(value.isNew ? "" : value.value, textAreaRef.current.value);
+    if (textAreaRef.current?.value)
+      onSubmit(value.isNew ? "" : value.value, textAreaRef.current.value);
   };
 
   const handleItemRemove = () => {
@@ -43,31 +36,34 @@ const AddSetMember: React.FC<Props> = (props) => {
   };
 
   const handleItemCopy = () => {
-    if (textAreaRef.current?.value){
+    if (textAreaRef.current?.value) {
       const text = JSON.stringify([textAreaRef.current.value]);
       navigator.clipboard.writeText(text);
     }
   };
 
   return (
-    <Container>
-      <Content>
+    <>
+      <MessageBackground />
+      <MessageContent>
         <h3>{value.isNew ? "Add" : "Edit"} Item</h3>
         <TextArea ref={textAreaRef}>{value.value}</TextArea>
-        {!value.isNew && <Actions>
-          <SquareButton onClick={handleItemCopy}>
-            <CopyIcon title="Copy as JSON" />
-          </SquareButton>
-          <SquareButton remove onClick={handleItemRemove}>
-            <RemoveIcon title="Remove property" />
-          </SquareButton>
-        </Actions>}
-        <ButtonWrapper>
+        {!value.isNew && (
+          <PreviewActions>
+            <PreviewActionButton onClick={handleItemCopy}>
+              <CopyIcon title="Copy as JSON" />
+            </PreviewActionButton>
+            <PreviewActionButton remove onClick={handleItemRemove}>
+              <RemoveIcon title="Remove property" />
+            </PreviewActionButton>
+          </PreviewActions>
+        )}
+        <MessageButtonWrapper>
           <Button label="Close" onClick={handleClose} />
           <Button label="Save" onClick={handleSave} />
-        </ButtonWrapper>
-      </Content>
-    </Container>
+        </MessageButtonWrapper>
+      </MessageContent>
+    </>
   );
 };
 

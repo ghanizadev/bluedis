@@ -1,5 +1,4 @@
 import React from "react";
-import styled from "styled-components";
 import { SquareButton } from "./SquareButton";
 import { Separator } from "./Separator";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,15 +20,7 @@ import { ReactComponent as DownloadIcon } from "../../assets/download.svg";
 import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
 import { ReactComponent as FavoriteIcon } from "../../assets/star.svg";
 import { Connection } from "../../redux/Types/Connection";
-
-const Container = styled.div`
-  margin: 8px;
-  height: 30px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-`;
+import { Container } from "./Container";
 
 type Props = {
   onRefresh: () => void;

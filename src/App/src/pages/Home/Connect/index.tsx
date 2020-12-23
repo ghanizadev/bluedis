@@ -1,16 +1,12 @@
 import React from "react";
 import styled from "styled-components";
-// import Checkbox from "../../../components/Checkbox";
 import { nanoid } from "nanoid";
-
 import { connect, saveFavorites } from "../../../services/mainProcess";
 import { useDispatch, useSelector } from "react-redux";
 import { actions, store } from "../../../redux/store";
 import { State } from "../../../redux/Types/State";
 import { Connection } from "../../../redux/Types/Connection";
 import Favorite from "./Favorite";
-import ErrorMessage from "./ErrorMessage";
-import { Error } from "../../../redux/Types/Error";
 
 const Container = styled.div`
   flex: 1;
@@ -76,7 +72,6 @@ const Connect = () => {
   const favorites = useSelector<State, Connection[]>(
     (state) => state.favorites
   );
-  const error = useSelector<State, Error | undefined>(state => state.error)
   const dispatch = useDispatch();
 
   const handleRemoveFromHistory = (connection: Connection) => {
@@ -104,9 +99,6 @@ const Connect = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, password: e.target.value });
   };
-  // const handleTLSChange = (value: boolean) => {
-  //   setConnection({ ...connection, tls: !value });
-  // };
 
   return (
   <>
@@ -129,11 +121,6 @@ const Connect = () => {
             <br />
             <input type="password" onChange={handlePasswordChange} />
           </label>
-          {/* <Checkbox
-            checked={connection.tls}
-            label="use TLS"
-            onChangeValue={handleTLSChange}
-          /> */}
           <LoginButton onClick={handleConnect}>Connect</LoginButton>
         </Form>
         <Recent>
@@ -161,7 +148,6 @@ const Connect = () => {
         </Recent>
       </Content>
     </Container>
-    {error && <ErrorMessage message={error} />}
     </>
   );
 };

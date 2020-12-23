@@ -3,28 +3,18 @@ import styled from "styled-components";
 
 import { changeString, deleteKey } from "../../services/mainProcess";
 import { Item } from "../../redux/Types/Item";
-import { SquareButton } from "./SquareButton";
 
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as SaveIcon } from "../../assets/save.svg";
+import { PreviewActionButton } from "../common/PreviewActionButton";
+import { PreviewActions } from "../common/PreviewActions";
 
 const Container = styled.textarea`
   resize: none;
   background-color: ${(props) => props.theme.background};
   color: ${(props) => props.theme.text};
   flex: 1;
-`;
-
-const Actions = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
-
-const ActionButton = styled(SquareButton)`
-  margin: 8px 0 0 8px;
 `;
 
 let timeout: number;
@@ -88,18 +78,18 @@ const StringComponent: React.FC<Props> = (props) => {
         >
           Document saved!
         </span>}
-        <Actions>
-          <ActionButton title="Save document" onClick={handleDocumentSave}>
+        <PreviewActions>
+          <PreviewActionButton title="Save document" onClick={handleDocumentSave}>
             <SaveIcon />
-          </ActionButton>
-          <ActionButton
+          </PreviewActionButton>
+          <PreviewActionButton
             title="Copy document as JSON"
             onClick={handleDocumentCopy}
           >
             <CopyIcon />
-          </ActionButton>
+          </PreviewActionButton>
 
-          <ActionButton
+          <PreviewActionButton
             title="Remove document"
             remove
             action={deleting}
@@ -108,8 +98,8 @@ const StringComponent: React.FC<Props> = (props) => {
             onMouseUp={handleCancelDelete}
           >
             <RemoveIcon />
-          </ActionButton>
-        </Actions>
+          </PreviewActionButton>
+        </PreviewActions>
       </div>
     </>
   );

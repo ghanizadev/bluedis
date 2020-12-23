@@ -1,44 +1,17 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import styled from "styled-components";
-import Dropbox from "../../components/Dropbox";
+import Dropdown from "../../components/Dropdown";
 import Input from "../../components/Input";
 import Toggle from "../../components/Toggle";
 import { State } from "../../redux/Types/State";
 import { Settings as ISettings } from "../../redux/Types/Settings";
 import { actions, store } from "../../redux/store";
-import { savePreferences } from "../../services/mainProcess";
+import { savePreferences, wipeData } from "../../services/mainProcess";
 import Button from "../../components/Button";
-
-const Container = styled.div`
-  padding: 8px;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-`;
-
-const Content = styled.div`
-  flex: 1;
-  flex-basis: 0;
-  overflow: hidden auto;
-  display: flex;
-  flex-direction: column;
-  margin: 8px 0;
-`;
-const Row = styled.div`
-  flex: 0 1;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  height: 40px;
-  margin: 5px 0 5px 8px;
-`;
-
-const Subtitle = styled.h3`
-  margin-top: 8px;
-  margin-bottom: 3px;
-`;
+import { Container } from "./Container";
+import { Content } from "./Content";
+import { Row } from "./Row";
+import { Subtitle } from "./Subtitle";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -82,6 +55,16 @@ const Settings = () => {
     saveChanges();
   };
 
+  const handleWipeData = () => {
+    dispatch(actions.setConfirmation({
+      title: "Confirmation",
+      message: "Do you really want to wipe all stored data? This includes all your preferences and favorites",
+      onConfirm: () => {
+        wipeData();
+      }
+    }))
+  }
+
   return (
     <Container>
       <h1>Settings</h1>
@@ -99,7 +82,7 @@ const Settings = () => {
         <Row>
           <span>Font</span>
           <span>
-            <Dropbox defaultValue={settings.appearence.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
+            <Dropdown defaultValue={settings.appearence.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
           </span>
         </Row>
         <Row>
@@ -116,7 +99,7 @@ const Settings = () => {
         <Row>
           <span>Wipe data</span>
           <span>
-            <Button label="Wipe now" />
+            <Button label="Wipe now" onClick={handleWipeData} />
           </span>
         </Row>
       </Content>

@@ -1,5 +1,4 @@
 import React from "react";
-import { Item } from "../../redux/Types/Item";
 import HashComponent from "./HashComponent";
 import ListComponent from "./ListComponent";
 import SetComponent from "./SetComponent";

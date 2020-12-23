@@ -93,6 +93,10 @@ export const saveFavorites = (favorites: any) => {
   ipcRenderer.send("saveFavorites", favorites);
 };
 
+export const wipeData = () => {
+  ipcRenderer.send("wipeData");
+};
+
 export const openLink = (link: string) => {
   shell.openExternal(link);
 };

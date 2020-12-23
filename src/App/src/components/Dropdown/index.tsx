@@ -38,7 +38,7 @@ type Props = {
   defaultValue?: string;
 };
 
-const Dropbox: React.FC<Props> = (props) => {
+const Dropdown: React.FC<Props> = (props) => {
   const { items, onChange, defaultValue } = props;
   
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -57,4 +57,4 @@ const Dropbox: React.FC<Props> = (props) => {
   );
 };
 
-export default Dropbox;
+export default Dropdown;

@@ -1,63 +1,22 @@
 import React from "react";
-import styled from "styled-components";
-import { SquareButton } from "./SquareButton";
 import AddOrderedItem from "./AddOrderedItem";
-
-import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
-import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
-import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-
+import { Item } from "../../redux/Types/Item";
+import { PreviewContainer } from "../common/PreviewContainer";
+import { PreviewActions } from "../common/PreviewActions";
+import { PreviewActionButton } from "../common/PreviewActionButton";
+import { PreviewTable } from "../common/PreviewTable";
+import { PreviewTableRow } from "../common/PreviewTableRow";
+import { PreviewTableData } from "../common/PreviewTableData";
 import {
   addZSetMember,
   deleteKey,
   removeZSetMember,
 } from "../../services/mainProcess";
-import { Item } from "../../redux/Types/Item";
 
-const Container = styled.div`
-  flex: 1;
-  background-color: ${(props) => props.theme.background};
-  flex-basis: 0;
-  overflow: hidden auto;
-`;
+import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
+import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
+import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 
-const Table = styled.table`
-  padding: 8px;
-  border-spacing: 0;
-  width: 100%;
-
-  & td {
-    height: 30px;
-  }
-
-  & th {
-    position: sticky;
-    top: 0;
-    background-color: ${(props) => props.theme.background};
-    height: 30px;
-  }
-`;
-
-const Row = styled.tr`
-  cursor: pointer;
-  overflow: hidden;
-
-  &:hover {
-    background-color: ${(props) => props.theme.foreground};
-    color: ${(props) => props.theme.innertext};
-  }
-`;
-
-const Actions = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
-
-const ActionButton = styled(SquareButton)`
-  margin: 8px 0 0 8px;
-`;
 
 let timeout: number;
 
@@ -123,37 +82,37 @@ const ZSetComponent: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Container>
-        <Table>
+      <PreviewContainer>
+        <PreviewTable>
           <tbody>
             <tr>
-              <th align="center">Score</th>
+              <th align="center" style={{width: "80px"}}>Score</th>
               <th>Value</th>
             </tr>
             {(value as { score: string; value: string }[]).map(
               (item, index) => {
                 return (
-                  <Row key={index} onClick={() => handleItemEdit(item)}>
-                    <td align="center">{item.score}</td>
-                    <td>{item.value}</td>
-                  </Row>
+                  <PreviewTableRow key={index} onClick={() => handleItemEdit(item)}>
+                    <td style={{width: "80px"}} align="center">{item.score}</td>
+                    <PreviewTableData>{item.value}</PreviewTableData>
+                  </PreviewTableRow>
                 );
               }
             )}
           </tbody>
-        </Table>
-      </Container>
-      <Actions>
-        <ActionButton title="Add new member" onClick={handleAddOpen}>
+        </PreviewTable>
+      </PreviewContainer>
+      <PreviewActions>
+        <PreviewActionButton title="Add new member" onClick={handleAddOpen}>
           <AddIcon />
-        </ActionButton>
-        <ActionButton
+        </PreviewActionButton>
+        <PreviewActionButton
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
-        </ActionButton>
-        <ActionButton
+        </PreviewActionButton>
+        <PreviewActionButton
           title="Remove document"
           remove
           action={deleting}
@@ -162,8 +121,8 @@ const ZSetComponent: React.FC<Props> = (props) => {
           onMouseLeave={handleDeleteCancel}
         >
           <RemoveIcon />
-        </ActionButton>
-      </Actions>
+        </PreviewActionButton>
+      </PreviewActions>
       {itemValue && (
         <AddOrderedItem
           onClose={handleItemClose}

@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import Frame from "./components/Frame";
-import Alert from "./components/Alert";
 import Home from "./pages/Home";
 import { DarkTheme, defaultSettings, ColorSchema, AppearenceSettings, LightTheme } from "./theme";
 import { State } from "./redux/Types/State";
@@ -13,26 +12,20 @@ import Sidebar from "./components/Sidebar";
 import { GlobalStyles } from "./theme/globalStyles";
 import { store } from "./redux/store";
 import { getPreferences } from "./services/mainProcess";
+import ErrorMessage from "./components/ErrorMessage";
+import ConfirmationMessage from "./components/ConfirmationMessage";
 
 export const SettingsContext = React.createContext({
   setTheme: (theme: ColorSchema) => {
     return;
   },
-  theme: {...DarkTheme, fontFamily: "", fontSize: "14pt"},
-  setAlert: (alert: { title: string; message: string; visible: boolean }) => {
-    return;
-  },
+  theme: {...DarkTheme, fontFamily: "", fontSize: "14pt"}
 });
 
 const App = () => {
   const [theme, setTheme] = React.useState<ColorSchema & AppearenceSettings>({...DarkTheme, ...defaultSettings});
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
 
-  const [alert, setAlert] = React.useState({
-    visible: true,
-    title: "",
-    message: "",
-  });
 
   const changeTheme = React.useCallback(
     (newTheme: ColorSchema) => {
@@ -40,14 +33,6 @@ const App = () => {
     },
     [setTheme, theme]
   );
-
-  const changeAlert = (alert: {
-    title: string;
-    message: string;
-    visible: boolean;
-  }) => {
-    setAlert(alert);
-  };
 
   const registerStore = React.useCallback(() => {
     store.subscribe(() => {
@@ -70,7 +55,7 @@ const App = () => {
 
   return (
     <SettingsContext.Provider
-      value={{ theme, setTheme: changeTheme, setAlert: changeAlert }}
+      value={{ theme, setTheme: changeTheme }}
     >
       <ThemeProvider theme={theme}>
         <Frame>
@@ -88,8 +73,9 @@ const App = () => {
             {currentPage === "help" && <Help />}
           </div>
         </Frame>
-        <Alert {...alert} />
         <GlobalStyles />
+        <ErrorMessage />
+        <ConfirmationMessage />
       </ThemeProvider>
     </SettingsContext.Provider>
   );

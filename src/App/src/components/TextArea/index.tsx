@@ -5,4 +5,5 @@ export const TextArea = styled.textarea`
   background-color: #fff;
   color: #333;
   resize: none;
+  min-height: 80px;
 `;

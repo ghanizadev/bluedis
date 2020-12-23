@@ -1,3 +1,4 @@
+import { Confirmation } from './Confirmation';
 import { Connection } from './Connection';
 import { Error } from './Error';
 import { Item } from './Item';
@@ -13,5 +14,6 @@ export type State = {
   settings: Settings,
   connection?: Connection,
   favorites: Connection[],
-  error?: Error
+  error?: Error,
+  confirmation?: Confirmation
 };

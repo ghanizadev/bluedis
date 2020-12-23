@@ -5,6 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { Appearence } from "./Types/Appearence";
+import { Confirmation } from "./Types/Confirmation";
 import { Connection } from "./Types/Connection";
 import { Error } from "./Types/Error";
 import { Item } from "./Types/Item";
@@ -86,6 +87,9 @@ const slice = createSlice({
     },
     setError: (state, action: PayloadAction<Error | undefined>) => {
       state.error = action.payload;
+    },
+    setConfirmation: (state, action: PayloadAction<Confirmation | undefined>) => {
+      state.confirmation = action.payload;
     }
   },
 });

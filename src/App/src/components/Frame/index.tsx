@@ -2,7 +2,7 @@ import React from "react";
 import { Background } from "./Background";
 import { Bar } from "./Bar";
 import { Close } from "./Close";
-import { Minimize } from "./Minimize";
+import { Resize } from "./Resize";
 import { WorkingArea } from "./WorkingArea";
 import { Title } from "./Title";
 import { close, maximize, minimize } from "../../services/mainProcess";
@@ -49,12 +49,12 @@ const Frame: React.FC = (props) => {
           </Title>
         </div>
         <ButtonWrapper>
-          <Minimize onClick={handleMinimize}>
+          <Resize onClick={handleMinimize}>
             <MinimizeIcon width={16} height={16} />
-          </Minimize>
-          <Minimize onClick={handleMaximize}>
+          </Resize>
+          <Resize onClick={handleMaximize}>
             <MaximizeIcon width={16} height={16} />
-          </Minimize>
+          </Resize>
           <Close onClick={handleClose}>
             <CloseIcon width={16} height={16} />
           </Close>

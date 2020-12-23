@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Type = styled.div`
+export const TypeInfo = styled.div`
   background-color: ${props => props.theme.text};
   color: ${props => props.theme.background};
   width: 60px;

@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "../Button";
-import Dropbox from "../Dropbox";
+import Dropdown from "../Dropdown";
 import Input from "../Input";
 
 import {find, selectDatabase} from "../../services/mainProcess";
@@ -52,7 +52,7 @@ const Search = () => {
     <Container>
       <span>Search:</span>
       <SearchInput onChange={handleChange} onKeyDown={handleKeyListener}/>
-      <Dropbox items={databases.map(db => db.name)} onChange={handleDatabaseChange} />
+      <Dropdown items={databases.map(db => db.name)} onChange={handleDatabaseChange} />
       <Button label="Apply" onClick={handleSearch}/>
     </Container>
   );

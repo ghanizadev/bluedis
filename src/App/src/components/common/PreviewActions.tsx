@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
-export const ButtonWrapper = styled.div`
+export const PreviewActions = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  margin: 15px 0;
 `;
