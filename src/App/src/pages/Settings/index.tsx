@@ -8,6 +8,7 @@ import { State } from "../../redux/Types/State";
 import { Settings as ISettings } from "../../redux/Types/Settings";
 import { actions, store } from "../../redux/store";
 import { savePreferences } from "../../services/mainProcess";
+import Button from "../../components/Button";
 
 const Container = styled.div`
   padding: 8px;
@@ -109,6 +110,13 @@ const Settings = () => {
               defaultValue={settings.appearence.fontSize}
               onBlur={handleFontSizeChange}
             />
+          </span>
+        </Row>
+        <Subtitle>Data</Subtitle>
+        <Row>
+          <span>Wipe data</span>
+          <span>
+            <Button label="Wipe now" />
           </span>
         </Row>
       </Content>

@@ -1,4 +1,5 @@
 import { Connection } from './Connection';
+import { Error } from './Error';
 import { Item } from './Item';
 import { Page } from './Page';
 import { Settings } from './Settings';
@@ -12,4 +13,5 @@ export type State = {
   settings: Settings,
   connection?: Connection,
   favorites: Connection[],
+  error?: Error
 };

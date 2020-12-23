@@ -3,6 +3,6 @@ import { BarButton } from "./BarButton";
 
 export const Minimize = styled(BarButton)`
   &:hover{
-    color: cornflowerblue;
+    color: ${props => props.theme.foreground};
   }
 `;

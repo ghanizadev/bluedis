@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import { Appearence } from "./Types/Appearence";
 import { Connection } from "./Types/Connection";
+import { Error } from "./Types/Error";
 import { Item } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
@@ -20,9 +21,10 @@ const initialState: State = {
       fontFamily: "Roboto",
       fontSize: "14pt",
     },
+    license: "teste"
   },
   connected: false,
-  favorites: []
+  favorites: [],
 };
 
 const slice = createSlice({
@@ -61,16 +63,29 @@ const slice = createSlice({
       state.settings.appearence = action.payload;
     },
     updatePreferences: (state, action) => {
-      state.settings = action.payload;
+      state.settings = {...state.settings, ...action.payload};
     },
     currentConnection: (state, action: PayloadAction<Connection>) => {
       state.connection = action.payload;
     },
     addFavorite: (state, action: PayloadAction<Connection>) => {
-      state.favorites = [...state.favorites, action.payload];
+      const newFavorites = [...state.favorites, action.payload];
+      state.favorites = newFavorites;
+    },
+    updateFavorites: (state, action) => {
+      state.favorites = action.payload;
     },
     removeFavorite: (state, action: PayloadAction<string>) => {
-      state.favorites = state.favorites.filter(favorite => favorite.id !== action.payload);
+      const newFavorites = state.favorites.filter(
+        (favorite) => favorite.id !== action.payload
+      );
+      state.favorites = newFavorites;
+    },
+    updateLicense: (state, action: PayloadAction<string>) => {
+      state.settings.license = action.payload;
+    },
+    setError: (state, action: PayloadAction<Error | undefined>) => {
+      state.error = action.payload;
     }
   },
 });

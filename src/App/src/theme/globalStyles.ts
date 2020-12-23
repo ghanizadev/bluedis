@@ -39,6 +39,10 @@ export const GlobalStyles = createGlobalStyle<{ theme: AppearenceSettings & Colo
   height: 20px;
 }
 
+a {
+  color: ${props => props.theme.foreground};
+}
+
 .switch input {
   opacity: 0;
   width: 0;

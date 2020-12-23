@@ -6,8 +6,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { State } from "../../redux/Types/State";
 import { Item } from "../../redux/Types/Item";
 import ItemDelete from "./ItemDelete";
-import { deleteKey, disconnect } from "../../services/mainProcess";
-import { actions } from "../../redux/store";
+import {
+  deleteKey,
+  disconnect,
+  saveFavorites,
+} from "../../services/mainProcess";
+import { actions, store } from "../../redux/store";
 import PickName from "./PickName";
 
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
@@ -44,7 +48,7 @@ const Toolbar: React.FC<Props> = (props) => {
     (state) => state.connection
   );
 
-  const[newName, setNewName] = React.useState(false);
+  const [newName, setNewName] = React.useState(false);
   const [toDelete, setToDelete] = React.useState(false);
   const dispatch = useDispatch();
 
@@ -98,12 +102,15 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleNewFavoriteName = (name: string) => {
-    if(currentConnection) {
-      dispatch(actions.addFavorite({...currentConnection, name}))
-      dispatch(actions.currentConnection({...currentConnection, name}))
+    if (currentConnection) {
+      dispatch(actions.addFavorite({ ...currentConnection, name }));
+      dispatch(actions.currentConnection({ ...currentConnection, name }));
+
+      const updated = store.getState();
+      saveFavorites(updated.favorites);
     }
     setNewName(false);
-  }
+  };
 
   const handleNewNameCancel = () => {
     setNewName(false);
@@ -149,7 +156,12 @@ const Toolbar: React.FC<Props> = (props) => {
           </SquareButton>
         )}
       </Container>
-      {newName && <PickName onConfirm={handleNewFavoriteName} onCancel={handleNewNameCancel} />}
+      {newName && (
+        <PickName
+          onConfirm={handleNewFavoriteName}
+          onCancel={handleNewNameCancel}
+        />
+      )}
       {toDelete && (
         <ItemDelete
           onCancel={handleDeleteCancel}

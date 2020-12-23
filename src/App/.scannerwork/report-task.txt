@@ -1,0 +1,6 @@
+projectKey=bluedis
+serverUrl=http://localhost:9000
+serverVersion=7.9.5.38598
+dashboardUrl=http://localhost:9000/dashboard?id=bluedis
+ceTaskId=AXaP_cfyp7drpQk1baUO
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AXaP_cfyp7drpQk1baUO

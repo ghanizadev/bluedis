@@ -1,14 +1,16 @@
 import React from "react";
 import styled from "styled-components";
-import Checkbox from "../../../components/Checkbox";
+// import Checkbox from "../../../components/Checkbox";
 import { nanoid } from "nanoid";
 
-import { connect } from "../../../services/mainProcess";
+import { connect, saveFavorites } from "../../../services/mainProcess";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "../../../redux/store";
+import { actions, store } from "../../../redux/store";
 import { State } from "../../../redux/Types/State";
 import { Connection } from "../../../redux/Types/Connection";
 import Favorite from "./Favorite";
+import ErrorMessage from "./ErrorMessage";
+import { Error } from "../../../redux/Types/Error";
 
 const Container = styled.div`
   flex: 1;
@@ -74,10 +76,13 @@ const Connect = () => {
   const favorites = useSelector<State, Connection[]>(
     (state) => state.favorites
   );
+  const error = useSelector<State, Error | undefined>(state => state.error)
   const dispatch = useDispatch();
 
   const handleRemoveFromHistory = (connection: Connection) => {
     dispatch(actions.removeFavorite(connection.id));
+    const updated = store.getState();
+    saveFavorites(updated.favorites);
   };
 
   const handleConnectFromHistory = (connection: Connection) => {
@@ -99,11 +104,12 @@ const Connect = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, password: e.target.value });
   };
-  const handleTLSChange = (value: boolean) => {
-    setConnection({ ...connection, tls: !value });
-  };
+  // const handleTLSChange = (value: boolean) => {
+  //   setConnection({ ...connection, tls: !value });
+  // };
 
   return (
+  <>
     <Container>
       <Content>
         <Form>
@@ -123,38 +129,40 @@ const Connect = () => {
             <br />
             <input type="password" onChange={handlePasswordChange} />
           </label>
-          <Checkbox
+          {/* <Checkbox
             checked={connection.tls}
             label="use TLS"
             onChangeValue={handleTLSChange}
-          />
+          /> */}
           <LoginButton onClick={handleConnect}>Connect</LoginButton>
         </Form>
         <Recent>
           <p>History</p>
           <ListWrapper>
-          <ConnectionsList>
-            {favorites.map((connection) => {
-              return (
-                <Favorite
-                  key={connection.id}
-                  connection={connection}
-                  onRemove={handleRemoveFromHistory}
-                  onConnect={handleConnectFromHistory}
-                />
-              );
-            })}
-            {favorites.length === 0 && (
-              <>
-                <br />
-                <p style={{ color: "gray" }}>No favorites so far...</p>
-              </>
-            )}
-          </ConnectionsList>
+            <ConnectionsList>
+              {favorites.map((connection) => {
+                return (
+                  <Favorite
+                    key={connection.id}
+                    connection={connection}
+                    onRemove={handleRemoveFromHistory}
+                    onConnect={handleConnectFromHistory}
+                  />
+                );
+              })}
+              {favorites.length === 0 && (
+                <>
+                  <br />
+                  <p style={{ color: "gray" }}>No favorites so far...</p>
+                </>
+              )}
+            </ConnectionsList>
           </ListWrapper>
         </Recent>
       </Content>
     </Container>
+    {error && <ErrorMessage message={error} />}
+    </>
   );
 };
 

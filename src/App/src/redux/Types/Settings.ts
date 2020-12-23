@@ -1,7 +1,8 @@
 import { Appearence } from "./Appearence";
 
 export interface Settings {
-  appearence: Appearence
+  appearence: Appearence;
+  license: string;
 }
 
 export {};
