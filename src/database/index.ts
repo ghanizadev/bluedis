@@ -306,8 +306,6 @@ class DatabaseManager {
         "0",
         "MATCH",
         match,
-        "COUNT",
-        "50",
         async (err, reply) => {
           if (err) rej(err);
 
@@ -321,7 +319,7 @@ class DatabaseManager {
 
   public async findAll(): Promise<any> {
     return await new Promise((res, rej) => {
-      this._instance.scan("0", "COUNT", "50", async (err, reply) => {
+      this._instance.scan("0", async (err, reply) => {
         if (err) rej(err);
 
         const [cursor, items] = reply;

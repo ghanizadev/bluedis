@@ -8,17 +8,15 @@ import { ReactComponent as LeftIcon } from "../../assets/left.svg";
 const Pagination: React.FC = () => {
   return (
     <>
-      {false &&
-        <Container>
-          <SquareButton>
-            <LeftIcon />
-          </SquareButton>
-          <div>1</div>
-          <SquareButton>
-            <RightIcon />
-          </SquareButton>
-        </Container>
-      }
+      <Container>
+        <SquareButton>
+          <LeftIcon />
+        </SquareButton>
+        <div>1</div>
+        <SquareButton>
+          <RightIcon />
+        </SquareButton>
+      </Container>
     </>
   );
 };

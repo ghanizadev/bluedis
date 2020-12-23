@@ -26,11 +26,11 @@ const createWindow = (): void => {
   });
 
   globalShortcut.register("F5", () => {
-    mainWindow.reload();
+    process.env.NODE_ENV === "development" && mainWindow.reload();
   });
 
   globalShortcut.register("F6", () => {
-    mainWindow.webContents.toggleDevTools();
+    process.env.NODE_ENV === "development" && mainWindow.webContents.toggleDevTools();
   });
 
   if (process.env.NODE_ENV === "development") {

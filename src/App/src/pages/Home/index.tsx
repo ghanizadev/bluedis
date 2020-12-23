@@ -86,7 +86,7 @@ const Home = () => {
             >
               <Wrapper>
                 <Table data={data} onItemEdit={handlePreview} />
-                <Pagination />
+                {/* <Pagination /> */}
               </Wrapper>
               <Preview onCloseRequest={handlePreviewClose} />
             </div>

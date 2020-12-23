@@ -34,8 +34,8 @@
     },
     "extends": null,
     "nsis": {
-      "installerIcon": "assets/icon.png",
-      "uninstallerIcon": "assets/icon.png"
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico"
     }
   },
   "license": "MIT",
