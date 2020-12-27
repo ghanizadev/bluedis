@@ -101,10 +101,11 @@ const ListComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <PreviewActions>
-        <PreviewActionButton title="Add new member" onClick={handleAddOpen}>
+        <PreviewActionButton data-testid="item-add" title="Add new member" onClick={handleAddOpen}>
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
+         data-testid="item-copy"
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >
@@ -112,8 +113,9 @@ const ListComponent: React.FC<Props> = (props) => {
         </PreviewActionButton>
         <PreviewActionButton
           title="Remove document"
+          data-testid="item-remove"
           remove
-          action={deleting}
+          inAction={deleting}
           onMouseUp={handleDeleteCancel}
           onMouseDown={handleDocumentDelete}
           onMouseLeave={handleDeleteCancel}

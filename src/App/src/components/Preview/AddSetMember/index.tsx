@@ -47,13 +47,20 @@ const AddSetMember: React.FC<Props> = (props) => {
       <MessageBackground />
       <MessageContent>
         <h3>{value.isNew ? "Add" : "Edit"} Item</h3>
-        <TextArea ref={textAreaRef}>{value.value}</TextArea>
+        <TextArea ref={textAreaRef} defaultValue={value.value} />
         {!value.isNew && (
           <PreviewActions>
-            <PreviewActionButton onClick={handleItemCopy}>
+            <PreviewActionButton
+              data-testid="message-copy"
+              onClick={handleItemCopy}
+            >
               <CopyIcon title="Copy as JSON" />
             </PreviewActionButton>
-            <PreviewActionButton remove onClick={handleItemRemove}>
+            <PreviewActionButton
+              data-testid="message-remove"
+              remove
+              onClick={handleItemRemove}
+            >
               <RemoveIcon title="Remove property" />
             </PreviewActionButton>
           </PreviewActions>

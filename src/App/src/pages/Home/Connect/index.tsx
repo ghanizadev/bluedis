@@ -104,7 +104,7 @@ const Connect = () => {
   <>
     <Container>
       <Content>
-        <Form>
+        <Form data-testid="connect-form">
           <h1>Connect</h1>
           <label>
             Host:
@@ -125,6 +125,7 @@ const Connect = () => {
         </Form>
         <Recent>
           <p>History</p>
+          <br />
           <ListWrapper>
             <ConnectionsList>
               {favorites.map((connection) => {
@@ -139,7 +140,6 @@ const Connect = () => {
               })}
               {favorites.length === 0 && (
                 <>
-                  <br />
                   <p style={{ color: "gray" }}>No favorites so far...</p>
                 </>
               )}

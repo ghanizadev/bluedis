@@ -18,7 +18,7 @@ const Container = styled.textarea`
 `;
 
 let timeout: number;
-let saveTimeout : number;
+let saveTimeout: number;
 
 type Props = {
   item: Item;
@@ -35,8 +35,8 @@ const StringComponent: React.FC<Props> = (props) => {
     setSaved(true);
 
     saveTimeout = setTimeout(() => {
-      setSaved(false)
-    }, 3000)
+      setSaved(false);
+    }, 3000);
   };
 
   const handleDocumentCopy = () => {
@@ -63,26 +63,33 @@ const StringComponent: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Container onChange={handleValueChange}>{value}</Container>
+      <Container onChange={handleValueChange} defaultValue={value} />
       <div
         style={{
           display: "flex",
           flexDirection: "row",
         }}
       >
-        {saved && <span
-          style={{
-            alignSelf: "flex-start",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Document saved!
-        </span>}
+        {saved && (
+          <span
+            style={{
+              alignSelf: "flex-start",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Document saved!
+          </span>
+        )}
         <PreviewActions>
-          <PreviewActionButton title="Save document" onClick={handleDocumentSave}>
+          <PreviewActionButton
+            title="Save document"
+            onClick={handleDocumentSave}
+            data-testid="item-save"
+          >
             <SaveIcon />
           </PreviewActionButton>
           <PreviewActionButton
+            data-testid="item-copy"
             title="Copy document as JSON"
             onClick={handleDocumentCopy}
           >
@@ -90,9 +97,10 @@ const StringComponent: React.FC<Props> = (props) => {
           </PreviewActionButton>
 
           <PreviewActionButton
+            data-testid="item-remove"
             title="Remove document"
             remove
-            action={deleting}
+            inAction={deleting}
             onMouseDown={handleDocumentDelete}
             onMouseLeave={handleCancelDelete}
             onMouseUp={handleCancelDelete}

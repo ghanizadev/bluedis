@@ -15,7 +15,7 @@ const Toggle: React.FC<Props> = (props) => {
   const { onChange, defaultChecked, checked } = props;
 
   return (
-    <Container>
+    <Container data-testid="toggle">
       <label className="switch">
         <input
           type="checkbox"

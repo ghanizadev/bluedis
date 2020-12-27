@@ -8,8 +8,8 @@ import { TextArea } from "../../TextArea";
 import { PreviewActions } from "../../common/PreviewActions";
 import { PreviewActionButton } from "../../common/PreviewActionButton";
 
-import {ReactComponent as RemoveIcon} from "../../../assets/trash.svg";
-import {ReactComponent as CopyIcon} from "../../../assets/clipboard.svg";
+import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
+import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
 
 const Input = styled.input`
   width: 100%;
@@ -23,13 +23,13 @@ const Label = styled.label`
 type Props = {
   onSubmit: (oldValue: string, newValue: string, score: string) => void;
   onClose: () => void;
-  item: { score: string; value: string, isNew: boolean };
+  item: { score: string; value: string; isNew: boolean };
   onDelete: (item: { score: string; value: string }) => void;
 };
 
 const AddOrderedItem: React.FC<Props> = (props) => {
   const { onSubmit, onDelete, onClose, item } = props;
-  const {score, value, isNew} = item;
+  const { score, value, isNew } = item;
 
   const valueRef = React.useRef<HTMLTextAreaElement>(null);
   const scoreRef = React.useRef<HTMLInputElement>(null);
@@ -40,36 +40,52 @@ const AddOrderedItem: React.FC<Props> = (props) => {
 
   const handleSave = () => {
     if (valueRef.current?.value && scoreRef.current?.value)
-      onSubmit(isNew ? "" : value, valueRef.current.value, scoreRef.current.value);
-  }; 
+      onSubmit(
+        isNew ? "" : value,
+        valueRef.current.value,
+        scoreRef.current.value
+      );
+  };
 
-  const handleItemCopy =() => {
-    const text = JSON.stringify({[score]: value});
+  const handleItemCopy = () => {
+    if (!scoreRef.current || !valueRef.current) return;
+
+    const currentScore = scoreRef.current.value;
+    const currentValue = valueRef.current.value;
+
+    const text = JSON.stringify({ [currentScore]: currentValue });
     navigator.clipboard.writeText(text);
-  }
+  };
 
   const handleItemRemove = () => {
     onDelete(item);
-  }
+  };
 
   return (
     <>
-    <MessageBackground />
+      <MessageBackground />
       <MessageContent>
         <h3>{isNew ? "Add" : "Edit"} Item</h3>
         <Label>
           Score: <br />
-          <Input ref={scoreRef} defaultValue={item?.score} />
+          <Input ref={scoreRef} defaultValue={score} />
         </Label>
         <Label style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           Value: <br />
-          <TextArea ref={valueRef}>{item?.value}</TextArea>
+          <TextArea ref={valueRef} defaultValue={value} />
         </Label>
         <PreviewActions>
-          <PreviewActionButton onClick={handleItemCopy}>
+          <PreviewActionButton
+            data-testid="message-copy"
+            onClick={handleItemCopy}
+          >
             <CopyIcon title="Copy as JSON" />
           </PreviewActionButton>
-          <PreviewActionButton remove onClick={handleItemRemove}>
+          <PreviewActionButton
+            data-testid="message-remove"
+            remove
+            onClick={handleItemRemove}
+          >
             <RemoveIcon title="Remove property" />
           </PreviewActionButton>
         </PreviewActions>

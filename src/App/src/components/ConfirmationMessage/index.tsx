@@ -16,7 +16,9 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ErrorMessage = () => {
-  const confirm = useSelector<State, Confirmation | undefined>((state) => state.confirmation);
+  const confirm = useSelector<State, Confirmation | undefined>(
+    (state) => state.confirmation
+  );
   const dispatch = useDispatch();
 
   const handleConfirm = () => {
@@ -25,23 +27,28 @@ const ErrorMessage = () => {
   };
 
   const handleCancel = () => {
-    if(confirm && confirm.onConfirm) confirm.onCancel!();
+    if (confirm?.onCancel) confirm?.onCancel();
     dispatch(actions.setConfirmation(undefined));
   };
-
 
   return (
     <>
       {confirm && (
         <>
           <MessageBackground />
-          <MessageContent>
+          <MessageContent data-testid="confirmation-message">
             <h3>{confirm.title}</h3>
             <br />
             <p>{confirm.message}</p>
             <ButtonsWrapper>
-              <Button onClick={handleCancel} label="Cancel" />
-              <Button onClick={handleConfirm} label="Confirm" />
+              <Button
+                onClick={handleCancel}
+                label="Cancel"
+              />
+              <Button
+                onClick={handleConfirm}
+                label="Confirm"
+              />
             </ButtonsWrapper>
           </MessageContent>
         </>

@@ -1,10 +1,6 @@
 import styled from "styled-components";
 
-type InputProps = {
-  checked: boolean;
-};
-
-export const Input = styled.button<InputProps> `
+export const Input = styled.button<{checked: boolean}> `
   height: 16px;
   width: 16px;
   border: 1px solid lightgray;

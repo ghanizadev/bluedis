@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../../components/Dropdown";
 import Input from "../../components/Input";
@@ -16,6 +16,8 @@ import { Subtitle } from "./Subtitle";
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
   const dispatch = useDispatch();
+
+  const fontSizeRef = useRef<HTMLInputElement>(null);
 
   const saveChanges = () => {
     const settings = store.getState().settings;
@@ -43,8 +45,10 @@ const Settings = () => {
     saveChanges();
   };
 
-  const handleFontSizeChange = (e: React.FocusEvent<HTMLInputElement>) => {
-    const value = e.target.value.match(/\d+/)?.join("");
+  const changeFont = () => {
+    if(!fontSizeRef.current) return;
+
+    const value = fontSizeRef.current.value.match(/\d+/)?.join("");
 
     dispatch(
       actions.changeAppearence({
@@ -53,6 +57,14 @@ const Settings = () => {
       })
     );
     saveChanges();
+  }
+
+  const handleFontSizeChange = () => {
+    changeFont();
+  };
+
+  const handleFontSizeChangeOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === "Enter") changeFont();
   };
 
   const handleWipeData = () => {
@@ -89,9 +101,12 @@ const Settings = () => {
           <span>Font size</span>
           <span>
             <Input
+              ref={fontSizeRef}
+              type="text"
               style={{ width: "100px", textAlign: "right" }}
               defaultValue={settings.appearence.fontSize}
               onBlur={handleFontSizeChange}
+              onKeyDown={handleFontSizeChangeOnEnter}
             />
           </span>
         </Row>

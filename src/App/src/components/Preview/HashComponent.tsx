@@ -96,10 +96,15 @@ const HashComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <PreviewActions>
-        <PreviewActionButton title="Add Item" onClick={handleAddOpen}>
+        <PreviewActionButton
+          data-testid="item-add"
+          title="Add Item"
+          onClick={handleAddOpen}
+        >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
+          data-testid="item-copy"
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >
@@ -107,9 +112,10 @@ const HashComponent: React.FC<Props> = (props) => {
         </PreviewActionButton>
 
         <PreviewActionButton
+          data-testid="item-remove"
           title="Remove document"
           remove
-          action={deleting}
+          inAction={deleting}
           onMouseUp={handleDeleteCancel}
           onMouseDown={handleDocumentDelete}
           onMouseLeave={handleDeleteCancel}

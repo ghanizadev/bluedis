@@ -11,7 +11,7 @@ const Container = styled.li`
   justify-content: space-between;
   width: 200px;
   height: 40px;
-  margin: 8px 0;
+  margin-bottom: 8px;
   padding: 3px;
   cursor: pointer;
 

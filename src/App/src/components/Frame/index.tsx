@@ -34,7 +34,7 @@ const Frame: React.FC = (props) => {
   };
 
   return (
-    <Background>
+    <Background data-testid="frame">
       <Bar>
         <div style={{display: "flex"}}>
           <img
@@ -49,13 +49,13 @@ const Frame: React.FC = (props) => {
           </Title>
         </div>
         <ButtonWrapper>
-          <Resize onClick={handleMinimize}>
+          <Resize  data-testid="frame-minimize" onClick={handleMinimize}>
             <MinimizeIcon width={16} height={16} />
           </Resize>
-          <Resize onClick={handleMaximize}>
+          <Resize data-testid="frame-maximize" onClick={handleMaximize}>
             <MaximizeIcon width={16} height={16} />
           </Resize>
-          <Close onClick={handleClose}>
+          <Close data-testid="frame-close" onClick={handleClose}>
             <CloseIcon width={16} height={16} />
           </Close>
         </ButtonWrapper>

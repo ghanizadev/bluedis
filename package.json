@@ -1,7 +1,7 @@
 {
   "name": "bluedis",
   "productName": "Bluedis",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "My Electron application description",
   "main": "./dist/index.js",
   "scripts": {
@@ -27,8 +27,12 @@
       "category": "public.app-category.developer-tools"
     },
     "files": [
-      "dist/**/*",
-      "assets/**/*"
+      "assets/**/*",
+      "dist/**/*.js",
+      "dist/**/*.js.map",
+      "dist/database/**/*",
+      "dist/build/**/*",
+      "dist/listeners/**/*"
     ],
     "directories": {
       "buildResources": "assets"

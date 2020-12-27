@@ -98,5 +98,5 @@ export const actions = slice.actions;
 
 export const store = configureStore({
   reducer: slice.reducer,
-  middleware: [...getDefaultMiddleware({ immutableCheck: false })],
+  middleware: [...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false })],
 });

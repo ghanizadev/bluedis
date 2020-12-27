@@ -3,7 +3,13 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import Frame from "./components/Frame";
 import Home from "./pages/Home";
-import { DarkTheme, defaultSettings, ColorSchema, AppearenceSettings, LightTheme } from "./theme";
+import {
+  DarkTheme,
+  defaultSettings,
+  ColorSchema,
+  AppearenceSettings,
+  LightTheme,
+} from "./theme";
 import { State } from "./redux/Types/State";
 import { Page } from "./redux/Types/Page";
 import Help from "./pages/Help";
@@ -16,47 +22,39 @@ import ErrorMessage from "./components/ErrorMessage";
 import ConfirmationMessage from "./components/ConfirmationMessage";
 
 export const SettingsContext = React.createContext({
-  setTheme: (theme: ColorSchema) => {
-    return;
-  },
-  theme: {...DarkTheme, fontFamily: "", fontSize: "14pt"}
+  theme: { ...DarkTheme, fontFamily: "", fontSize: "14pt" },
 });
 
 const App = () => {
-  const [theme, setTheme] = React.useState<ColorSchema & AppearenceSettings>({...DarkTheme, ...defaultSettings});
+  const [theme, setTheme] = React.useState<ColorSchema & AppearenceSettings>({
+    ...LightTheme,
+    ...defaultSettings,
+  });
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
-
-
-  const changeTheme = React.useCallback(
-    (newTheme: ColorSchema) => {
-      setTheme({...theme, ...newTheme});
-    },
-    [setTheme, theme]
-  );
 
   const registerStore = React.useCallback(() => {
     store.subscribe(() => {
-      const {settings: {appearence}} = store.getState();
+      const {
+        settings: { appearence },
+      } = store.getState();
 
-      const t : ColorSchema & AppearenceSettings = {
+      const t: ColorSchema & AppearenceSettings = {
         ...(appearence.darkTheme ? DarkTheme : LightTheme),
         fontFamily: appearence.fontFamily,
         fontSize: appearence.fontSize,
       };
 
       setTheme(t);
-    })
-  }, [])
+    });
+  }, []);
 
   React.useEffect(() => {
-    registerStore()
+    registerStore();
     getPreferences();
   }, [registerStore]);
 
   return (
-    <SettingsContext.Provider
-      value={{ theme, setTheme: changeTheme }}
-    >
+    <SettingsContext.Provider value={{ theme }}>
       <ThemeProvider theme={theme}>
         <Frame>
           <div

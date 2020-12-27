@@ -1,0 +1,3 @@
+module.esports = {
+    verbose: true,
+}

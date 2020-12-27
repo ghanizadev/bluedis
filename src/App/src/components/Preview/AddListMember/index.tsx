@@ -31,8 +31,9 @@ const AddListMember: React.FC<Props> = (props) => {
       onSubmit(textAreaRef.current.value, value?.index ?? -1);
   };
   const handleItemCopy = () => {
-    if(value){
-      const text = JSON.stringify({[value.index]: value.value})
+    if(value && textAreaRef.current){
+      const currentValue = textAreaRef.current.value;
+      const text = JSON.stringify({[value.index]: currentValue})
       navigator.clipboard.writeText(text);
     }
   }
@@ -46,12 +47,12 @@ const AddListMember: React.FC<Props> = (props) => {
       <MessageBackground />
       <MessageContent>
         <h3>Add/Edit Item</h3>
-        <TextArea ref={textAreaRef}>{value?.value}</TextArea>
+        <TextArea ref={textAreaRef} defaultValue={value?.value}/>
         <PreviewActions>
-          <PreviewActionButton onClick={handleItemCopy}>
+          <PreviewActionButton data-testid="message-copy" onClick={handleItemCopy}>
             <CopyIcon title="Copy as JSON" />
           </PreviewActionButton>
-          <PreviewActionButton remove onClick={handleItemRemove}>
+          <PreviewActionButton data-testid="message-remove" remove onClick={handleItemRemove}>
             <RemoveIcon title="Remove property" />
           </PreviewActionButton>
         </PreviewActions>

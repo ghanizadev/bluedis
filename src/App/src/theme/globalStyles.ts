@@ -2,15 +2,16 @@ import { createGlobalStyle } from "styled-components";
 import { AppearenceSettings, ColorSchema } from ".";
 
 export const GlobalStyles = createGlobalStyle<{ theme: AppearenceSettings & ColorSchema }>`
-  html {
+  html, body, #root {
     font-size: ${(props) => props.theme.fontSize};
+    font-family: ${(props) => props.theme.fontFamily};
   } 
 
   * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    font-family: ${(props) => props.theme.fontFamily};
+    font-family: inherit;
   }
 
   *:focus {

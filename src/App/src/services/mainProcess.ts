@@ -89,7 +89,6 @@ export const savePreferences = (preferences: any) => {
 };
 
 export const saveFavorites = (favorites: any) => {
-  alert(JSON.stringify({ favorites }));
   ipcRenderer.send("saveFavorites", favorites);
 };
 

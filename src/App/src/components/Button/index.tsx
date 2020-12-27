@@ -10,7 +10,7 @@ type Props = {
 const Button: React.FC<Props> = (props) => {
   const {label, onClick} = props;
   return(
-    <Container onClick={onClick}>
+    <Container data-testid="square-button" onClick={onClick}>
       <Text>
         {label}
       </Text>

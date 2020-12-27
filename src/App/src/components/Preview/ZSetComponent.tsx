@@ -17,7 +17,6 @@ import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 
-
 let timeout: number;
 
 type Props = {
@@ -86,14 +85,21 @@ const ZSetComponent: React.FC<Props> = (props) => {
         <PreviewTable>
           <tbody>
             <tr>
-              <th align="center" style={{width: "80px"}}>Score</th>
+              <th align="center" style={{ width: "80px" }}>
+                Score
+              </th>
               <th>Value</th>
             </tr>
             {(value as { score: string; value: string }[]).map(
               (item, index) => {
                 return (
-                  <PreviewTableRow key={index} onClick={() => handleItemEdit(item)}>
-                    <td style={{width: "80px"}} align="center">{item.score}</td>
+                  <PreviewTableRow
+                    key={index}
+                    onClick={() => handleItemEdit(item)}
+                  >
+                    <td style={{ width: "80px" }} align="center">
+                      {item.score}
+                    </td>
                     <PreviewTableData>{item.value}</PreviewTableData>
                   </PreviewTableRow>
                 );
@@ -103,19 +109,25 @@ const ZSetComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <PreviewActions>
-        <PreviewActionButton title="Add new member" onClick={handleAddOpen}>
+        <PreviewActionButton
+          data-testid="item-add"
+          title="Add new member"
+          onClick={handleAddOpen}
+        >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
+          data-testid="item-copy"
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
         </PreviewActionButton>
         <PreviewActionButton
+          data-testid="item-remove"
           title="Remove document"
           remove
-          action={deleting}
+          inAction={deleting}
           onMouseUp={handleDeleteCancel}
           onMouseDown={handleDocumentDelete}
           onMouseLeave={handleDeleteCancel}

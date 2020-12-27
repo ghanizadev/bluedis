@@ -66,16 +66,21 @@ const AddHashItem: React.FC<Props> = (props) => {
         </Label>
         <Label>
           Value: <br />
-          <TextArea ref={textAreaRef}>
-            {item?.value || "New item here..."}
-          </TextArea>
+          <TextArea ref={textAreaRef} defaultValue={item?.value || "New item here..."} />
         </Label>
         {!newItem && (
           <PreviewActions>
-            <PreviewActionButton onClick={handleItemCopy}>
+            <PreviewActionButton
+              data-testid="message-copy"
+              onClick={handleItemCopy}
+            >
               <CopyIcon title="Copy as JSON" />
             </PreviewActionButton>
-            <PreviewActionButton remove onClick={handleItemRemove}>
+            <PreviewActionButton
+              data-testid="message-remove"
+              remove
+              onClick={handleItemRemove}
+            >
               <RemoveIcon title="Remove property" />
             </PreviewActionButton>
           </PreviewActions>

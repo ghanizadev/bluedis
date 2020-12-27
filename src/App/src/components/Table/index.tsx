@@ -17,7 +17,7 @@ const TableContainer = styled.table`
   margin: 0 8px;
   flex: 1;
   border-spacing: 0;
-  
+
   & th {
     position: sticky;
     top: 0;
@@ -48,10 +48,10 @@ const Table: React.FC<Props> = (props) => {
   };
 
   return (
-    <Container>
+    <Container data-testid="home-table">
       <TableContainer>
         <tbody>
-          <Row>
+          <Row data-testid="home-table-header">
             <Header style={{ width: "40px" }}>
               <Checkbox
                 checked={data.every((item) => selected.includes(item.key))}
@@ -63,7 +63,7 @@ const Table: React.FC<Props> = (props) => {
           </Row>
           {data.map((item, index) => {
             return (
-              <Row key={index}>
+              <Row key={index} data-testid="item-table-row">
                 <Data
                   style={{
                     minWidth: "50px",

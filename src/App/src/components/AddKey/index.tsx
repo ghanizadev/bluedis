@@ -53,7 +53,7 @@ const AddKey: React.FC<Props> = (props) => {
   return (
     <>
       <MessageBackground />
-      <MessageContent>
+      <MessageContent data-testid="data-add-message" >
         <h3>Add new key</h3>
         <Row>
           <Key onChange={handleKeyChange} />
@@ -65,6 +65,7 @@ const AddKey: React.FC<Props> = (props) => {
         <Row style={{ justifyContent: "flex-end" }}>
           <Button label="Cancel" onClick={handleCancel} />
           <Button label="Confirm" onClick={handleConfirm} />
+          <button data-testid="teste1" onClick={handleConfirm} >Teste1</button>
         </Row>
       </MessageContent>
     </>

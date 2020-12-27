@@ -4,7 +4,6 @@ import { Separator } from "./Separator";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "../../redux/Types/State";
 import { Item } from "../../redux/Types/Item";
-import ItemDelete from "./ItemDelete";
 import {
   deleteKey,
   disconnect,
@@ -40,7 +39,6 @@ const Toolbar: React.FC<Props> = (props) => {
   );
 
   const [newName, setNewName] = React.useState(false);
-  const [toDelete, setToDelete] = React.useState(false);
   const dispatch = useDispatch();
 
   const handleRefresh = () => {
@@ -71,17 +69,14 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleDeleteSelected = () => {
-    setToDelete(true);
-  };
-
-  const handleDeleteConfirm = () => {
-    deleteKey(selected);
-    dispatch(actions.clearSelection());
-    setToDelete(false);
-  };
-
-  const handleDeleteCancel = () => {
-    setToDelete(false);
+    dispatch(actions.setConfirmation({
+      message: `Do you really want to delete ${selected.length > 0 ? "THIS KEY" : "THESE " + selected.length + " KEYS"}?`,
+      title: "Attention",
+      onConfirm: () => {
+        deleteKey(selected);
+        dispatch(actions.clearSelection());
+      }
+    }))
   };
 
   const handleDisconnect = () => {
@@ -108,58 +103,65 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   return (
-    <>
-      <Container>
-        <SquareButton title="Add a new key" onClick={handleAdd}>
-          <AddIcon />
-        </SquareButton>
-        <SquareButton title="Refresh list" onClick={handleRefresh}>
-          <RefreshIcon />
-        </SquareButton>
-        <Separator />
+    <Container data-testid="toolbar">
+      <SquareButton
+        data-testid="data-add"
+        title="Add a new key"
+        onClick={handleAdd}
+      >
+        <AddIcon />
+      </SquareButton>
+      <SquareButton
+        data-testid="data-refresh"
+        title="Refresh list"
+        onClick={handleRefresh}
+      >
+        <RefreshIcon />
+      </SquareButton>
+      <Separator />
+      <SquareButton
+        data-testid="data-remove"
+        disabled={selected.length === 0}
+        remove
+        title="Remove selected"
+        onClick={handleDeleteSelected}
+      >
+        <RemoveIcon />
+      </SquareButton>
+      <SquareButton
+        data-testid="data-export"
+        disabled={selected.length === 0}
+        title="Export selected"
+        onClick={handleDownloadSelected}
+      >
+        <DownloadIcon />
+      </SquareButton>
+      <Separator />
+      <SquareButton
+        data-testid="data-disconnect"
+        title="Close this connection"
+        onClick={handleDisconnect}
+      >
+        <DisconnectIcon />
+      </SquareButton>
+      {!favorites.find(
+        (connection) => connection.id === currentConnection?.id
+      ) && (
         <SquareButton
-          disabled={selected.length === 0}
-          remove
-          title="Remove selected"
-          onClick={handleDeleteSelected}
+          data-testid="data-favorite"
+          title="Favorite this connection"
+          onClick={handleFavorite}
         >
-          <RemoveIcon />
+          <FavoriteIcon />
         </SquareButton>
-        <SquareButton
-          disabled={selected.length === 0}
-          title="Export selected"
-          onClick={handleDownloadSelected}
-        >
-          <DownloadIcon />
-        </SquareButton>
-        <Separator />
-        <SquareButton title="Close this connection" onClick={handleDisconnect}>
-          <DisconnectIcon />
-        </SquareButton>
-        {!favorites.find(
-          (connection) => connection.id === currentConnection?.id
-        ) && (
-          <SquareButton
-            title="Favorite this connection"
-            onClick={handleFavorite}
-          >
-            <FavoriteIcon />
-          </SquareButton>
-        )}
-      </Container>
+      )}
       {newName && (
         <PickName
           onConfirm={handleNewFavoriteName}
           onCancel={handleNewNameCancel}
         />
       )}
-      {toDelete && (
-        <ItemDelete
-          onCancel={handleDeleteCancel}
-          onConfirm={handleDeleteConfirm}
-        />
-      )}
-    </>
+    </Container>
   );
 };
 

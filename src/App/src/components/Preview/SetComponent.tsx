@@ -83,7 +83,10 @@ const SetComponent: React.FC<Props> = (props) => {
             </tr>
             {(value as string[]).map((item, index) => {
               return (
-                <PreviewTableRow onClick={() => handleMemberEdit(item)} key={index}>
+                <PreviewTableRow
+                  onClick={() => handleMemberEdit(item)}
+                  key={index}
+                >
                   <PreviewTableData>{item}</PreviewTableData>
                 </PreviewTableRow>
               );
@@ -92,10 +95,15 @@ const SetComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <PreviewActions>
-        <PreviewActionButton title="Add Item" onClick={handleAddOpen}>
+        <PreviewActionButton
+          data-testid="item-add"
+          title="Add Item"
+          onClick={handleAddOpen}
+        >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
+          data-testid="item-copy"
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >
@@ -104,8 +112,9 @@ const SetComponent: React.FC<Props> = (props) => {
 
         <PreviewActionButton
           title="Remove document"
+          data-testid="item-remove"
           remove
-          action={deleting}
+          inAction={deleting}
           onMouseUp={handleDeleteCancel}
           onMouseDown={handleDocumentDelete}
           onMouseLeave={handleDeleteCancel}

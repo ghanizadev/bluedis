@@ -41,12 +41,12 @@ const Preview: React.FC<Props> = (props) => {
   };
 
   return (
-    <Container open={!!preview}>
+    <Container open={!!preview} data-testid="preview">
       {!!preview && (
         <>
           <Header>
             <h1>{preview.key}</h1>
-            <Close onClick={handleCloseRequest}>
+            <Close data-testid="preview-close" onClick={handleCloseRequest}>
               <CloseIcon width={18} height={18} />
             </Close>
           </Header>
