@@ -8,7 +8,7 @@ import { Item } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-import { updateData, addKey } from "../../services/mainProcess";
+import { updateData, addKey, findByKey } from "../../services/mainProcess";
 import AddKey from "../../components/AddKey";
 // import Pagination from "../../components/Pagination";
 import Connect from "./Connect";
@@ -42,7 +42,7 @@ const Home = () => {
       return;
     }
 
-    dispatch(actions.setPreview(item));
+    findByKey(item.key);
   };
 
   const handlePreviewClose = () => {
@@ -63,10 +63,11 @@ const Home = () => {
 
   const handleAddConfirm = (
     type: "set" | "zset" | "hash" | "string" | "list",
-    key: string
+    key: string,
+    ttl: number | string
   ) => {
     setAddItem(false);
-    addKey(key, type);
+    addKey(key, type, ttl);
   };
 
   return (

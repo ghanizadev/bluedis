@@ -24,7 +24,7 @@ type Props = {
   item: Item;
 };
 const StringComponent: React.FC<Props> = (props) => {
-  const { key, value } = props.item;
+  const { key, value, ttl } = props.item;
   const [itemValue, setItemValue] = React.useState("");
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
@@ -80,6 +80,9 @@ const StringComponent: React.FC<Props> = (props) => {
             Document saved!
           </span>
         )}
+        <div>
+          <span>TTL: {ttl}</span>
+        </div>
         <PreviewActions>
           <PreviewActionButton
             title="Save document"

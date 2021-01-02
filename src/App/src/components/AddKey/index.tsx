@@ -5,15 +5,21 @@ import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import Dropdown from "../Dropdown";
 import Input from "../Input";
+import Toggle from "../Toggle";
 
 const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
 
   margin-top: 15px;
+  width: 100%;
+
+  & input {
+    margin: 0 !important;
+  }
 `;
 
 const Key = styled(Input)`
@@ -24,7 +30,8 @@ type Props = {
   onCancel: () => void;
   onConfirm: (
     type: "set" | "zset" | "hash" | "string" | "list",
-    key: string
+    key: string,
+    ttl: number | string
   ) => void;
 };
 
@@ -32,10 +39,13 @@ const AddKey: React.FC<Props> = (props) => {
   const { onCancel, onConfirm } = props;
   const [type, setType] = React.useState("set");
   const [key, setKey] = React.useState("");
+  const [ttl, setTTL] = React.useState<string | number>(0);
+  const [useTTL, setUseTTL] = React.useState(false);
+  const [ttlAbsolute, setTTLAbsolute] = React.useState(false);
 
   const handleConfirm = () => {
     if (!type || !key) return;
-    onConfirm(type as any, key);
+    onConfirm(type as any, key, ttl);
   };
 
   const handleCancel = () => {
@@ -50,22 +60,61 @@ const AddKey: React.FC<Props> = (props) => {
     setKey(e.target.value);
   };
 
+  const handleTTLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (ttlAbsolute) {
+      setTTL(e.target.value);
+    } else setTTL(e.target.valueAsNumber);
+  };
+
   return (
     <>
       <MessageBackground />
-      <MessageContent data-testid="data-add-message" >
+      <MessageContent data-testid="data-add-message">
         <h3>Add new key</h3>
         <Row>
+          <span>Name: </span>
           <Key onChange={handleKeyChange} />
+        </Row>
+        <Row>
+          <span>Type: </span>
           <Dropdown
             onChange={handleTypeChange}
             items={["set", "zset", "hash", "string", "list"]}
           />
         </Row>
+        <Row>
+          <span>TTL: </span>
+          <Toggle
+            onChange={() => {
+              setUseTTL(!useTTL);
+            }}
+          />
+        </Row>
+        {useTTL && (
+          <>
+            <Row>
+              <span>Absolute TTL: </span>
+              <Toggle
+                onChange={() => {
+                  setTTLAbsolute(!ttlAbsolute);
+                }}
+              />
+            </Row>
+            <Row>
+              <span>
+                {ttlAbsolute ? "Expires At" : "Expiration (seconds)"}:{" "}
+              </span>
+              <Input
+                type={ttlAbsolute ? "datetime-local" : "number"}
+                style={{ width: ttlAbsolute ? "unset" : "80px" }}
+                onChange={handleTTLChange}
+              />
+            </Row>
+          </>
+        )}
         <Row style={{ justifyContent: "flex-end" }}>
           <Button label="Cancel" onClick={handleCancel} />
           <Button label="Confirm" onClick={handleConfirm} />
-          <button data-testid="teste1" onClick={handleConfirm} >Teste1</button>
         </Row>
       </MessageContent>
     </>

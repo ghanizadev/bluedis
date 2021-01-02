@@ -21,8 +21,8 @@ export const updateData = (pattern: string) => {
   ipcRenderer.send("update", pattern);
 };
 
-export const addKey = (key: string, type: string) => {
-  ipcRenderer.send("addKey", key, type);
+export const addKey = (key: string, type: string, ttl: number | string) => {
+  ipcRenderer.send("addKey", key, type, ttl);
 };
 
 export const changeString = (key: string, value: string) => {
@@ -84,6 +84,10 @@ export const find = (match: string) => {
   ipcRenderer.send("find", match);
 };
 
+export const findByKey = (key: string) => {
+  ipcRenderer.send("findByKey", key);
+};
+
 export const savePreferences = (preferences: any) => {
   ipcRenderer.send("savePreferences", preferences);
 };
@@ -134,6 +138,10 @@ ipcRenderer.on("data", (event: any, data: any[]) => {
 
 ipcRenderer.on("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));
+});
+
+ipcRenderer.on("dataPreview", (event: any, doc: any) => {
+  store.dispatch(actions.setPreview(doc));
 });
 
 ipcRenderer.on("error", (event: any, error: Error) => {

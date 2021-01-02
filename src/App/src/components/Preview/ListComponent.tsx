@@ -25,7 +25,7 @@ type Props = {
 };
 const ListComponent: React.FC<Props> = (props) => {
   const {
-    item: { key, value },
+    item: { key, value, ttl },
   } = props;
   const [itemValue, setItemValue] = React.useState<{
     value: string;
@@ -100,6 +100,9 @@ const ListComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
+      <div>
+          <span>TTL: {ttl}</span>
+        </div>
       <PreviewActions>
         <PreviewActionButton data-testid="item-add" title="Add new member" onClick={handleAddOpen}>
           <AddIcon />

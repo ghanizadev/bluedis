@@ -11,6 +11,7 @@ import {
   addHashMember,
   removeHashMember,
   deleteKey,
+  updateData,
 } from "../../services/mainProcess";
 
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
@@ -23,7 +24,7 @@ type Props = {
   item: Item;
 };
 const HashComponent: React.FC<Props> = (props) => {
-  const { key, value } = props.item;
+  const { key, value, ttl } = props.item;
   const [itemValue, setItemValue] = React.useState<{
     key: string;
     value: string;
@@ -72,6 +73,10 @@ const HashComponent: React.FC<Props> = (props) => {
     clearTimeout(timeout);
   };
 
+  React.useEffect(() => {
+    updateData("");
+  }, []);
+
   return (
     <>
       <PreviewContainer>
@@ -95,6 +100,9 @@ const HashComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
+      <div>
+        <span>{ttl !== -1 && `TTL: ${new Date(Date.now() + ttl).toLocaleString(navigator.language, { timeZoneName: 'short' } )}`}</span>
+      </div>
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"

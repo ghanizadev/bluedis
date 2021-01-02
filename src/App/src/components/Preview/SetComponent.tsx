@@ -23,7 +23,7 @@ type Props = {
   item: Item;
 };
 const SetComponent: React.FC<Props> = (props) => {
-  const { value, key } = props.item;
+  const { value, key, ttl } = props.item;
   const [itemValue, setItemValue] = React.useState<{
     isNew: boolean;
     value: string;
@@ -94,6 +94,9 @@ const SetComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
+      <div>
+        <span>TTL: {ttl}</span>
+      </div>
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"

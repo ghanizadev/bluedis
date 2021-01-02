@@ -25,7 +25,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.`
+SOFTWARE.`;
 
 ipcMain.on("close", () => {
   app.quit();
@@ -37,11 +37,11 @@ ipcMain.on("connect", async (event, options) => {
   database.connect(host, port, password, tls);
   const docs = await database.findAll();
   event.sender.send("data", docs);
-})
+});
 
 ipcMain.on("disconnect", () => {
   database.disconnect();
-})
+});
 
 ipcMain.on("update", async (event) => {
   const docs = await database.findAll();
@@ -55,15 +55,15 @@ ipcMain.on("deleteKey", async (event, key) => {
   event.sender.send("data", docs);
 });
 
-ipcMain.on("addKey", async (event, key, type) => {
-  await database.addKey(key, type);
+ipcMain.on("addKey", async (event, key, type, ttl) => {
+  await database.addKey(key, type, ttl);
 
   const docs = await database.findAll();
   event.sender.send("data", docs);
 });
 
-ipcMain.on("changeString", async (event, key, value) => {
-  await database.changeString(key, value);
+ipcMain.on("changeString", async (event, key, value, ttl) => {
+  await database.changeString(key, value, ttl);
 
   const docs = await database.findAll();
   event.sender.send("data", docs);
@@ -146,7 +146,6 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
   store.set("favorites", JSON.stringify(favorites));
 });
 
-
 ipcMain.on("wipeData", async (event, favorites) => {
   store.clear();
 });
@@ -163,4 +162,9 @@ ipcMain.on("initial", async (event) => {
 ipcMain.on("find", async (event, match) => {
   const docs = await database.find(match);
   event.sender.send("data", docs);
+});
+
+ipcMain.on("findByKey", async (event, key) => {
+  const doc = await database.findByKey(key);
+  event.sender.send("dataPreview", doc);
 });

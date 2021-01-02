@@ -42,27 +42,50 @@ class DatabaseManager {
     });
   };
 
-  public async changeString(key: string, value: string): Promise<void> {
+  private async addTTL(key: string, ttl: number | string) : Promise<void>{
+    return new Promise((res, rej) => {
+      if (ttl) {
+        if (typeof ttl === "string") {
+          this._instance.PEXPIREAT(key, new Date(ttl).getTime(), (err) => {
+            if (err) rej(err);
+            else res();
+          });
+        } else {
+          this._instance.EXPIRE(key, ttl, (err) => {
+            if (err) rej(err);
+            else res();
+          });
+        }
+      } else res();
+    })
+  }
+
+  public async changeString(
+    key: string,
+    value: string,
+    ttl: string | number
+  ): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.SET(key, value, (err) => {
         if (err) rej(err);
-        return res();
+        else this.addTTL(key, ttl).then(res);
       });
     });
   }
 
-  public async changeSet(key: string, value: string): Promise<void> {
+  public async changeSet(key: string, value: string, ttl: string | number): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.SADD(key, value, (err) => {
         if (err) rej(err);
-        return res();
+        else this.addTTL(key, ttl).then(res);
       });
     });
   }
 
   public async changeZSet(
     key: string,
-    items: { score: string; value: string }[]
+    items: { score: string; value: string }[],
+    ttl: number | string
   ): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.ZADD(
@@ -73,15 +96,17 @@ class DatabaseManager {
         ),
         (err) => {
           if (err) rej(err);
-          return res();
+          else this.addTTL(key, ttl).then(res);
         }
       );
+
     });
   }
 
   public async changeHash(
     key: string,
-    values: { [key: string]: any }
+    values: { [key: string]: any },
+    ttl: number | string
   ): Promise<void> {
     return new Promise((res, rej) => {
       const items = Object.keys(values).reduce(
@@ -91,16 +116,16 @@ class DatabaseManager {
 
       this._instance.HSET(key, items, (err) => {
         if (err) rej(err);
-        return res();
+        else this.addTTL(key, ttl).then(res);
       });
     });
   }
 
-  public async changeList(key: string, value: string): Promise<void> {
+  public async changeList(key: string, value: string, ttl: string | number): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.LPUSH(key, value, (err) => {
         if (err) rej(err);
-        return res();
+        else this.addTTL(key, ttl).then(res);
       });
     });
   }
@@ -220,35 +245,37 @@ class DatabaseManager {
 
   public async addKey(
     key: string,
-    type: "set" | "zset" | "hash" | "string" | "list"
+    type: "set" | "zset" | "hash" | "string" | "list",
+    ttl: number
   ) {
     switch (type) {
       case "string":
-        await this.changeString(key, "New Value");
+        await this.changeString(key, "New Value", ttl);
         break;
       case "set":
-        await this.changeSet(key, "New Member");
+        await this.changeSet(key, "New Member", ttl);
         break;
       case "zset":
-        await this.changeZSet(key, [{ score: "0", value: "New Member" }]);
+        await this.changeZSet(key, [{ score: "0", value: "New Member" }], ttl);
         break;
       case "hash":
-        await this.changeHash(key, { "New Item": "New Member" });
+        await this.changeHash(key, { "New Item": "New Member" }, ttl);
         break;
       case "list":
-        await this.changeList(key, "New Member");
+        await this.changeList(key, "New Member", ttl);
         break;
       default:
         throw new Error("not impemented");
     }
   }
 
-  private async hydrateItems(items: string[]): Promise<any> {
+  private async hydrateItems(items: string[]): Promise<any[]> {
     const promises = items.map(async (item) => {
       const response: any = {
         key: item,
         value: "",
         type: "",
+        ttl: -1
       };
 
       const type = await new Promise((res, rej) => {
@@ -291,8 +318,16 @@ class DatabaseManager {
         }
       });
 
+      const ttl = await new Promise((res, rej) => {
+        this._instance.PTTL(item, (err, ttl) => {
+          if(err) rej(err)
+          return res(ttl)
+        })
+      })
+
       response.value = value;
       response.type = type;
+      response.ttl = ttl;
 
       return response;
     });
@@ -302,18 +337,13 @@ class DatabaseManager {
 
   public async find(match: string): Promise<any> {
     return await new Promise((res, rej) => {
-      this._instance.scan(
-        "0",
-        "MATCH",
-        match,
-        async (err, reply) => {
-          if (err) rej(err);
+      this._instance.scan("0", "MATCH", match, async (err, reply) => {
+        if (err) rej(err);
 
-          const [cursor, items] = reply;
-          const response = await this.hydrateItems(items);
-          res(response);
-        }
-      );
+        const [cursor, items] = reply;
+        const response = await this.hydrateItems(items);
+        res(response);
+      });
     });
   }
 
@@ -327,6 +357,10 @@ class DatabaseManager {
         res(response);
       });
     });
+  }
+
+  public async findByKey(key: string): Promise<any> {
+    return (await this.hydrateItems([key])).pop();
   }
 }
 

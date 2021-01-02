@@ -6,10 +6,11 @@ export const MessageContent = styled.div`
   color: ${(props) => props.theme.text};
   border: 1px solid ${(props) => props.theme.text};
   position: absolute;
-  padding: 15px 8px;
+  padding: 15px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  transition: height 250ms ease-out;
 
   display: flex;
   flex-direction: column;

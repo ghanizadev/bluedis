@@ -24,7 +24,7 @@ type Props = {
 };
 
 const ZSetComponent: React.FC<Props> = (props) => {
-  const { key, value } = props.item;
+  const { key, value, ttl } = props.item;
 
   const [itemValue, setItemValue] = React.useState<{
     score: string;
@@ -108,6 +108,9 @@ const ZSetComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
+      <div>
+        <span>TTL: {ttl}</span>
+      </div>
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"
