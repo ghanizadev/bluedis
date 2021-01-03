@@ -20,6 +20,7 @@ import { store } from "./redux/store";
 import { getPreferences } from "./services/mainProcess";
 import ErrorMessage from "./components/ErrorMessage";
 import ConfirmationMessage from "./components/ConfirmationMessage";
+import EditTTL from "./components/EditTTL";
 
 export const SettingsContext = React.createContext({
   theme: { ...DarkTheme, fontFamily: "", fontSize: "14pt" },
@@ -72,6 +73,7 @@ const App = () => {
           </div>
         </Frame>
         <GlobalStyles />
+        <EditTTL />
         <ErrorMessage />
         <ConfirmationMessage />
       </ThemeProvider>

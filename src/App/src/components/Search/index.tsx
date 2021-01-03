@@ -7,11 +7,11 @@ import Input from "../Input";
 import {find, selectDatabase} from "../../services/mainProcess";
 
 const Container = styled.div`
-  width: 100%;
   margin: 0 8px 5px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 1;
 `;
 
 const SearchInput = styled(Input)`

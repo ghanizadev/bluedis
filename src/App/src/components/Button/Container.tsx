@@ -11,4 +11,8 @@ export const Container = styled.button`
   &:hover {
     filter: brightness(0.95);
   }
+
+  &:disabled {
+    background-color: gray;
+  }
 `;

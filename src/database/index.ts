@@ -42,7 +42,7 @@ class DatabaseManager {
     });
   };
 
-  private async addTTL(key: string, ttl: number | string) : Promise<void>{
+  public async addTTL(key: string, ttl: number | string): Promise<void> {
     return new Promise((res, rej) => {
       if (ttl) {
         if (typeof ttl === "string") {
@@ -57,7 +57,16 @@ class DatabaseManager {
           });
         }
       } else res();
-    })
+    });
+  }
+
+  public async removeTTL(key: string): Promise<void> {
+    return new Promise((res, rej) => {
+      this._instance.PERSIST(key, (err, reply) => {
+        if (err) rej(err);
+        else res();
+      });
+    });
   }
 
   public async changeString(
@@ -73,7 +82,11 @@ class DatabaseManager {
     });
   }
 
-  public async changeSet(key: string, value: string, ttl: string | number): Promise<void> {
+  public async changeSet(
+    key: string,
+    value: string,
+    ttl: string | number
+  ): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.SADD(key, value, (err) => {
         if (err) rej(err);
@@ -99,7 +112,6 @@ class DatabaseManager {
           else this.addTTL(key, ttl).then(res);
         }
       );
-
     });
   }
 
@@ -121,7 +133,11 @@ class DatabaseManager {
     });
   }
 
-  public async changeList(key: string, value: string, ttl: string | number): Promise<void> {
+  public async changeList(
+    key: string,
+    value: string,
+    ttl: string | number
+  ): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.LPUSH(key, value, (err) => {
         if (err) rej(err);
@@ -275,7 +291,7 @@ class DatabaseManager {
         key: item,
         value: "",
         type: "",
-        ttl: -1
+        ttl: -1,
       };
 
       const type = await new Promise((res, rej) => {
@@ -320,10 +336,12 @@ class DatabaseManager {
 
       const ttl = await new Promise((res, rej) => {
         this._instance.PTTL(item, (err, ttl) => {
-          if(err) rej(err)
-          return res(ttl)
-        })
-      })
+          if (err) rej(err);
+
+          if (ttl === -1) return res(-1);
+          return res(new Date(Date.now() + ttl).getTime());
+        });
+      });
 
       response.value = value;
       response.type = type;

@@ -13,9 +13,12 @@ import {
   removeZSetMember,
 } from "../../services/mainProcess";
 
+import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/store";
 
 let timeout: number;
 
@@ -33,6 +36,8 @@ const ZSetComponent: React.FC<Props> = (props) => {
   }>();
   const [deleting, setDeleting] = React.useState(false);
 
+  const dispatch = useDispatch();
+  
   const handleAddOpen = () => {
     setItemValue({ isNew: true, score: "0", value: "New value here..." });
   };
@@ -79,6 +84,10 @@ const ZSetComponent: React.FC<Props> = (props) => {
     clearTimeout(timeout);
   };
 
+  const handleTTLOpen = () => {
+    dispatch(actions.setEditTTL(props.item));
+  };
+
   return (
     <>
       <PreviewContainer>
@@ -109,7 +118,10 @@ const ZSetComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <div>
-        <span>TTL: {ttl}</span>
+        <span>
+          {ttl !== -1 &&
+            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+        </span>
       </div>
       <PreviewActions>
         <PreviewActionButton
@@ -125,6 +137,13 @@ const ZSetComponent: React.FC<Props> = (props) => {
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
+        </PreviewActionButton>
+        <PreviewActionButton
+          data-testid="item-ttl"
+          title="Edit TTL"
+          onClick={handleTTLOpen}
+        >
+          <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-remove"

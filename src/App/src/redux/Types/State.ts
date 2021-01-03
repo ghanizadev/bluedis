@@ -9,11 +9,13 @@ export type State = {
   connected: boolean;
   data: Item[];
   preview?: Item;
+  editTTL?: Item;
   selected: string[];
   currentPage: Page,
   settings: Settings,
   connection?: Connection,
   favorites: Connection[],
   error?: Error,
-  confirmation?: Confirmation
+  confirmation?: Confirmation,
+  lastRefresh: Date
 };

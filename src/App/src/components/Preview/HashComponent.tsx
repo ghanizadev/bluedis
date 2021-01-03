@@ -17,6 +17,9 @@ import {
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
+import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/store";
 
 let timeout: number;
 
@@ -30,6 +33,8 @@ const HashComponent: React.FC<Props> = (props) => {
     value: string;
     new: boolean;
   }>();
+
+  const dispatch = useDispatch();
 
   const [deleting, setDeleting] = React.useState(false);
 
@@ -73,6 +78,10 @@ const HashComponent: React.FC<Props> = (props) => {
     clearTimeout(timeout);
   };
 
+  const handleTTLOpen = () => {
+    dispatch(actions.setEditTTL(props.item));
+  };
+
   React.useEffect(() => {
     updateData("");
   }, []);
@@ -101,7 +110,10 @@ const HashComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <div>
-        <span>{ttl !== -1 && `TTL: ${new Date(Date.now() + ttl).toLocaleString(navigator.language, { timeZoneName: 'short' } )}`}</span>
+        <span>
+          {ttl !== -1 &&
+            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+        </span>
       </div>
       <PreviewActions>
         <PreviewActionButton
@@ -118,7 +130,13 @@ const HashComponent: React.FC<Props> = (props) => {
         >
           <CopyIcon />
         </PreviewActionButton>
-
+        <PreviewActionButton
+          data-testid="item-ttl"
+          title="Edit TTL"
+          onClick={handleTTLOpen}
+        >
+          <TTLIcon />
+        </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-remove"
           title="Remove document"

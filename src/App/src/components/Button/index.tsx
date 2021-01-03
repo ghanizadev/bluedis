@@ -5,12 +5,13 @@ import { Text } from "./Text";
 type Props = {
   label: string;
   onClick ?: () => void;
+  disabled?: boolean;
 }
 
 const Button: React.FC<Props> = (props) => {
-  const {label, onClick} = props;
+  const {label, onClick, disabled} = props;
   return(
-    <Container data-testid="square-button" onClick={onClick}>
+    <Container disabled={disabled} data-testid="square-button" onClick={onClick}>
       <Text>
         {label}
       </Text>

@@ -88,6 +88,14 @@ export const findByKey = (key: string) => {
   ipcRenderer.send("findByKey", key);
 };
 
+export const setTTL = (key: string, ttl: number | string) => {
+  ipcRenderer.send("setTTL", key, ttl);
+};
+
+export const removeTTL = (key: string) => {
+  ipcRenderer.send("removeTTL", key);
+};
+
 export const savePreferences = (preferences: any) => {
   ipcRenderer.send("savePreferences", preferences);
 };
@@ -145,12 +153,18 @@ ipcRenderer.on("dataPreview", (event: any, doc: any) => {
 });
 
 ipcRenderer.on("error", (event: any, error: Error) => {
+  if(!error || !error.message){
+    store.dispatch(actions.setError({title: "Error", message: "Something went bad"}));
+    return;
+  }
   if(error.message.includes("ERR AUTH")){
     store.dispatch(actions.setError({title: "Error", message: "Authentication error. Is password required?"}))
   } else if(error.message.includes("WRONGPASS")){
     store.dispatch(actions.setError({title: "Warning", message: "Password does not match"}))
   } else if(error.message.includes("NOAUTH")){
     store.dispatch(actions.setError({title: "Warning", message: "Password is required for this connection"}))
+  } else if(error.message.includes("Redis connection in broken state")){
+    store.dispatch(actions.setError({title: "Warning", message: "Host is unreachable. Check your connection"}))
   } else {
     store.dispatch(actions.setError({title: "Error", message: error.message}))
   }

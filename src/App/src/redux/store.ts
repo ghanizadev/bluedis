@@ -26,6 +26,7 @@ const initialState: State = {
   },
   connected: false,
   favorites: [],
+  lastRefresh: new Date()
 };
 
 const slice = createSlice({
@@ -36,6 +37,7 @@ const slice = createSlice({
       state.connected = action.payload;
     },
     setData: (state, action: PayloadAction<Item[]>) => {
+      state.lastRefresh = new Date();
       state.data = action.payload;
     },
     setPreview: (state, action: PayloadAction<Item | undefined>) => {
@@ -90,6 +92,9 @@ const slice = createSlice({
     },
     setConfirmation: (state, action: PayloadAction<Confirmation | undefined>) => {
       state.confirmation = action.payload;
+    },
+    setEditTTL: (state, action: PayloadAction<Item | undefined>) => {
+      state.editTTL = action.payload;
     }
   },
 });

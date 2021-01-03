@@ -4,11 +4,14 @@ import styled from "styled-components";
 import { changeString, deleteKey } from "../../services/mainProcess";
 import { Item } from "../../redux/Types/Item";
 
+import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as SaveIcon } from "../../assets/save.svg";
 import { PreviewActionButton } from "../common/PreviewActionButton";
 import { PreviewActions } from "../common/PreviewActions";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/store";
 
 const Container = styled.textarea`
   resize: none;
@@ -28,6 +31,8 @@ const StringComponent: React.FC<Props> = (props) => {
   const [itemValue, setItemValue] = React.useState("");
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+
+  const dispatch = useDispatch();
 
   const handleDocumentSave = () => {
     changeString(key, itemValue);
@@ -61,13 +66,17 @@ const StringComponent: React.FC<Props> = (props) => {
     clearTimeout(timeout);
   };
 
+  const handleTTLOpen = () => {
+    dispatch(actions.setEditTTL(props.item));
+  };
+
   return (
     <>
       <Container onChange={handleValueChange} defaultValue={value} />
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
         }}
       >
         {saved && (
@@ -80,9 +89,12 @@ const StringComponent: React.FC<Props> = (props) => {
             Document saved!
           </span>
         )}
-        <div>
-          <span>TTL: {ttl}</span>
-        </div>
+      <div>
+        <span>
+          {ttl !== -1 &&
+            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+        </span>
+      </div>
         <PreviewActions>
           <PreviewActionButton
             title="Save document"
@@ -98,7 +110,13 @@ const StringComponent: React.FC<Props> = (props) => {
           >
             <CopyIcon />
           </PreviewActionButton>
-
+          <PreviewActionButton
+          data-testid="item-ttl"
+          title="Edit TTL"
+          onClick={handleTTLOpen}
+        >
+          <TTLIcon />
+        </PreviewActionButton>
           <PreviewActionButton
             data-testid="item-remove"
             title="Remove document"

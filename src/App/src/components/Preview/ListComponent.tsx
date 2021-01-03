@@ -17,6 +17,9 @@ import {
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
+import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/store";
 
 let timeout: number;
 
@@ -32,6 +35,8 @@ const ListComponent: React.FC<Props> = (props) => {
     index: number;
   }>();
   const [deleting, setDeleting] = React.useState(false);
+
+  const dispatch = useDispatch();
 
   const handleAddOpen = () => {
     setItemValue({ value: "New value here...", index: -1 });
@@ -70,6 +75,10 @@ const ListComponent: React.FC<Props> = (props) => {
     }, 1000);
   };
 
+  const handleTTLOpen = () => {
+    dispatch(actions.setEditTTL(props.item));
+  };
+
   const handleDeleteCancel = () => {
     setDeleting(false);
     clearTimeout(timeout);
@@ -100,9 +109,10 @@ const ListComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
-      <div>
-          <span>TTL: {ttl}</span>
-        </div>
+      <span>
+          {ttl !== -1 &&
+            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+        </span>
       <PreviewActions>
         <PreviewActionButton data-testid="item-add" title="Add new member" onClick={handleAddOpen}>
           <AddIcon />
@@ -113,6 +123,13 @@ const ListComponent: React.FC<Props> = (props) => {
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
+        </PreviewActionButton>
+        <PreviewActionButton
+          data-testid="item-ttl"
+          title="Edit TTL"
+          onClick={handleTTLOpen}
+        >
+          <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
           title="Remove document"

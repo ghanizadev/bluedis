@@ -124,6 +124,20 @@ ipcMain.on("addZSetMember", async (event, key, value, score) => {
   event.sender.send("data", docs);
 });
 
+ipcMain.on("setTTL", async (event, key, ttl) => {
+  await database.addTTL(key, ttl);
+
+  const docs = await database.findAll();
+  event.sender.send("data", docs);
+});
+
+ipcMain.on("removeTTL", async (event, key) => {
+  await database.removeTTL(key);
+
+  const docs = await database.findAll();
+  event.sender.send("data", docs);
+});
+
 ipcMain.on("removeZSetMember", async (event, key, index) => {
   await database.removeZSetMember(key, index);
 

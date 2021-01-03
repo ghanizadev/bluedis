@@ -112,11 +112,17 @@ const Settings = () => {
         </Row>
         <Subtitle>Data</Subtitle>
         <Row>
-          <span>Wipe data</span>
+          <span>Clear preferences</span>
           <span>
-            <Button label="Wipe now" onClick={handleWipeData} />
+            <Button label="Wipe data" onClick={handleWipeData} />
           </span>
         </Row>
+        {
+        /**
+         * Maximum DB default 5
+         * Language preferences
+         */
+         }
       </Content>
     </Container>
   );
