@@ -124,7 +124,7 @@ const Connect = () => {
           <LoginButton onClick={handleConnect}>Connect</LoginButton>
         </Form>
         <Recent>
-          <p>History</p>
+          <p>Favorites</p>
           <br />
           <ListWrapper>
             <ConnectionsList>

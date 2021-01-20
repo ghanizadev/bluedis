@@ -8,9 +8,8 @@ import { Item } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-import { updateData, addKey, findByKey } from "../../services/mainProcess";
+import { updateData, addKey, updatePreview } from "../../services/mainProcess";
 import AddKey from "../../components/AddKey";
-// import Pagination from "../../components/Pagination";
 import Connect from "./Connect";
 import { State } from "../../redux/Types/State";
 
@@ -42,7 +41,7 @@ const Home = () => {
       return;
     }
 
-    findByKey(item.key);
+    updatePreview(item.key);
   };
 
   const handlePreviewClose = () => {
@@ -50,7 +49,7 @@ const Home = () => {
   };
 
   const handleRefresh = () => {
-    updateData("");
+    updateData();
   };
 
   const handleAddCancel = () => {
@@ -86,7 +85,6 @@ const Home = () => {
             >
               <Wrapper>
                 <Table data={data} onItemEdit={handlePreview} />
-                {/* <Pagination /> */}
               </Wrapper>
               <Preview onCloseRequest={handlePreviewClose} />
             </div>

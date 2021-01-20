@@ -285,6 +285,29 @@ class DatabaseManager {
     }
   }
 
+  private async hydratateShallow(items: string[]){
+    const promises = items.map(async (item) => {
+      const response: any = {
+        key: item,
+        value: "",
+        type: "",
+        ttl: -1,
+      };
+
+      const type = await new Promise((res, rej) => {
+        this._instance.TYPE(item, (err, reply) => {
+          res(reply);
+        });
+      });
+
+      response.type = type;
+
+      return response;
+    });
+
+    return Promise.all(promises);
+  }
+
   private async hydrateItems(items: string[]): Promise<any[]> {
     const promises = items.map(async (item) => {
       const response: any = {
@@ -353,32 +376,86 @@ class DatabaseManager {
     return Promise.all(promises);
   }
 
-  public async find(match: string): Promise<any> {
-    return await new Promise((res, rej) => {
-      this._instance.scan("0", "MATCH", match, async (err, reply) => {
-        if (err) rej(err);
+  public async countDocuments(): Promise<number> {
+    return new Promise((res, rej) => {
+      this._instance.DBSIZE((err, reply) => {
+        if(err) return rej(err);
+        return res(reply);
+      })
+    })
+  }
 
-        const [cursor, items] = reply;
-        const response = await this.hydrateItems(items);
-        res(response);
-      });
+  public async loadMore(
+    match: string,
+    cursor = 0,
+    count = 10
+  ): Promise<{docs: any[], cursor: number}> {
+    return await new Promise((res, rej) => {
+      this._instance.SCAN(
+        String(cursor),
+        "MATCH",
+        match,
+        "COUNT",
+        String(count),
+        async (err, reply) => {
+          if (err) rej(err);
+
+          const [replycursor, items] = reply;
+          const response = await this.hydratateShallow(items);
+          res({
+            docs: response,
+            cursor: Number(replycursor),
+          });
+        }
+      );
     });
   }
 
-  public async findAll(): Promise<any> {
+  public async findByName(
+    match: string
+  ): Promise<{docs: any[], cursor: number, totalDocs: number}> {
     return await new Promise((res, rej) => {
-      this._instance.scan("0", async (err, reply) => {
-        if (err) rej(err);
+      this._instance.KEYS(
+        match,
+        async (err, reply) => {
+          if (err) rej(err);
 
-        const [cursor, items] = reply;
-        const response = await this.hydrateItems(items);
-        res(response);
-      });
+          const items = reply;
+          const response = await this.hydratateShallow(items);
+          res({
+            docs: response,
+            cursor: 0,
+            totalDocs: items.length
+          });
+        }
+      );
     });
   }
 
-  public async findByKey(key: string): Promise<any> {
-    return (await this.hydrateItems([key])).pop();
+  public async findAll(cursor = 0, count = 10): Promise<{docs: any[], cursor: number, totalDocs: number}> {
+    return await new Promise((res, rej) => {
+      this._instance.scan(
+        String(cursor),
+        "COUNT",
+        String(count),
+        async (err, reply) => {
+          if (err) rej(err);
+
+          const totalCount = await this.countDocuments();
+          const [replycursor, items] = reply;
+          const response = await this.hydratateShallow(items);
+          res({
+            docs: response,
+            cursor: Number(replycursor),
+            totalDocs: totalCount
+          });
+        }
+      );
+    });
+  }
+
+  public async findByKeys(keys: string[]): Promise<any> {
+    return this.hydrateItems(keys);
   }
 }
 

@@ -22,11 +22,20 @@ const initialState: State = {
       fontFamily: "Roboto",
       fontSize: "14pt",
     },
+    general: {
+      maxDB: 6,
+      stepSize: 10,
+    },
+    region: {
+      language: "en-US",
+      dateFormat: "system"
+    },
     license: "teste"
   },
   connected: false,
   favorites: [],
-  lastRefresh: new Date()
+  lastRefresh: new Date(),
+  query: { cursor: 0, count: 0, totalDocs: 0 }
 };
 
 const slice = createSlice({
@@ -39,6 +48,10 @@ const slice = createSlice({
     setData: (state, action: PayloadAction<Item[]>) => {
       state.lastRefresh = new Date();
       state.data = action.payload;
+    },
+    pushData: (state, action: PayloadAction<Item[]>) => {
+      state.lastRefresh = new Date();
+      state.data = [...state.data, ...action.payload];
     },
     setPreview: (state, action: PayloadAction<Item | undefined>) => {
       state.preview = action.payload;
@@ -95,6 +108,18 @@ const slice = createSlice({
     },
     setEditTTL: (state, action: PayloadAction<Item | undefined>) => {
       state.editTTL = action.payload;
+    },
+    setQuery: (state, action: PayloadAction<{ cursor: number, count: number, totalDocs?: number}>) => {
+      state.query = {...action.payload, totalDocs: action.payload.totalDocs ?? state.query.totalDocs };
+    },
+    addDocument:(state, action: PayloadAction<Item>)=>{
+      state.data = [action.payload, ...state.data];
+      state.query.totalDocs = state.query.totalDocs + 1;
+    },
+    removeDocument:(state, action: PayloadAction<string[]>)=>{
+      state.data = state.data.filter(doc => !action.payload.includes(doc.key));
+      state.preview = undefined;
+      state.query.totalDocs = state.query.totalDocs - action.payload.length;
     }
   },
 });

@@ -17,5 +17,10 @@ export type State = {
   favorites: Connection[],
   error?: Error,
   confirmation?: Confirmation,
-  lastRefresh: Date
+  lastRefresh: Date,
+  query: {
+    cursor: number;
+    count: number;
+    totalDocs: number
+  }
 };

@@ -3,10 +3,10 @@ import { SquareButton } from "./SquareButton";
 import { Separator } from "./Separator";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "../../redux/Types/State";
-import { Item } from "../../redux/Types/Item";
 import {
   deleteKey,
   disconnect,
+  exportItems,
   saveFavorites,
 } from "../../services/mainProcess";
 import { actions, store } from "../../redux/store";
@@ -31,7 +31,6 @@ const Toolbar: React.FC<Props> = (props) => {
   const { onRefresh, onAddKey } = props;
 
   const selected = useSelector<State, string[]>((state) => state.selected);
-  const data = useSelector<State, Item[]>((state) => state.data);
   const favorites = useSelector<State, Connection[]>(
     (state) => state.favorites
   );
@@ -52,22 +51,7 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleDownloadSelected = () => {
-    const items = selected
-      .map((key) => data.find((item) => item.key === key))
-      .reduce(
-        (prev, curr) => !!curr && { ...prev, [curr.key]: curr.value },
-        {}
-      );
-
-    const string = JSON.stringify(items, null, 2);
-
-    const blob = new Blob([Buffer.from(string, "utf-8")], {
-      type: "application/json;charset=utf-8",
-    });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `export_${Date.now()}.json`;
-    a.click();
+    exportItems(selected);
   };
 
   const handleDeleteSelected = () => {

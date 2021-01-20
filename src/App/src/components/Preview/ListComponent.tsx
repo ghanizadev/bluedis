@@ -71,7 +71,7 @@ const ListComponent: React.FC<Props> = (props) => {
 
     timeout = setTimeout(() => {
       setDeleting(false);
-      deleteKey(key);
+      deleteKey([key]);
     }, 1000);
   };
 

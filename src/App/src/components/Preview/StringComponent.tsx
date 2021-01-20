@@ -56,7 +56,7 @@ const StringComponent: React.FC<Props> = (props) => {
   const handleDocumentDelete = () => {
     setDeleting(true);
     timeout = setTimeout(() => {
-      deleteKey(key);
+      deleteKey([key]);
       setDeleting(false);
     }, 1000);
   };

@@ -11,7 +11,6 @@ import {
   addHashMember,
   removeHashMember,
   deleteKey,
-  updateData,
 } from "../../services/mainProcess";
 
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
@@ -69,7 +68,7 @@ const HashComponent: React.FC<Props> = (props) => {
 
     timeout = setTimeout(() => {
       setDeleting(false);
-      deleteKey(key);
+      deleteKey([key]);
     }, 1000);
   };
 
@@ -81,10 +80,6 @@ const HashComponent: React.FC<Props> = (props) => {
   const handleTTLOpen = () => {
     dispatch(actions.setEditTTL(props.item));
   };
-
-  React.useEffect(() => {
-    updateData("");
-  }, []);
 
   return (
     <>

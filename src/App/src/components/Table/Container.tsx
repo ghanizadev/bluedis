@@ -5,4 +5,5 @@ export const Container = styled.div`
   flex-basis: 0;
   overflow: auto;
   display: flex;
+  flex-direction: column;
 `;

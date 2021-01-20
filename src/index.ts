@@ -2,7 +2,7 @@ import { app, BrowserWindow, globalShortcut, ipcMain, screen } from "electron";
 import "./listeners";
 import path from "path";
 import dotenv from "dotenv";
-import { autoUpdater } from "electron-updater"
+import { autoUpdater } from "electron-updater";
 
 dotenv.config();
 
@@ -23,6 +23,7 @@ const createWindow = (): void => {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
+      contextIsolation: false,
     },
   });
 
@@ -31,7 +32,8 @@ const createWindow = (): void => {
   });
 
   globalShortcut.register("F6", () => {
-    process.env.NODE_ENV === "development" && mainWindow.webContents.toggleDevTools();
+    process.env.NODE_ENV === "development" &&
+      mainWindow.webContents.toggleDevTools();
   });
 
   if (process.env.NODE_ENV === "development") {
@@ -56,8 +58,8 @@ ipcMain.on("maximize", () => {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
     mainWindow.setBounds({
-      x:( width / 2) - 500,
-      y: (height / 2) - 400,
+      x: width / 2 - 500,
+      y: height / 2 - 400,
       width: 1000,
       height: 800,
     });

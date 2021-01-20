@@ -1,22 +1,31 @@
 {
   "name": "bluedis",
   "productName": "Bluedis",
-  "version": "1.0.2",
-  "description": "My Electron application description",
+  "version": "1.0.0",
+  "description": "An elegant Redis GUI interface",
   "main": "./dist/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production electron .",
     "lint": "eslint --ext .ts .",
     "dev": "gulp dev",
-    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "dev:electron": "npx tsc && cross-env NODE_ENV=development electron .",
     "dev:react": "yarn --cwd ./src/App start",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "dist:linux": "electron-builder --linux snap",
     "build": "gulp build",
     "compile": "gulp dist",
     "publish": "build --mac --win --linux -p always"
   },
-  "keywords": [],
+  "keywords": [
+    "redis",
+    "gui",
+    "database",
+    "bluedis",
+    "management",
+    "data",
+    "visualization"
+  ],
   "author": {
     "name": "Jean Felipe de Melo",
     "email": "jf.melo6@gmail.com"
@@ -46,6 +55,11 @@
       "publish": [
         "github"
       ]
+    },
+    "linux": {
+      "target": "snap",
+      "desktop": "Bluedis",
+      "category": "Development"
     }
   },
   "license": "MIT",

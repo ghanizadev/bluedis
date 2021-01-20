@@ -48,101 +48,99 @@ ipcMain.on("update", async (event) => {
   event.sender.send("data", docs);
 });
 
-ipcMain.on("deleteKey", async (event, key) => {
+ipcMain.on("deleteKey", async (event, key: string[]) => {
   await database.deleteKey(key);
-
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  event.sender.send("keyRemoved", key);
 });
 
 ipcMain.on("addKey", async (event, key, type, ttl) => {
   await database.addKey(key, type, ttl);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("keyAdded", doc.pop());
 });
 
 ipcMain.on("changeString", async (event, key, value, ttl) => {
   await database.changeString(key, value, ttl);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("addListMember", async (event, key, value) => {
   await database.addListMember(key, value);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("removeListMember", async (event, key, index) => {
   await database.removeListMember(key, index);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("alterListMember", async (event, key, value, index) => {
   await database.alterListMember(key, value, index);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("addSetMember", async (event, key, value) => {
   await database.addSetMember(key, value);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("removeSetMember", async (event, key, index) => {
   await database.removeSetMember(key, index);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("addHashMember", async (event, key, value) => {
   await database.addHashMember(key, value);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("removeHashMember", async (event, key, index) => {
   await database.removeHashMember(key, index);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 ipcMain.on("addZSetMember", async (event, key, value, score) => {
   await database.addZSetMember(key, value, score);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("setTTL", async (event, key, ttl) => {
   await database.addTTL(key, ttl);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("removeTTL", async (event, key) => {
   await database.removeTTL(key);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("removeZSetMember", async (event, key, index) => {
   await database.removeZSetMember(key, index);
 
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
 });
 
 ipcMain.on("selectDatabase", async (event, index) => {
@@ -174,11 +172,21 @@ ipcMain.on("initial", async (event) => {
 });
 
 ipcMain.on("find", async (event, match) => {
-  const docs = await database.find(match);
-  event.sender.send("data", docs);
+  const result = await database.findByName(match);
+  event.sender.send("data", result);
 });
 
-ipcMain.on("findByKey", async (event, key) => {
-  const doc = await database.findByKey(key);
-  event.sender.send("dataPreview", doc);
+ipcMain.on("loadMore", async (event, match, cursor, count) => {
+  const result = await database.loadMore(match, cursor || 0, count || 10);
+  event.sender.send("loadedData", result);
+});
+
+ipcMain.on("updatePreview", async (event, key) => {
+  const doc = await database.findByKeys([key]);
+  event.sender.send("dataPreview", doc.pop());
+});
+
+ipcMain.on("exportItems", async (event, items) => {
+  const docs = await database.findByKeys(items);
+  event.sender.send("exportedItems", {docs});
 });

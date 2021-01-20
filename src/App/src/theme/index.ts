@@ -27,7 +27,7 @@ export const LightTheme : ColorSchema = {
   text: "#1f2f30",
   innertext: "#fff",
   title: "#1f2f30",
-  sidebarBackground: "whitesmoke"
+  sidebarBackground: "#edf5f4"
 }
 
 export const defaultSettings : AppearenceSettings = {

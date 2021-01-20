@@ -10,6 +10,7 @@ import Checkbox from "../Checkbox";
 import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
+import { loadMore } from "../../services/mainProcess";
 
 const Row = styled.tr``;
 
@@ -24,6 +25,26 @@ const TableContainer = styled.table`
   }
 `;
 
+const LoadMore = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+
+  & button {
+    background-color: transparent;
+    color: ${({ theme }) => theme.foreground};
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:disabled {
+      color: gray;
+    }
+  }
+`;
+
 type Props = {
   data: Item[];
   onItemEdit?: (item: Item) => void;
@@ -32,7 +53,14 @@ type Props = {
 const Table: React.FC<Props> = (props) => {
   const { data, onItemEdit } = props;
   const selected = useSelector<State, string[]>((state) => state.selected);
+  const query = useSelector<State, { count: number; cursor: number }>(
+    (state) => state.query
+  );
   const dispatch = useDispatch();
+  const totalCount = useSelector<State, number>(
+    (state) => state.query.totalDocs
+  );
+  const currentCount = useSelector<State, number>((state) => state.data.length);
 
   const handleItemEdit = (item: Item) => {
     onItemEdit && onItemEdit(item);
@@ -47,6 +75,10 @@ const Table: React.FC<Props> = (props) => {
     else dispatch(actions.pushSelected(key));
   };
 
+  const handleLoadMore = () => {
+    loadMore("*", query.cursor, query.count);
+  };
+
   return (
     <Container data-testid="home-table">
       <TableContainer>
@@ -54,7 +86,7 @@ const Table: React.FC<Props> = (props) => {
           <Row data-testid="home-table-header">
             <Header style={{ width: "40px" }}>
               <Checkbox
-                checked={data.every((item) => selected.includes(item.key))}
+                checked={data.length !== 0 && data.every((item) => selected.includes(item.key))}
                 onChangeValue={() => handleSelect("", { all: true })}
               />
             </Header>
@@ -93,6 +125,17 @@ const Table: React.FC<Props> = (props) => {
           })}
         </tbody>
       </TableContainer>
+      <LoadMore>
+        <span>
+          showing {currentCount} of {totalCount} documents
+          {query.cursor !== 0 && " - "}
+          {query.cursor !== 0 && (
+            <button disabled={query.cursor === 0} onClick={handleLoadMore}>
+              Load more ...
+            </button>
+          )}
+        </span>
+      </LoadMore>
     </Container>
   );
 };

@@ -35,12 +35,12 @@ const Search = () => {
 
   const handleKeyListener = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === "Enter"){
-      find(match || "");
+      find(match || "*");
     }
   }
 
   const handleSearch = () => {
-    find(match || "");
+    find(match || "*");
   }
 
   const handleDatabaseChange = (item: string) => {

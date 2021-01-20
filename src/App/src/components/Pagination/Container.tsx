@@ -5,7 +5,6 @@ export const Container = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: 80px;
   align-items: center;
   text-align: justify;
   font-size: 1.15rem;

@@ -4,8 +4,12 @@ import { Container } from "./Container";
 
 import { ReactComponent as RightIcon } from "../../assets/right.svg";
 import { ReactComponent as LeftIcon } from "../../assets/left.svg";
+import { State } from "../../redux/Types/State";
+import { useSelector } from "react-redux";
 
 const Pagination: React.FC = () => {
+  const pagination = useSelector<State, {cursor: number, count: number}>(state => state.query);
+  
   return (
     <>
       <Container>
@@ -16,6 +20,9 @@ const Pagination: React.FC = () => {
         <SquareButton>
           <RightIcon />
         </SquareButton>
+        <span>
+          showing {pagination.cursor} of {pagination.count}
+        </span>
       </Container>
     </>
   );

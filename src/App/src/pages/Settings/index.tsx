@@ -121,6 +121,8 @@ const Settings = () => {
         /**
          * Maximum DB default 5
          * Language preferences
+         * fetch data => load step = 10
+         * date format
          */
          }
       </Content>
