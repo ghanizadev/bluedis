@@ -19,6 +19,23 @@ const Container = styled.li`
     background-color: ${(props) => props.theme.foreground};
     color: ${(props) => props.theme.innertext};
   }
+
+  & svg {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+  }
+`;
+
+const InnerText = styled.span`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+
+  & strong {
+    font-size: 0.9rem;
+  }
 `;
 
 type Props = {
@@ -37,14 +54,13 @@ const Favorite: React.FC<Props> = (props) => {
   };
   return (
     <Container onClick={() => onConnect(connection)}>
-      <div>
+      <InnerText>
         <strong>{connection.name}</strong>
         <br />
-        <small>
-          redis://{connection.host}:{connection.port}
-        </small>
-      </div>
-      <CloseIcon width={16} height={16} onClick={handleRemove(connection)} />
+        redis://{connection.host}:{connection.port}
+        {/* redis://{connection.host}:{connection.port} */}
+      </InnerText>
+      <CloseIcon onClick={handleRemove(connection)} />
     </Container>
   );
 };
