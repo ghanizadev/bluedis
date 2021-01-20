@@ -41,7 +41,6 @@ const GhanizadevIcon = styled.img`
   width: 50px;
   height: 50px;
   object-fit: contain;
-  filter: invert(1);
   margin: 8px;
 `;
 
@@ -67,7 +66,7 @@ const Help = () => {
       <h1>Help</h1>
       <Content>
         <Header>
-          <GhanizadevIcon src={`${process.env.PUBLIC_URL}/logo.png`} />
+          <GhanizadevIcon src={`${process.env.PUBLIC_URL}/logo_blue.png`} />
           <div>
             <h2>
               Bluedis <small>v1.0.0</small>
