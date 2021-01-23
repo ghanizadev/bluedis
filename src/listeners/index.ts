@@ -167,8 +167,11 @@ ipcMain.on("initial", async (event) => {
   const favorites = store.get("favorites");
 
   event.sender.send("license", license);
-  event.sender.send("preferences", JSON.parse(preferences as string));
-  event.sender.send("favorites", JSON.parse(favorites as string));
+  
+  if(preferences)
+    event.sender.send("preferences", JSON.parse(preferences as string));
+  if(favorites)
+    event.sender.send("favorites", JSON.parse(favorites as string));
 });
 
 ipcMain.on("find", async (event, match) => {

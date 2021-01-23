@@ -59,7 +59,8 @@
     "linux": {
       "target": "snap",
       "desktop": "Bluedis",
-      "category": "Development"
+      "category": "Development",
+      "icon": "assets/icon.png"
     }
   },
   "license": "MIT",
