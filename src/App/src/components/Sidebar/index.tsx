@@ -20,8 +20,8 @@ const Sidebar = () => {
   }
 
   return (
-    <Container open={open}>
-      <MenuIcon onClick={() => setOpen(!open)} />
+    <Container data-testid="menu-sidebar" open={open}>
+      <MenuIcon data-testid="menu-button" onClick={() => setOpen(!open)} />
       <Items open={open}>
         <Item onClick={() => handlePageChange("home")}>
           <DatabaseIcon />

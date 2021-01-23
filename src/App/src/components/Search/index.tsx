@@ -1,17 +1,17 @@
 import React from "react";
 import styled from "styled-components";
 import Button from "../Button";
-import Dropbox from "../Dropbox";
+import Dropdown from "../Dropdown";
 import Input from "../Input";
 
 import {find, selectDatabase} from "../../services/mainProcess";
 
 const Container = styled.div`
-  width: 100%;
   margin: 0 8px 5px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 1;
 `;
 
 const SearchInput = styled(Input)`
@@ -35,12 +35,12 @@ const Search = () => {
 
   const handleKeyListener = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === "Enter"){
-      find(match || "");
+      find(match || "*");
     }
   }
 
   const handleSearch = () => {
-    find(match || "");
+    find(match || "*");
   }
 
   const handleDatabaseChange = (item: string) => {
@@ -52,7 +52,7 @@ const Search = () => {
     <Container>
       <span>Search:</span>
       <SearchInput onChange={handleChange} onKeyDown={handleKeyListener}/>
-      <Dropbox items={databases.map(db => db.name)} onChange={handleDatabaseChange} />
+      <Dropdown items={databases.map(db => db.name)} onChange={handleDatabaseChange} />
       <Button label="Apply" onClick={handleSearch}/>
     </Container>
   );

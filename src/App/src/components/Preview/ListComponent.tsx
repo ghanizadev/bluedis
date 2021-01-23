@@ -1,8 +1,12 @@
 import React from "react";
-import styled from "styled-components";
-import { SquareButton } from "./SquareButton";
 import AddListMember from "./AddListMember";
 import { Item } from "../../redux/Types/Item";
+import { PreviewActionButton } from "../common/PreviewActionButton";
+import { PreviewActions } from "../common/PreviewActions";
+import { PreviewContainer } from "../common/PreviewContainer";
+import { PreviewTable } from "../common/PreviewTable";
+import { PreviewTableRow } from "../common/PreviewTableRow";
+import { PreviewTableData } from "../common/PreviewTableData";
 import {
   addListMember,
   alterListMember,
@@ -13,57 +17,9 @@ import {
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-
-const Container = styled.div`
-  flex: 1;
-  background-color: ${(props) => props.theme.background};
-  flex-basis: 0;
-  overflow: hidden auto;
-`;
-
-const Table = styled.table`
-  padding: 8px;
-  border-spacing: 0;
-  width: 100%;
-
-  & td {
-    height: 30px;
-  }
-
-  & th {
-    position: sticky;
-    top: 0;
-    background-color: ${(props) => props.theme.background};
-    height: 30px;
-  }
-`;
-
-const Row = styled.tr`
-  cursor: pointer;
-  overflow: hidden;
-
-  &:hover {
-    background-color: ${(props) => props.theme.foreground};
-    color: ${(props) => props.theme.innertext};
-  }
-`;
-
-const ItemData = styled.td`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const Actions = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
-
-const ActionButton = styled(SquareButton)`
-  margin: 8px 0 0 8px;
-`;
+import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/store";
 
 let timeout: number;
 
@@ -72,13 +28,15 @@ type Props = {
 };
 const ListComponent: React.FC<Props> = (props) => {
   const {
-    item: { key, value },
+    item: { key, value, ttl },
   } = props;
   const [itemValue, setItemValue] = React.useState<{
     value: string;
     index: number;
   }>();
   const [deleting, setDeleting] = React.useState(false);
+
+  const dispatch = useDispatch();
 
   const handleAddOpen = () => {
     setItemValue({ value: "New value here...", index: -1 });
@@ -113,8 +71,12 @@ const ListComponent: React.FC<Props> = (props) => {
 
     timeout = setTimeout(() => {
       setDeleting(false);
-      deleteKey(key);
+      deleteKey([key]);
     }, 1000);
+  };
+
+  const handleTTLOpen = () => {
+    dispatch(actions.setEditTTL(props.item));
   };
 
   const handleDeleteCancel = () => {
@@ -124,45 +86,69 @@ const ListComponent: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Container>
-        <Table>
+      <PreviewContainer>
+        <PreviewTable>
           <tbody>
             <tr>
-              <th>Index</th>
+              <th style={{ width: "80px" }}>Index</th>
               <th>Value</th>
             </tr>
             {value.map((item: string, index: number) => {
               return (
-                <Row onClick={() => handleItemEdit(item, index)} key={index}>
-                  <td align="center">{index}</td>
-                  <ItemData>{item}</ItemData>
-                </Row>
+                <PreviewTableRow
+                  onClick={() => handleItemEdit(item, index)}
+                  key={index}
+                >
+                  <td style={{ width: "80px" }} align="center">
+                    {index}
+                  </td>
+                  <PreviewTableData>{item}</PreviewTableData>
+                </PreviewTableRow>
               );
             })}
           </tbody>
-        </Table>
-      </Container>
-      <Actions>
-        <ActionButton title="Add new member" onClick={handleAddOpen}>
+        </PreviewTable>
+      </PreviewContainer>
+      <span>
+        {ttl !== -1 &&
+          `TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+            timeZoneName: "short",
+          })}`}
+      </span>
+      <PreviewActions>
+        <PreviewActionButton
+          data-testid="item-add"
+          title="Add new member"
+          onClick={handleAddOpen}
+        >
           <AddIcon />
-        </ActionButton>
-        <ActionButton
+        </PreviewActionButton>
+        <PreviewActionButton
+          data-testid="item-copy"
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
-        </ActionButton>
-        <ActionButton
+        </PreviewActionButton>
+        <PreviewActionButton
+          data-testid="item-ttl"
+          title="Edit TTL"
+          onClick={handleTTLOpen}
+        >
+          <TTLIcon />
+        </PreviewActionButton>
+        <PreviewActionButton
           title="Remove document"
+          data-testid="item-remove"
           remove
-          action={deleting}
+          inAction={deleting}
           onMouseUp={handleDeleteCancel}
           onMouseDown={handleDocumentDelete}
           onMouseLeave={handleDeleteCancel}
         >
           <RemoveIcon />
-        </ActionButton>
-      </Actions>
+        </PreviewActionButton>
+      </PreviewActions>
       {!!itemValue && (
         <AddListMember
           value={itemValue}

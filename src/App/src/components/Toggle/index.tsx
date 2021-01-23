@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import "./styles.css";
 
 const Container = styled.div`
   -webkit-app-region: no-drag;
@@ -16,7 +15,7 @@ const Toggle: React.FC<Props> = (props) => {
   const { onChange, defaultChecked, checked } = props;
 
   return (
-    <Container>
+    <Container data-testid="toggle">
       <label className="switch">
         <input
           type="checkbox"

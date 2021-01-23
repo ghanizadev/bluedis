@@ -13,21 +13,21 @@ export interface AppearenceSettings {
 }
 
 export const DarkTheme : ColorSchema = {
-  background: "#1f1f1f",
-  foreground: "#4389fa",
+  background: "#1f2f30",
+  foreground: "#2ad4c3",
   text: "#fff",
   innertext: "#fff",
   title: "#fff",
-  sidebarBackground: "#333"
+  sidebarBackground: "#355052"
 }
 
 export const LightTheme : ColorSchema = {
   background: "#fdfdfd",
-  foreground: "#4389fa",
-  text: "#333",
+  foreground: "#2ad4c3",
+  text: "#1f2f30",
   innertext: "#fff",
-  title: "#333",
-  sidebarBackground: "whitesmoke"
+  title: "#1f2f30",
+  sidebarBackground: "#edf5f4"
 }
 
 export const defaultSettings : AppearenceSettings = {

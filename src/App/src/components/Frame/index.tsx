@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Background } from "./Background";
 import { Bar } from "./Bar";
 import { Close } from "./Close";
-import { Minimize } from "./Minimize";
+import { Resize } from "./Resize";
 import { WorkingArea } from "./WorkingArea";
 import { Title } from "./Title";
 import { close, maximize, minimize } from "../../services/mainProcess";
@@ -11,8 +11,17 @@ import { ButtonWrapper } from "./ButtonWrapper";
 import { ReactComponent as CloseIcon } from "../../assets/close.svg";
 import { ReactComponent as MinimizeIcon } from "../../assets/minus.svg";
 import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
+import { useSelector } from "react-redux";
+import { State } from "../../redux/Types/State";
+import { Connection } from "../../redux/Types/Connection";
 
 const Frame: React.FC = (props) => {
+  const connected = useSelector<State, boolean>((state) => state.connected);
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
+  const [host, setHost] = React.useState("");
+  const [name, setName] = React.useState("");
 
   const handleClose = () => {
     close();
@@ -26,18 +35,55 @@ const Frame: React.FC = (props) => {
     maximize();
   };
 
+  useEffect(() => {
+    if (connection && connected) {
+      if (connection.host.length > 30) {
+        setHost(
+          ` - redis://${connection.host.slice(0, 12)}...${connection.host.slice(
+            -12
+          )}:${connection.port}`
+        );
+      } else {
+        setHost(` - redis://${connection.host}:${connection.port}`);
+      }
+      if (connection.name && connection.name.length > 30) {
+        setName(
+          ` | [${connection.name.slice(0, 12)}...${connection.name.slice(-12)}]`
+        );
+      } else {
+        setName(` | [${connection.name}]`);
+      }
+    } else {
+      setHost("");
+      setName("");
+    }
+
+    console.log(connection)
+  }, [connection, connected]);
+
   return (
-    <Background>
+    <Background data-testid="frame">
       <Bar>
-        <Title>Bluedis - v1.0.0</Title>
+        <div style={{ display: "flex" }}>
+          <img
+            src={process.env.PUBLIC_URL + "/icon.png"}
+            alt=""
+            style={{ objectFit: "contain", width: 18, height: 18 }}
+          />
+          <Title>
+            Bluedis
+            {host}
+            {name}
+          </Title>
+        </div>
         <ButtonWrapper>
-          <Minimize onClick={handleMinimize}>
+          <Resize data-testid="frame-minimize" onClick={handleMinimize}>
             <MinimizeIcon width={16} height={16} />
-          </Minimize>
-          <Minimize onClick={handleMaximize}>
+          </Resize>
+          <Resize data-testid="frame-maximize" onClick={handleMaximize}>
             <MaximizeIcon width={16} height={16} />
-          </Minimize>
-          <Close onClick={handleClose}>
+          </Resize>
+          <Close data-testid="frame-close" onClick={handleClose}>
             <CloseIcon width={16} height={16} />
           </Close>
         </ButtonWrapper>

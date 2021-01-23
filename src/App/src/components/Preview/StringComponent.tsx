@@ -3,11 +3,15 @@ import styled from "styled-components";
 
 import { changeString, deleteKey } from "../../services/mainProcess";
 import { Item } from "../../redux/Types/Item";
-import { SquareButton } from "./SquareButton";
 
+import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as SaveIcon } from "../../assets/save.svg";
+import { PreviewActionButton } from "../common/PreviewActionButton";
+import { PreviewActions } from "../common/PreviewActions";
+import { useDispatch } from "react-redux";
+import { actions } from "../../redux/store";
 
 const Container = styled.textarea`
   resize: none;
@@ -16,28 +20,19 @@ const Container = styled.textarea`
   flex: 1;
 `;
 
-const Actions = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-`;
-
-const ActionButton = styled(SquareButton)`
-  margin: 8px 0 0 8px;
-`;
-
 let timeout: number;
-let saveTimeout : number;
+let saveTimeout: number;
 
 type Props = {
   item: Item;
 };
 const StringComponent: React.FC<Props> = (props) => {
-  const { key, value } = props.item;
+  const { key, value, ttl } = props.item;
   const [itemValue, setItemValue] = React.useState("");
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+
+  const dispatch = useDispatch();
 
   const handleDocumentSave = () => {
     changeString(key, itemValue);
@@ -45,8 +40,8 @@ const StringComponent: React.FC<Props> = (props) => {
     setSaved(true);
 
     saveTimeout = setTimeout(() => {
-      setSaved(false)
-    }, 3000)
+      setSaved(false);
+    }, 3000);
   };
 
   const handleDocumentCopy = () => {
@@ -61,7 +56,7 @@ const StringComponent: React.FC<Props> = (props) => {
   const handleDocumentDelete = () => {
     setDeleting(true);
     timeout = setTimeout(() => {
-      deleteKey(key);
+      deleteKey([key]);
       setDeleting(false);
     }, 1000);
   };
@@ -71,45 +66,69 @@ const StringComponent: React.FC<Props> = (props) => {
     clearTimeout(timeout);
   };
 
+  const handleTTLOpen = () => {
+    dispatch(actions.setEditTTL(props.item));
+  };
+
   return (
     <>
-      <Container onChange={handleValueChange}>{value}</Container>
+      <Container onChange={handleValueChange} defaultValue={value} />
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
         }}
       >
-        {saved && <span
-          style={{
-            alignSelf: "flex-start",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Document saved!
-        </span>}
-        <Actions>
-          <ActionButton title="Save document" onClick={handleDocumentSave}>
+        {saved && (
+          <span
+            style={{
+              alignSelf: "flex-start",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Document saved!
+          </span>
+        )}
+      <div>
+        <span>
+          {ttl !== -1 &&
+            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+        </span>
+      </div>
+        <PreviewActions>
+          <PreviewActionButton
+            title="Save document"
+            onClick={handleDocumentSave}
+            data-testid="item-save"
+          >
             <SaveIcon />
-          </ActionButton>
-          <ActionButton
+          </PreviewActionButton>
+          <PreviewActionButton
+            data-testid="item-copy"
             title="Copy document as JSON"
             onClick={handleDocumentCopy}
           >
             <CopyIcon />
-          </ActionButton>
-
-          <ActionButton
+          </PreviewActionButton>
+          <PreviewActionButton
+          data-testid="item-ttl"
+          title="Edit TTL"
+          onClick={handleTTLOpen}
+        >
+          <TTLIcon />
+        </PreviewActionButton>
+          <PreviewActionButton
+            data-testid="item-remove"
             title="Remove document"
             remove
-            action={deleting}
+            inAction={deleting}
             onMouseDown={handleDocumentDelete}
             onMouseLeave={handleCancelDelete}
             onMouseUp={handleCancelDelete}
           >
             <RemoveIcon />
-          </ActionButton>
-        </Actions>
+          </PreviewActionButton>
+        </PreviewActions>
       </div>
     </>
   );

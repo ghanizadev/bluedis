@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "./Input";
 
 type Props = {
@@ -10,24 +10,29 @@ type Props = {
 
 const Checkbox: React.FC<Props> = (props) => {
   const { label, onChangeValue, defaultChecked } = props;
+  const [checked, setChecked] = React.useState(
+    props.checked || defaultChecked || false
+  );
 
   const handleChecked = () => {
-    onChangeValue && onChangeValue(props.checked || defaultChecked || false);
+    setChecked(!checked);
+    onChangeValue && onChangeValue(!checked);
   };
+
+  useEffect(() => {
+    if (typeof props.checked === "boolean") setChecked(props.checked);
+  }, [props.checked]);
 
   return (
     <label>
       <Input
-        checked={props.checked || props.defaultChecked || false }
+        data-testid="checkbox-input"
+        checked={checked}
         onClick={handleChecked}
       >
         ✓
       </Input>
-      {label && (
-        <>
-          {` ${label}`}
-        </>
-      )}
+      {label && <>{` ${label}`}</>}
     </label>
   );
 };

@@ -2,9 +2,14 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import Frame from "./components/Frame";
-import Alert from "./components/Alert";
 import Home from "./pages/Home";
-import { DarkTheme, defaultSettings, ColorSchema, AppearenceSettings, LightTheme } from "./theme";
+import {
+  DarkTheme,
+  defaultSettings,
+  ColorSchema,
+  AppearenceSettings,
+  LightTheme,
+} from "./theme";
 import { State } from "./redux/Types/State";
 import { Page } from "./redux/Types/Page";
 import Help from "./pages/Help";
@@ -13,65 +18,44 @@ import Sidebar from "./components/Sidebar";
 import { GlobalStyles } from "./theme/globalStyles";
 import { store } from "./redux/store";
 import { getPreferences } from "./services/mainProcess";
+import ErrorMessage from "./components/ErrorMessage";
+import ConfirmationMessage from "./components/ConfirmationMessage";
+import EditTTL from "./components/EditTTL";
 
 export const SettingsContext = React.createContext({
-  setTheme: (theme: ColorSchema) => {
-    return;
-  },
-  theme: {...DarkTheme, fontFamily: "", fontSize: "14pt"},
-  setAlert: (alert: { title: string; message: string; visible: boolean }) => {
-    return;
-  },
+  theme: { ...DarkTheme, fontFamily: "", fontSize: "14pt" },
 });
 
 const App = () => {
-  const [theme, setTheme] = React.useState<ColorSchema & AppearenceSettings>({...DarkTheme, ...defaultSettings});
-  const currentPage = useSelector<State, Page>((state) => state.currentPage);
-
-  const [alert, setAlert] = React.useState({
-    visible: true,
-    title: "",
-    message: "",
+  const [theme, setTheme] = React.useState<ColorSchema & AppearenceSettings>({
+    ...LightTheme,
+    ...defaultSettings,
   });
-
-  const changeTheme = React.useCallback(
-    (newTheme: ColorSchema) => {
-      setTheme({...theme, ...newTheme});
-    },
-    [setTheme, theme]
-  );
-
-  const changeAlert = (alert: {
-    title: string;
-    message: string;
-    visible: boolean;
-  }) => {
-    setAlert(alert);
-  };
+  const currentPage = useSelector<State, Page>((state) => state.currentPage);
 
   const registerStore = React.useCallback(() => {
     store.subscribe(() => {
-      const {settings: {appearence}} = store.getState();
+      const {
+        settings: { appearence },
+      } = store.getState();
 
-      const t : ColorSchema & AppearenceSettings = {
+      const t: ColorSchema & AppearenceSettings = {
         ...(appearence.darkTheme ? DarkTheme : LightTheme),
         fontFamily: appearence.fontFamily,
         fontSize: appearence.fontSize,
       };
 
       setTheme(t);
-    })
-  }, [])
+    });
+  }, []);
 
   React.useEffect(() => {
-    registerStore()
+    registerStore();
     getPreferences();
   }, [registerStore]);
 
   return (
-    <SettingsContext.Provider
-      value={{ theme, setTheme: changeTheme, setAlert: changeAlert }}
-    >
+    <SettingsContext.Provider value={{ theme }}>
       <ThemeProvider theme={theme}>
         <Frame>
           <div
@@ -88,8 +72,10 @@ const App = () => {
             {currentPage === "help" && <Help />}
           </div>
         </Frame>
-        <Alert {...alert} />
         <GlobalStyles />
+        <EditTTL />
+        <ErrorMessage />
+        <ConfirmationMessage />
       </ThemeProvider>
     </SettingsContext.Provider>
   );

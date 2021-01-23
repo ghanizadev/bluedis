@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
 export const Input = styled.input`
-  width: 100%;
+  flex: 1;
   height: 30px;
 `;
