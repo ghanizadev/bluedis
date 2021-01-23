@@ -1,0 +1,43 @@
+name: bluedis
+title: Bluedis
+base: core18
+version: '0.1.0'
+summary: An elegant Redis interface
+description: |
+  This project was made aiming local debugging of Redis instances.
+  Check the roadmap of this project in the repository described below.
+
+  Hope you enjoy as much as I did making this for you!
+  Checkout the GitHub repository for further information.
+
+  https://github.com/ghanizadev/bluedis
+grade: stable
+confinement: strict
+icon: assets/icon.png
+
+apps:
+  bluedis:
+    command: electron-quick-start/electron-quick-start --no-sandbox
+    extensions: [gnome-3-34]
+    plugs:
+    - browser-support
+    - network
+    - network-bind
+    environment:
+      TMPDIR: $XDG_RUNTIME_DIR
+
+parts:
+  bluedis:
+    plugin: nil
+    source: .
+    override-build: |
+        npm install electron electron-packager
+        npx electron-packager . --overwrite --platform=linux --output=release-build --prune=true
+        cp -rv ./electron-quick-start-linux-* $SNAPCRAFT_PART_INSTALL/electron-quick-start
+    build-snaps:
+    - node/14/stable
+    build-packages:
+    - unzip
+    stage-packages:
+    - libnss3
+    - libnspr4
