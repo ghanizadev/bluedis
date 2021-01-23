@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Background } from "./Background";
 import { Bar } from "./Bar";
 import { Close } from "./Close";
@@ -20,6 +20,8 @@ const Frame: React.FC = (props) => {
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection
   );
+  const [host, setHost] = React.useState("");
+  const [name, setName] = React.useState("");
 
   const handleClose = () => {
     close();
@@ -33,10 +35,36 @@ const Frame: React.FC = (props) => {
     maximize();
   };
 
+  useEffect(() => {
+    if (connection && connected) {
+      if (connection.host.length > 30) {
+        setHost(
+          ` - redis://${connection.host.slice(0, 12)}...${connection.host.slice(
+            -12
+          )}:${connection.port}`
+        );
+      } else {
+        setHost(` - redis://${connection.host}:${connection.port}`);
+      }
+      if (connection.name && connection.name.length > 30) {
+        setName(
+          ` | [${connection.name.slice(0, 12)}...${connection.name.slice(-12)}]`
+        );
+      } else {
+        setName(` | [${connection.name}]`);
+      }
+    } else {
+      setHost("");
+      setName("");
+    }
+
+    console.log(connection)
+  }, [connection, connected]);
+
   return (
     <Background data-testid="frame">
       <Bar>
-        <div style={{display: "flex"}}>
+        <div style={{ display: "flex" }}>
           <img
             src={process.env.PUBLIC_URL + "/icon.png"}
             alt=""
@@ -44,12 +72,12 @@ const Frame: React.FC = (props) => {
           />
           <Title>
             Bluedis
-            {connected && ` - redis://${connection?.host}:${connection?.port}`}
-            {connected && connection?.name && ` | [${connection?.name}]`}
+            {host}
+            {name}
           </Title>
         </div>
         <ButtonWrapper>
-          <Resize  data-testid="frame-minimize" onClick={handleMinimize}>
+          <Resize data-testid="frame-minimize" onClick={handleMinimize}>
             <MinimizeIcon width={16} height={16} />
           </Resize>
           <Resize data-testid="frame-maximize" onClick={handleMaximize}>

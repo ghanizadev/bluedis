@@ -110,15 +110,21 @@ const ListComponent: React.FC<Props> = (props) => {
         </PreviewTable>
       </PreviewContainer>
       <span>
-          {ttl !== -1 &&
-            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
-        </span>
+        {ttl !== -1 &&
+          `TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+            timeZoneName: "short",
+          })}`}
+      </span>
       <PreviewActions>
-        <PreviewActionButton data-testid="item-add" title="Add new member" onClick={handleAddOpen}>
+        <PreviewActionButton
+          data-testid="item-add"
+          title="Add new member"
+          onClick={handleAddOpen}
+        >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
-         data-testid="item-copy"
+          data-testid="item-copy"
           title="Copy document as JSON"
           onClick={handleDocumentCopy}
         >

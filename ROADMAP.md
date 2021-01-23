@@ -23,3 +23,4 @@
 - [ ] Add suport to export to CSV;
 - [ ] Quick setup for AWS, Azure, Redis Labs...;
 - [ ] Suport to clusters;
+- [ ] Add webpack;
