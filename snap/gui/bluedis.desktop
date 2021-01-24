@@ -1,6 +1,9 @@
+[Desktop Entry]
+Name=Bluedis
 Exec=bluedis
 Icon=${SNAP}/meta/gui/bluedis.png
 Type=Application
 Version=0.1.0
-Categories=Development
+Terminal=false
+Categories=Development;Utility;
 Comment=An elegant Redis interface
