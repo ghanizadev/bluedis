@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const gulp = require("gulp");
 var exec = require('child_process').exec;
 
