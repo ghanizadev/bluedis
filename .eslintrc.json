@@ -18,5 +18,5 @@
           "extensions": [".js", ".jsx", ".ts", ".tsx"]
         }
       }
-    },
+    }
 }
