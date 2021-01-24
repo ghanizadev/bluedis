@@ -39,7 +39,7 @@ parts:
         yarn
         yarn --cwd ./src/App
         yarn build
-        cp -rv ./dist/linux-unpacked $SNAPCRAFT_PART_INSTALL
+        cp -rv $SNAPCRAFT_PART_BUILD/dist/linux-unpacked $SNAPCRAFT_PART_INSTALL
         mv $SNAPCRAFT_PART_INSTALL/linux-unpacked $SNAPCRAFT_PART_INSTALL/bin
     build-snaps:
     - node/14/stable
