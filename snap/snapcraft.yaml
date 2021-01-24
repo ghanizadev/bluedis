@@ -2,6 +2,7 @@ name: bluedis
 title: Bluedis
 base: core18
 version: '0.1.0'
+architectures: [amd64, i386]
 summary: An elegant Redis interface
 description: |
   This project was made aiming local debugging of Redis instances.
@@ -36,15 +37,12 @@ parts:
           export GLOBAL_AGENT_HTTP_PROXY="${http_proxy}"
           export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy}"
         fi
-        echo $PWD
-        ls -a
-        yarn
-        yarn --cwd ./src/App
-        yarn compile
-        cd dist
-        ls -a
-        cp -rv $SNAPCRAFT_PART_BUILD/dist/linux-unpacked $SNAPCRAFT_PART_INSTALL
-        mv $SNAPCRAFT_PART_INSTALL/linux-unpacked $SNAPCRAFT_PART_INSTALL/bin
+
+        yarn --frozen-lockfile
+        yarn --cwd ./src/App --frozen-lockfile
+        yarn dir
+        cp -rv $SNAPCRAFT_PART_BUILD/dist/linux-* $SNAPCRAFT_PART_INSTALL
+        mv $SNAPCRAFT_PART_INSTALL/linux-* $SNAPCRAFT_PART_INSTALL/bin
     build-snaps:
     - node/14/stable
     build-packages:
