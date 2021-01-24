@@ -37,6 +37,7 @@ parts:
           export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy}"
         fi
         yarn
+        yarn --cwd ./src/App
         yarn build
         cp -rv ./dist/linux-unpacked/* $SNAPCRAFT_PART_INSTALL/
     build-snaps:
