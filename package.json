@@ -11,8 +11,8 @@
     "dev:electron": "npx tsc && cross-env NODE_ENV=development electron .",
     "dev:react": "yarn --cwd ./src/App start",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win nsis --linux snap",
-    "dist:linux": "electron-builder --linux snap",
+    "dist": "electron-builder",
+    "dist:all": "electron-builder --win nsis --linux snap",
     "build": "gulp build",
     "compile": "gulp dist",
     "publish": "build --mac --win --linux -p always"
