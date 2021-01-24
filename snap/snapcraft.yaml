@@ -40,7 +40,7 @@ parts:
         ls -a
         yarn
         yarn --cwd ./src/App
-        yarn build
+        yarn compile
         cd dist
         ls -a
         cp -rv $SNAPCRAFT_PART_BUILD/dist/linux-unpacked $SNAPCRAFT_PART_INSTALL
