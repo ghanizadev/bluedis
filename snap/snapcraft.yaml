@@ -17,7 +17,7 @@ icon: snap/local/icon.png
 
 apps:
   bluedis:
-    command: bluedis --no-sandbox
+    command: bin/bluedis --no-sandbox
     extensions: [gnome-3-34]
     plugs:
     - browser-support
@@ -39,7 +39,8 @@ parts:
         yarn
         yarn --cwd ./src/App
         yarn build
-        cp -rv ./dist/linux-unpacked/* $SNAPCRAFT_PART_INSTALL/
+        cp -rv ./dist/linux-unpacked $SNAPCRAFT_PART_INSTALL
+        mv $SNAPCRAFT_PART_INSTALL/linux-unpacked $SNAPCRAFT_PART_INSTALL/bin
     build-snaps:
     - node/14/stable
     build-packages:
