@@ -1,2 +1,6 @@
 Exec=bluedis
 Icon=${SNAP}/meta/gui/bluedis.png
+Type=Application
+Version=0.1.0
+Categories=Development
+Comment=An elegant Redis interface
