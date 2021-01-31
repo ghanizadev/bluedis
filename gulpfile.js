@@ -41,6 +41,13 @@ gulp.task('dir', function (cb) {
     });
 })
 
+gulp.task('make', function (cb) {
+    exec('electron-builder', function (err, out, error) {
+      console.log(out, error)
+      cb(err);
+    });
+})
+
 gulp.task('copy-react', function () {
     return gulp.src('./src/App/build/**/*')
         .pipe(gulp.dest('./dist/build'));
@@ -61,4 +68,5 @@ gulp.task('start-react', function (cb) {
 gulp.task('build', gulp.series(['compile-electron', 'compile-react', 'copy-react']));
 gulp.task('dist', gulp.series(['build', 'dist']));
 gulp.task('pack', gulp.series(['build', 'dir']));
+gulp.task('compile', gulp.series(['build', "make"]));
 gulp.task('dev', gulp.series(['compile-electron', gulp.parallel(['start-react', 'start-electron'])]));
