@@ -13,6 +13,7 @@ import { Page } from "./Types/Page";
 import { State } from "./Types/State";
 
 const initialState: State = {
+  isLoading: false,
   data: [],
   selected: [],
   currentPage: "home",
@@ -120,6 +121,9 @@ const slice = createSlice({
       state.data = state.data.filter(doc => !action.payload.includes(doc.key));
       state.preview = undefined;
       state.query.totalDocs = state.query.totalDocs - action.payload.length;
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     }
   },
 });
