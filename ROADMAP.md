@@ -3,7 +3,7 @@
 ## Next changes
 
 - [ ] Add visual feedback for loading;
-- [ ] Repository and social media links in connection screen;
+- [x] Repository and social media links in connection screen;
 - [ ] [Add native promise-base](https://github.com/luin/ioredis#plugging-in-your-own-promises-library) library to Redis instance;
 - [ ] Add support to SSH/TLS;
 - [ ] Load data from external files;
