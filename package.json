@@ -63,6 +63,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
     "@types/electron": "^1.6.10",
+    "@types/ioredis": "^4.19.3",
     "@types/redis": "^2.8.28",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.0.1",
@@ -81,6 +82,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^6.0.1",
     "electron-updater": "^4.3.5",
+    "ioredis": "^4.22.0",
     "npm-run-all": "^4.1.5",
     "redis": "^3.0.2",
     "uuid": "^8.3.2"

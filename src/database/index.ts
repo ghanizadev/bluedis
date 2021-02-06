@@ -1,27 +1,29 @@
-import redis, { RedisClient } from "redis";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import Redis from "ioredis";
 import { v4 } from "uuid";
 
 class DatabaseManager {
-  private _instance: RedisClient;
+  private _instance: Redis.Redis;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
   public connect(
     host = "localhost",
     port = 6379,
     password?: string,
-    tls?: boolean
-  ) {
-    this._instance = redis.createClient(port, host, {
-      auth_pass: password,
+    tls?: {
+      ca: string;
+    }
+  ): void {
+    this._instance = new Redis(port, host, {
+      password,
       tls,
-      retry_strategy: () => new Error("Host unreacheable"),
     });
   }
 
-  public disconnect() {
+  public disconnect(): void {
     this._instance.quit();
-    this._instance.unref();
   }
 
   public deleteKey = async (key: string | string[]): Promise<number> => {
@@ -46,12 +48,12 @@ class DatabaseManager {
     return new Promise((res, rej) => {
       if (ttl) {
         if (typeof ttl === "string") {
-          this._instance.PEXPIREAT(key, new Date(ttl).getTime(), (err) => {
+          this._instance.pexpireat(key, new Date(ttl).getTime(), (err) => {
             if (err) rej(err);
             else res();
           });
         } else {
-          this._instance.EXPIRE(key, ttl, (err) => {
+          this._instance.expire(key, ttl, (err) => {
             if (err) rej(err);
             else res();
           });
@@ -62,7 +64,7 @@ class DatabaseManager {
 
   public async removeTTL(key: string): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.PERSIST(key, (err, reply) => {
+      this._instance.persist(key, (err) => {
         if (err) rej(err);
         else res();
       });
@@ -75,7 +77,7 @@ class DatabaseManager {
     ttl: string | number
   ): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.SET(key, value, (err) => {
+      this._instance.set(key, value, (err) => {
         if (err) rej(err);
         else this.addTTL(key, ttl).then(res);
       });
@@ -88,7 +90,7 @@ class DatabaseManager {
     ttl: string | number
   ): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.SADD(key, value, (err) => {
+      this._instance.sadd(key, value, (err) => {
         if (err) rej(err);
         else this.addTTL(key, ttl).then(res);
       });
@@ -101,7 +103,7 @@ class DatabaseManager {
     ttl: number | string
   ): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.ZADD(
+      this._instance.zadd(
         key,
         items.reduce(
           (prev, curr) => [...prev, curr.score, curr.value],
@@ -117,7 +119,7 @@ class DatabaseManager {
 
   public async changeHash(
     key: string,
-    values: { [key: string]: any },
+    values: { [key: string]: string | number | boolean | Date },
     ttl: number | string
   ): Promise<void> {
     return new Promise((res, rej) => {
@@ -126,7 +128,7 @@ class DatabaseManager {
         Array<string>()
       );
 
-      this._instance.HSET(key, items, (err) => {
+      this._instance.hset(key, items, (err) => {
         if (err) rej(err);
         else this.addTTL(key, ttl).then(res);
       });
@@ -139,7 +141,7 @@ class DatabaseManager {
     ttl: string | number
   ): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.LPUSH(key, value, (err) => {
+      this._instance.lpush(key, value, (err) => {
         if (err) rej(err);
         else this.addTTL(key, ttl).then(res);
       });
@@ -153,12 +155,12 @@ class DatabaseManager {
   ): Promise<void> {
     return new Promise((res, rej) => {
       if (position === "head") {
-        this._instance.LPUSH(key, value, (err) => {
+        this._instance.lpush(key, value, (err) => {
           if (err) rej(err);
           return res();
         });
       } else {
-        this._instance.RPUSH(key, value, (err) => {
+        this._instance.rpush(key, value, (err) => {
           if (err) rej(err);
           return res();
         });
@@ -169,10 +171,10 @@ class DatabaseManager {
   public async removeListMember(key: string, index: number): Promise<void> {
     return new Promise((res, rej) => {
       const uuid = v4();
-      this._instance.LSET(key, index, uuid, (err) => {
+      this._instance.lset(key, index, uuid, (err) => {
         if (err) rej(err);
 
-        this._instance.LREM(key, 1, uuid, (err) => {
+        this._instance.lrem(key, 1, uuid, (err) => {
           if (err) rej(err);
           return res();
         });
@@ -186,7 +188,7 @@ class DatabaseManager {
     index: number
   ): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.LSET(key, index, value, (err) => {
+      this._instance.lset(key, index, value, (err) => {
         if (err) rej(err);
         res();
       });
@@ -195,7 +197,7 @@ class DatabaseManager {
 
   public async addSetMember(key: string, value: string): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.SADD(key, value, (err) => {
+      this._instance.sadd(key, value, (err) => {
         if (err) rej(err);
         return res();
       });
@@ -204,7 +206,7 @@ class DatabaseManager {
 
   public async removeSetMember(key: string, value: string): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.SREM(key, value, (err) => {
+      this._instance.srem(key, value, (err) => {
         if (err) rej(err);
         return res();
       });
@@ -214,10 +216,10 @@ class DatabaseManager {
   public async addZSetMember(
     key: string,
     value: string,
-    score: string = "0"
+    score = "0"
   ): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.ZADD(key, [score, value], (err) => {
+      this._instance.zadd(key, [score, value], (err) => {
         if (err) rej(err);
         return res();
       });
@@ -226,7 +228,7 @@ class DatabaseManager {
 
   public async removeZSetMember(key: string, value: string): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.ZREM(key, value, (err) => {
+      this._instance.zrem(key, value, (err) => {
         if (err) rej(err);
         return res();
       });
@@ -235,7 +237,7 @@ class DatabaseManager {
 
   public async addHashMember(
     key: string,
-    values: { [key: string]: any }
+    values: { [key: string]: string | number | boolean | Date }
   ): Promise<void> {
     return new Promise((res, rej) => {
       const items = Object.keys(values).reduce(
@@ -243,7 +245,7 @@ class DatabaseManager {
         Array<string>()
       );
 
-      this._instance.HSET(key, items, (err) => {
+      this._instance.hset(key, items, (err) => {
         if (err) rej(err);
         return res();
       });
@@ -252,7 +254,7 @@ class DatabaseManager {
 
   public async removeHashMember(key: string, value: string): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.HDEL(key, value, (err) => {
+      this._instance.hdel(key, value, (err) => {
         if (err) rej(err);
         return res();
       });
@@ -263,7 +265,7 @@ class DatabaseManager {
     key: string,
     type: "set" | "zset" | "hash" | "string" | "list",
     ttl: number
-  ) {
+  ): Promise<void> {
     switch (type) {
       case "string":
         await this.changeString(key, "New Value", ttl);
@@ -285,7 +287,7 @@ class DatabaseManager {
     }
   }
 
-  private async hydratateShallow(items: string[]){
+  private async hydratateShallow(items: string[]) {
     const promises = items.map(async (item) => {
       const response: any = {
         key: item,
@@ -294,8 +296,8 @@ class DatabaseManager {
         ttl: -1,
       };
 
-      const type = await new Promise((res, rej) => {
-        this._instance.TYPE(item, (err, reply) => {
+      const type = await new Promise((res) => {
+        this._instance.type(item, (err, reply) => {
           res(reply);
         });
       });
@@ -317,13 +319,13 @@ class DatabaseManager {
         ttl: -1,
       };
 
-      const type = await new Promise((res, rej) => {
-        this._instance.TYPE(item, (err, reply) => {
+      const type = await new Promise((res) => {
+        this._instance.type(item, (err, reply) => {
           res(reply);
         });
       });
 
-      const value = await new Promise((res, rej) => {
+      const value = await new Promise((res) => {
         if (type === "string") {
           this._instance.get(item, (err, reply) => {
             res(reply);
@@ -358,7 +360,7 @@ class DatabaseManager {
       });
 
       const ttl = await new Promise((res, rej) => {
-        this._instance.PTTL(item, (err, ttl) => {
+        this._instance.pttl(item, (err, ttl) => {
           if (err) rej(err);
 
           if (ttl === -1) return res(-1);
@@ -378,79 +380,67 @@ class DatabaseManager {
 
   public async countDocuments(): Promise<number> {
     return new Promise((res, rej) => {
-      this._instance.DBSIZE((err, reply) => {
-        if(err) return rej(err);
+      this._instance.dbsize((err, reply) => {
+        if (err) return rej(err);
         return res(reply);
-      })
-    })
+      });
+    });
   }
 
   public async loadMore(
     match: string,
-    cursor = 0,
-    count = 10
-  ): Promise<{docs: any[], cursor: number}> {
+    cursor = 0
+    // count = 10
+  ): Promise<{ docs: any[]; cursor: number }> {
     return await new Promise((res, rej) => {
-      this._instance.SCAN(
-        String(cursor),
-        "MATCH",
-        match,
-        "COUNT",
-        String(count),
-        async (err, reply) => {
-          if (err) rej(err);
+      this._instance.scan(cursor, "MATCH", match, async (err, reply) => {
+        if (err) rej(err);
 
-          const [replycursor, items] = reply;
-          const response = await this.hydratateShallow(items);
-          res({
-            docs: response,
-            cursor: Number(replycursor),
-          });
-        }
-      );
+        const [replycursor, items] = reply;
+        const response = await this.hydratateShallow(items);
+        res({
+          docs: response,
+          cursor: Number(replycursor),
+        });
+      });
     });
   }
 
   public async findByName(
     match: string
-  ): Promise<{docs: any[], cursor: number, totalDocs: number}> {
+  ): Promise<{ docs: any[]; cursor: number; totalDocs: number }> {
     return await new Promise((res, rej) => {
-      this._instance.KEYS(
-        match,
-        async (err, reply) => {
-          if (err) rej(err);
+      this._instance.scan(0, "MATCH", match, async (err, reply) => {
+        if (err) rej(err);
 
-          const items = reply;
-          const response = await this.hydratateShallow(items);
-          res({
-            docs: response,
-            cursor: 0,
-            totalDocs: items.length
-          });
-        }
-      );
+        const [cursor, items] = reply;
+        const response = await this.hydratateShallow(items);
+        res({
+          docs: response,
+          cursor: Number(cursor),
+          totalDocs: items.length,
+        });
+      });
     });
   }
 
-  public async findAll(cursor = 0, count = 10): Promise<{docs: any[], cursor: number, totalDocs: number}> {
+  public async findAll(
+    cursor = 0
+    // count = 10
+  ): Promise<{ docs: any[]; cursor: number; totalDocs: number }> {
     return await new Promise((res, rej) => {
-      this._instance.scan(
-        String(cursor),
-        "COUNT",
-        String(count),
-        async (err, reply) => {
-          if (err) rej(err);
+      this._instance.scan(cursor, "MATCH", "*", async (err, reply) => {
+        if (err) rej(err);
 
-          const totalCount = await this.countDocuments();
-          const [replycursor, items] = reply;
-          const response = await this.hydratateShallow(items);
-          res({
-            docs: response,
-            cursor: Number(replycursor),
-            totalDocs: totalCount
-          });
-        }
-      );
+        const totalCount = await this.countDocuments();
+        const [replycursor, items] = reply;
+        const response = await this.hydratateShallow(items);
+        res({
+          docs: response,
+          cursor: Number(replycursor),
+          totalDocs: totalCount,
+        });
+      });
     });
   }
 

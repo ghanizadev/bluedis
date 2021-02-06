@@ -88,6 +88,7 @@ const Connect = () => {
 
   const handleConnect = () => {
     dispatch(actions.currentConnection({ ...connection, id: nanoid(8) }));
+    dispatch(actions.setLoading(true));
     connect(connection);
   };
 
