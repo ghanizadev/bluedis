@@ -5,6 +5,7 @@ import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { command } from "./comands";
 import { executeCommand } from "../../services/mainProcess";
+import availableCommands from "./availableCommands.json";
 
 export const Background = styled.div`
   position: absolute;
@@ -78,10 +79,20 @@ const Shell: React.FC = () => {
     if (event.key === "Enter" && inputRef.current) {
       const value = inputRef.current!.value;
       if (!value) return;
+
       inputRef.current!.value = "";
       dispatch(actions.updateSTDOUT(`> ${value}`));
+
       if ((command as any)[value]) (command as any)[value]();
-      else executeCommand(value);
+      else if (
+        availableCommands.filter((v) => value.toUpperCase().startsWith(v))
+          .length > 0
+      ) {
+        executeCommand(value);
+      } else {
+        dispatch(actions.updateSTDOUT(`> Command not recognized: ${value}`));
+      }
+
       inputRef.current!.disabled = true;
     }
   };

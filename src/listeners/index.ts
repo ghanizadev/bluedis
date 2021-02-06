@@ -55,9 +55,11 @@ ipcMain.on("deleteKey", async (event, key: string[]) => {
 
 ipcMain.on("executeCommand", async (event, command: string) => {
   try {
-    const reply = await database.command(command.replace(/\s\s+/g, ' ').trim());
+    console.log({ command });
+    const reply = await database.command(command.replace(/\s\s+/g, " ").trim());
     event.sender.send("commandReply", reply);
-  } catch(e) {
+  } catch (e) {
+    console.log(e);
     return event.sender.send("commandReply", e.message);
   }
 });
@@ -176,10 +178,10 @@ ipcMain.on("initial", async (event) => {
   const favorites = store.get("favorites");
 
   event.sender.send("license", license);
-  
-  if(preferences)
+
+  if (preferences)
     event.sender.send("preferences", JSON.parse(preferences as string));
-  if(favorites)
+  if (favorites)
     event.sender.send("favorites", JSON.parse(favorites as string));
 });
 
@@ -200,5 +202,5 @@ ipcMain.on("updatePreview", async (event, key) => {
 
 ipcMain.on("exportItems", async (event, items) => {
   const docs = await database.findByKeys(items);
-  event.sender.send("exportedItems", {docs});
+  event.sender.send("exportedItems", { docs });
 });

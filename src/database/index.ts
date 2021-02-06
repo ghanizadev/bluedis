@@ -1,5 +1,6 @@
 import redis, { RedisClient } from "redis";
 import { v4 } from "uuid";
+import availableCommands from "./availableCommands.json";
 
 type DBResponse =
   | string
@@ -23,7 +24,7 @@ class DatabaseManager {
     this._instance = redis.createClient(port, host, {
       auth_pass: password,
       retry_strategy: () => new Error("Host unreacheable"),
-      tls
+      tls,
     });
   }
 
@@ -34,10 +35,25 @@ class DatabaseManager {
 
   public command = async (command: string): Promise<any> => {
     return new Promise<any>((res, rej) => {
-      this._instance.batch([command.split(" ")]).exec((err, reply) => {
-        if (err) return rej(err);
-        return res(reply);
-      });
+      try{
+        const c = (availableCommands as string[]).find((str) =>
+          command.toUpperCase().startsWith(str)
+        );
+  
+        if (!c) return rej("Command not found");
+  
+        const query = [c, ...command.slice(c.length).trim().split(" ").filter(i => i !== "")];
+  
+        console.log(query);
+  
+        this._instance.batch([query]).exec((err, reply) => {
+          if (err) return rej(err);
+          return res(reply);
+        });
+        
+      }catch(e){
+        console.error(e)
+      }
     });
   };
 
