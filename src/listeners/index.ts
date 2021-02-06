@@ -158,7 +158,7 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
   store.set("favorites", JSON.stringify(favorites));
 });
 
-ipcMain.on("wipeData", async (event, favorites) => {
+ipcMain.on("wipeData", async () => {
   store.clear();
 });
 
@@ -179,8 +179,8 @@ ipcMain.on("find", async (event, match) => {
   event.sender.send("data", result);
 });
 
-ipcMain.on("loadMore", async (event, match, cursor, count) => {
-  const result = await database.loadMore(match, cursor || 0, count || 10);
+ipcMain.on("loadMore", async (event, match, cursor) => {
+  const result = await database.loadMore(match, cursor || 0);
   event.sender.send("loadedData", result);
 });
 
