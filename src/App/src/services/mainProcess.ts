@@ -113,6 +113,10 @@ export const saveFavorites = (favorites: any) => {
   ipcRenderer.send("saveFavorites", favorites);
 };
 
+export const executeCommand = (command: string) => {
+  ipcRenderer.send("executeCommand", command);
+};
+
 export const exportItems = (items: string[]) => {
   ipcRenderer.send("exportItems", items);
 };
@@ -180,6 +184,10 @@ ipcRenderer.on(
 
 ipcRenderer.on("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));
+});
+
+ipcRenderer.on("commandReply", (event: any, reply: string) => {
+  store.dispatch(actions.updateSTDOUT(reply));
 });
 
 ipcRenderer.on("dataPreview", (event: any, doc: any) => {

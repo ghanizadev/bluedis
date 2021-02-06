@@ -32,6 +32,15 @@ const initialState: State = {
     },
     license: "teste"
   },
+  terminal: {
+    open: false,
+    stdout: [
+      "Bluedis Terminal",
+      "\u00a0",
+      "Type \"help\" to check for commands or go to Help tab.",
+      "\u00a0",
+    ],
+  },
   connected: false,
   favorites: [],
   lastRefresh: new Date(),
@@ -120,6 +129,15 @@ const slice = createSlice({
       state.data = state.data.filter(doc => !action.payload.includes(doc.key));
       state.preview = undefined;
       state.query.totalDocs = state.query.totalDocs - action.payload.length;
+    },
+    setTerminal:(state, action: PayloadAction<boolean>)=>{
+      state.terminal.open = action.payload;
+    },
+    updateSTDOUT:(state, action: PayloadAction<string>)=>{
+      state.terminal.stdout = [...state.terminal.stdout, action.payload];
+    },
+    clearSTDOUT:(state)=>{
+      state.terminal.stdout = [];
     }
   },
 });

@@ -18,6 +18,7 @@ import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as DownloadIcon } from "../../assets/download.svg";
 import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
 import { ReactComponent as FavoriteIcon } from "../../assets/star.svg";
+import { ReactComponent as TerminalIcon } from "../../assets/terminal.svg";
 import { Connection } from "../../redux/Types/Connection";
 import { Container } from "./Container";
 import { LastRefresh } from "./LastRefresh";
@@ -73,6 +74,10 @@ const Toolbar: React.FC<Props> = (props) => {
 
   const handleDisconnect = () => {
     disconnect();
+  };
+
+  const handleTerminal = () => {
+    dispatch(actions.setTerminal(!store.getState().terminal.open));
   };
 
   const handleFavorite = () => {
@@ -131,6 +136,14 @@ const Toolbar: React.FC<Props> = (props) => {
         </SquareButton>
         <Separator />
         <SquareButton
+          data-testid="data-shell"
+          title="Open terminal"
+          onClick={handleTerminal}
+        >
+          <TerminalIcon />
+        </SquareButton>
+        <Separator />
+        <SquareButton
           data-testid="data-disconnect"
           title="Close this connection"
           onClick={handleDisconnect}
@@ -148,7 +161,9 @@ const Toolbar: React.FC<Props> = (props) => {
             <FavoriteIcon />
           </SquareButton>
         )}
-        <LastRefresh>Last update: {lastRefresh.toLocaleTimeString()}</LastRefresh>
+        <LastRefresh>
+          Last update: {lastRefresh.toLocaleTimeString()}
+        </LastRefresh>
       </Container>
       {newName && (
         <PickName

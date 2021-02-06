@@ -1,28 +1,45 @@
 import redis, { RedisClient } from "redis";
 import { v4 } from "uuid";
 
+type DBResponse =
+  | string
+  | string[]
+  | { [key: string]: string }
+  | { value: string; score: string }[];
 class DatabaseManager {
   private _instance: RedisClient;
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor() {}
 
   public connect(
     host = "localhost",
     port = 6379,
     password?: string,
-    tls?: boolean
-  ) {
+    tls?: {
+      ca: Buffer | string;
+    }
+  ): void {
     this._instance = redis.createClient(port, host, {
       auth_pass: password,
-      tls,
       retry_strategy: () => new Error("Host unreacheable"),
+      tls
     });
   }
 
-  public disconnect() {
+  public disconnect(): void {
     this._instance.quit();
     this._instance.unref();
   }
+
+  public command = async (command: string): Promise<any> => {
+    return new Promise<any>((res, rej) => {
+      this._instance.batch([command.split(" ")]).exec((err, reply) => {
+        if (err) return rej(err);
+        return res(reply);
+      });
+    });
+  };
 
   public deleteKey = async (key: string | string[]): Promise<number> => {
     return new Promise((res, rej) => {
@@ -62,7 +79,7 @@ class DatabaseManager {
 
   public async removeTTL(key: string): Promise<void> {
     return new Promise((res, rej) => {
-      this._instance.PERSIST(key, (err, reply) => {
+      this._instance.PERSIST(key, (err) => {
         if (err) rej(err);
         else res();
       });
@@ -117,7 +134,7 @@ class DatabaseManager {
 
   public async changeHash(
     key: string,
-    values: { [key: string]: any },
+    values: { [key: string]: string | number | boolean | Date },
     ttl: number | string
   ): Promise<void> {
     return new Promise((res, rej) => {
@@ -214,7 +231,7 @@ class DatabaseManager {
   public async addZSetMember(
     key: string,
     value: string,
-    score: string = "0"
+    score = "0"
   ): Promise<void> {
     return new Promise((res, rej) => {
       this._instance.ZADD(key, [score, value], (err) => {
@@ -235,7 +252,7 @@ class DatabaseManager {
 
   public async addHashMember(
     key: string,
-    values: { [key: string]: any }
+    values: { [key: string]: string | number | boolean | Date }
   ): Promise<void> {
     return new Promise((res, rej) => {
       const items = Object.keys(values).reduce(
@@ -263,7 +280,7 @@ class DatabaseManager {
     key: string,
     type: "set" | "zset" | "hash" | "string" | "list",
     ttl: number
-  ) {
+  ): Promise<void> {
     switch (type) {
       case "string":
         await this.changeString(key, "New Value", ttl);
@@ -285,16 +302,16 @@ class DatabaseManager {
     }
   }
 
-  private async hydratateShallow(items: string[]){
+  private async hydratateShallow(items: string[]) {
     const promises = items.map(async (item) => {
-      const response: any = {
+      const response = {
         key: item,
         value: "",
         type: "",
         ttl: -1,
       };
 
-      const type = await new Promise((res, rej) => {
+      const type = await new Promise<string>((res) => {
         this._instance.TYPE(item, (err, reply) => {
           res(reply);
         });
@@ -310,20 +327,25 @@ class DatabaseManager {
 
   private async hydrateItems(items: string[]): Promise<any[]> {
     const promises = items.map(async (item) => {
-      const response: any = {
+      const response: {
+        key: string;
+        value: DBResponse;
+        type: string;
+        ttl: number;
+      } = {
         key: item,
         value: "",
         type: "",
         ttl: -1,
       };
 
-      const type = await new Promise((res, rej) => {
+      const type = await new Promise<string>((res) => {
         this._instance.TYPE(item, (err, reply) => {
           res(reply);
         });
       });
 
-      const value = await new Promise((res, rej) => {
+      const value = await new Promise<DBResponse>((res) => {
         if (type === "string") {
           this._instance.get(item, (err, reply) => {
             res(reply);
@@ -357,7 +379,7 @@ class DatabaseManager {
         }
       });
 
-      const ttl = await new Promise((res, rej) => {
+      const ttl = await new Promise<number>((res, rej) => {
         this._instance.PTTL(item, (err, ttl) => {
           if (err) rej(err);
 
@@ -379,17 +401,17 @@ class DatabaseManager {
   public async countDocuments(): Promise<number> {
     return new Promise((res, rej) => {
       this._instance.DBSIZE((err, reply) => {
-        if(err) return rej(err);
+        if (err) return rej(err);
         return res(reply);
-      })
-    })
+      });
+    });
   }
 
   public async loadMore(
     match: string,
     cursor = 0,
     count = 10
-  ): Promise<{docs: any[], cursor: number}> {
+  ): Promise<{ docs: any[]; cursor: number }> {
     return await new Promise((res, rej) => {
       this._instance.SCAN(
         String(cursor),
@@ -413,26 +435,26 @@ class DatabaseManager {
 
   public async findByName(
     match: string
-  ): Promise<{docs: any[], cursor: number, totalDocs: number}> {
+  ): Promise<{ docs: any[]; cursor: number; totalDocs: number }> {
     return await new Promise((res, rej) => {
-      this._instance.KEYS(
-        match,
-        async (err, reply) => {
-          if (err) rej(err);
+      this._instance.KEYS(match, async (err, reply) => {
+        if (err) rej(err);
 
-          const items = reply;
-          const response = await this.hydratateShallow(items);
-          res({
-            docs: response,
-            cursor: 0,
-            totalDocs: items.length
-          });
-        }
-      );
+        const items = reply;
+        const response = await this.hydratateShallow(items);
+        res({
+          docs: response,
+          cursor: 0,
+          totalDocs: items.length,
+        });
+      });
     });
   }
 
-  public async findAll(cursor = 0, count = 10): Promise<{docs: any[], cursor: number, totalDocs: number}> {
+  public async findAll(
+    cursor = 0,
+    count = 10
+  ): Promise<{ docs: any[]; cursor: number; totalDocs: number }> {
     return await new Promise((res, rej) => {
       this._instance.scan(
         String(cursor),
@@ -447,14 +469,14 @@ class DatabaseManager {
           res({
             docs: response,
             cursor: Number(replycursor),
-            totalDocs: totalCount
+            totalDocs: totalCount,
           });
         }
       );
     });
   }
 
-  public async findByKeys(keys: string[]): Promise<any> {
+  public async findByKeys(keys: string[]): Promise<any[]> {
     return this.hydrateItems(keys);
   }
 }

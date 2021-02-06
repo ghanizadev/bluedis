@@ -1,0 +1,128 @@
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import styled from "styled-components";
+import { actions } from "../../redux/store";
+import { State } from "../../redux/Types/State";
+import { command } from "./comands";
+import { executeCommand } from "../../services/mainProcess";
+
+export const Background = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background-color: rgba(0, 0, 0, 0.15);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 10;
+`;
+
+const Container = styled.section`
+  flex: 0 1;
+  height: 180px;
+  background-color: ${(props) => props.theme.sidebarBackground};
+  color: ${(props) => props.theme.text};
+  border: 1px solid ${(props) => props.theme.text};
+  transition: height 250ms ease-out;
+
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+`;
+
+const Terminal = styled.div`
+  background-color: #333;
+  color: #fff;
+  font-family: "Fira Code", monospace;
+  flex: 1;
+  flex-basis: 0;
+  overflow-y: scroll;
+  padding: 5px;
+  font-size: 12px;
+
+  & p {
+    width: 100%;
+    display: flex;
+  }
+
+  & div {
+    margin-right: 7px;
+  }
+
+  & input {
+    background-color: transparent;
+    border: none;
+    cursor: default;
+    caret-color: #fff;
+    color: inherit;
+    font-size: inherit;
+    flex: 1;
+  }
+`;
+
+const Shell: React.FC = () => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const terminal = useSelector<State, { open: boolean; stdout: string[] }>(
+    (state) => state.terminal
+  );
+  const dispatch = useDispatch();
+
+  const handleCommandsubmit = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key === "Enter" && inputRef.current) {
+      const value = inputRef.current!.value;
+      if (!value) return;
+      inputRef.current!.value = "";
+      dispatch(actions.updateSTDOUT(`> ${value}`));
+      if ((command as any)[value]) (command as any)[value]();
+      else executeCommand(value);
+      inputRef.current!.disabled = true;
+    }
+  };
+
+  const handleOnTerminalClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  React.useEffect(() => {
+    if (!inputRef.current) return;
+    if (!inputRef.current.disabled) return;
+
+    inputRef.current!.disabled = false;
+    inputRef.current!.focus();
+    const div = document.querySelector("#terminal")!;
+    div.scrollTo({ top: div.scrollTop, behavior: "smooth" });
+  }, [terminal.stdout]);
+
+  return (
+    <>
+      {terminal.open && (
+        <Container>
+          <Terminal id="terminal" onClick={handleOnTerminalClick}>
+            {terminal.stdout.map((command) => (
+              <div>{command}</div>
+            ))}
+            <p>
+              <div>{"> "}</div>
+              <input
+                spellCheck={false}
+                ref={inputRef}
+                onKeyDown={handleCommandsubmit}
+              />
+            </p>
+          </Terminal>
+        </Container>
+      )}
+    </>
+  );
+};
+
+export default Shell;

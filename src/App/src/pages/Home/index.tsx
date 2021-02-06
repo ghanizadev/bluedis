@@ -12,6 +12,7 @@ import { updateData, addKey, updatePreview } from "../../services/mainProcess";
 import AddKey from "../../components/AddKey";
 import Connect from "./Connect";
 import { State } from "../../redux/Types/State";
+import Shell from "../../components/Shell";
 
 const Content = styled.div`
   width: 100%;
@@ -88,6 +89,7 @@ const Home = () => {
               </Wrapper>
               <Preview onCloseRequest={handlePreviewClose} />
             </div>
+            <Shell />
           </>
         )}
         {!connected && <Connect />}

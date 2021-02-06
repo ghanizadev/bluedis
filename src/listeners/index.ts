@@ -53,6 +53,15 @@ ipcMain.on("deleteKey", async (event, key: string[]) => {
   event.sender.send("keyRemoved", key);
 });
 
+ipcMain.on("executeCommand", async (event, command: string) => {
+  try {
+    const reply = await database.command(command.replace(/\s\s+/g, ' ').trim());
+    event.sender.send("commandReply", reply);
+  } catch(e) {
+    return event.sender.send("commandReply", e.message);
+  }
+});
+
 ipcMain.on("addKey", async (event, key, type, ttl) => {
   await database.addKey(key, type, ttl);
 
