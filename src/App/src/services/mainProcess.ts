@@ -130,6 +130,7 @@ export const getPreferences = () => {
 };
 
 export const connect = (connection: any) => {
+  store.dispatch(actions.setLoading(true));
   ipcRenderer.send("connect", connection);
 };
 
@@ -161,6 +162,7 @@ ipcRenderer.on(
     store.dispatch(actions.setData(data.docs));
     store.dispatch(actions.setConnected(true));
     store.dispatch(actions.setPreview(undefined));
+    store.dispatch(actions.setLoading(false));
   }
 );
 
@@ -240,4 +242,6 @@ ipcRenderer.on("error", (event: any, error: Error) => {
       actions.setError({ title: "Error", message: error.message })
     );
   }
+
+  store.dispatch(actions.setLoading(false));
 });
