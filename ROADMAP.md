@@ -12,7 +12,7 @@
 - [ ] Add option for monitor (logging);
 - [ ] Add custom timeout for connections;
 - [ ] Dump/restore from RDB database native files;
-- [ ] Add CLI interface;
+- [X] Add CLI interface;
 - [ ] Add PUB/SUB listeners for debugging;
 
 ## To be considered

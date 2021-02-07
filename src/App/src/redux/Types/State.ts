@@ -19,6 +19,10 @@ export type State = {
   error?: Error,
   confirmation?: Confirmation,
   lastRefresh: Date,
+  terminal: {
+    open: boolean;
+    stdout: string[]
+  }
   query: {
     cursor: number;
     count: number;

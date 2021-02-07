@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Redis from "ioredis";
 import { v4 } from "uuid";
+import availableCommands from "./availableCommands.json";
 
+type DBResponse =
+  | string
+  | string[]
+  | { [key: string]: string }
+  | { value: string; score: string }[];
 class DatabaseManager {
   private _instance: Redis.Redis;
 
@@ -19,12 +25,49 @@ class DatabaseManager {
     this._instance = new Redis(port, host, {
       password,
       tls,
+      retryStrategy: (times) => {
+        if (times > 3) throw new Error("timeout");
+      },
+      maxRetriesPerRequest: 3,
     });
   }
 
   public disconnect(): void {
     this._instance.quit();
   }
+
+  public command = async (command: string): Promise<any> => {
+    return new Promise<any>((res, rej) => {
+      try {
+        const c = (availableCommands as string[]).find((str) =>
+          command.toLowerCase().startsWith(str)
+        );
+
+        if (!c) return rej("Command not found");
+
+        this._instance
+          .send_command(
+            c,
+            ...command
+              .slice(c.length)
+              .trim()
+              .split(" ")
+              .filter((i) => i !== "")
+          )
+          .then((reply) => {
+            return res(reply);
+          })
+          .catch((e) => {
+            return rej(e);
+          });
+
+
+        this._instance;
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  };
 
   public deleteKey = async (key: string | string[]): Promise<number> => {
     return new Promise((res, rej) => {
@@ -289,14 +332,14 @@ class DatabaseManager {
 
   private async hydratateShallow(items: string[]) {
     const promises = items.map(async (item) => {
-      const response: any = {
+      const response = {
         key: item,
         value: "",
         type: "",
         ttl: -1,
       };
 
-      const type = await new Promise((res) => {
+      const type = await new Promise<string>((res) => {
         this._instance.type(item, (err, reply) => {
           res(reply);
         });
@@ -312,20 +355,25 @@ class DatabaseManager {
 
   private async hydrateItems(items: string[]): Promise<any[]> {
     const promises = items.map(async (item) => {
-      const response: any = {
+      const response: {
+        key: string;
+        value: DBResponse;
+        type: string;
+        ttl: number;
+      } = {
         key: item,
         value: "",
         type: "",
         ttl: -1,
       };
 
-      const type = await new Promise((res) => {
+      const type = await new Promise<string>((res) => {
         this._instance.type(item, (err, reply) => {
           res(reply);
         });
       });
 
-      const value = await new Promise((res) => {
+      const value = await new Promise<DBResponse>((res) => {
         if (type === "string") {
           this._instance.get(item, (err, reply) => {
             res(reply);
@@ -359,7 +407,7 @@ class DatabaseManager {
         }
       });
 
-      const ttl = await new Promise((res, rej) => {
+      const ttl = await new Promise<number>((res, rej) => {
         this._instance.pttl(item, (err, ttl) => {
           if (err) rej(err);
 
@@ -444,7 +492,7 @@ class DatabaseManager {
     });
   }
 
-  public async findByKeys(keys: string[]): Promise<any> {
+  public async findByKeys(keys: string[]): Promise<any[]> {
     return this.hydrateItems(keys);
   }
 }

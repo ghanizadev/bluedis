@@ -113,6 +113,10 @@ export const saveFavorites = (favorites: any) => {
   ipcRenderer.send("saveFavorites", favorites);
 };
 
+export const executeCommand = (command: string) => {
+  ipcRenderer.send("executeCommand", command);
+};
+
 export const exportItems = (items: string[]) => {
   ipcRenderer.send("exportItems", items);
 };
@@ -137,6 +141,7 @@ export const connect = (connection: any) => {
 export const disconnect = () => {
   ipcRenderer.send("disconnect");
   store.dispatch(actions.setConnected(false));
+  store.dispatch(actions.resetTerminal());
 };
 
 ipcRenderer.on("preferences", (event: any, preferences: any) => {
@@ -182,6 +187,10 @@ ipcRenderer.on(
 
 ipcRenderer.on("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));
+});
+
+ipcRenderer.on("commandReply", (event: any, reply: string) => {
+  store.dispatch(actions.updateSTDOUT(reply));
 });
 
 ipcRenderer.on("dataPreview", (event: any, doc: any) => {
