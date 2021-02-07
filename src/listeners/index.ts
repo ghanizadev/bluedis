@@ -32,11 +32,16 @@ ipcMain.on("close", () => {
 });
 
 ipcMain.on("connect", async (event, options) => {
-  const { host, port, password, tls } = options;
+  try {
+    const { host, port, password, tls } = options;
+  
+    database.connect(host, port, password, tls);
+    const docs = await database.findAll();
+    event.sender.send("data", docs);
 
-  database.connect(host, port, password, tls);
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  }catch(e) {
+    return event.sender.send("error", e);
+  }
 });
 
 ipcMain.on("disconnect", () => {

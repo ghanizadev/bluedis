@@ -19,6 +19,10 @@ class DatabaseManager {
     this._instance = new Redis(port, host, {
       password,
       tls,
+      retryStrategy: (times) => { 
+        if(times > 3) throw new Error("timeout")
+      },
+      maxRetriesPerRequest: 3
     });
   }
 
