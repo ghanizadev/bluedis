@@ -29,23 +29,18 @@ const initialState: State = {
     },
     region: {
       language: "en-US",
-      dateFormat: "system"
+      dateFormat: "system",
     },
-    license: "teste"
+    license: "teste",
   },
   terminal: {
     open: false,
-    stdout: [
-      "Bluedis Terminal",
-      "\u00a0",
-      "Type \"help\" to check for commands or go to Help tab.",
-      "\u00a0",
-    ],
+    stdout: [],
   },
   connected: false,
   favorites: [],
   lastRefresh: new Date(),
-  query: { cursor: 0, count: 0, totalDocs: 0 }
+  query: { cursor: 0, count: 0, totalDocs: 0 },
 };
 
 const slice = createSlice({
@@ -89,7 +84,7 @@ const slice = createSlice({
       state.settings.appearence = action.payload;
     },
     updatePreferences: (state, action) => {
-      state.settings = {...state.settings, ...action.payload};
+      state.settings = { ...state.settings, ...action.payload };
     },
     currentConnection: (state, action: PayloadAction<Connection>) => {
       state.connection = action.payload;
@@ -113,36 +108,60 @@ const slice = createSlice({
     setError: (state, action: PayloadAction<Error | undefined>) => {
       state.error = action.payload;
     },
-    setConfirmation: (state, action: PayloadAction<Confirmation | undefined>) => {
+    setConfirmation: (
+      state,
+      action: PayloadAction<Confirmation | undefined>
+    ) => {
       state.confirmation = action.payload;
     },
     setEditTTL: (state, action: PayloadAction<Item | undefined>) => {
       state.editTTL = action.payload;
     },
-    setQuery: (state, action: PayloadAction<{ cursor: number, count: number, totalDocs?: number}>) => {
-      state.query = {...action.payload, totalDocs: action.payload.totalDocs ?? state.query.totalDocs };
+    setQuery: (
+      state,
+      action: PayloadAction<{
+        cursor: number;
+        count: number;
+        totalDocs?: number;
+      }>
+    ) => {
+      state.query = {
+        ...action.payload,
+        totalDocs: action.payload.totalDocs ?? state.query.totalDocs,
+      };
     },
-    addDocument:(state, action: PayloadAction<Item>)=>{
+    addDocument: (state, action: PayloadAction<Item>) => {
       state.data = [action.payload, ...state.data];
       state.query.totalDocs = state.query.totalDocs + 1;
     },
-    removeDocument:(state, action: PayloadAction<string[]>)=>{
-      state.data = state.data.filter(doc => !action.payload.includes(doc.key));
+    removeDocument: (state, action: PayloadAction<string[]>) => {
+      state.data = state.data.filter(
+        (doc) => !action.payload.includes(doc.key)
+      );
       state.preview = undefined;
       state.query.totalDocs = state.query.totalDocs - action.payload.length;
     },
-    setTerminal:(state, action: PayloadAction<boolean>)=>{
+    setTerminal: (state, action: PayloadAction<boolean>) => {
       state.terminal.open = action.payload;
     },
-    updateSTDOUT:(state, action: PayloadAction<string>)=>{
+    updateSTDOUT: (state, action: PayloadAction<string>) => {
       state.terminal.stdout = [...state.terminal.stdout, action.payload];
     },
-    clearSTDOUT:(state)=>{
+    clearSTDOUT: (state) => {
       state.terminal.stdout = [];
+    },
+    resetTerminal: (state) => {
+      state.terminal.open = false;
+      state.terminal.stdout = [
+        "Bluedis Terminal",
+        "\u00a0",
+        'Type "help" to check for commands or go to Help tab.',
+        "\u00a0",
+      ];
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
-    }
+    },
   },
 });
 
@@ -150,5 +169,10 @@ export const actions = slice.actions;
 
 export const store = configureStore({
   reducer: slice.reducer,
-  middleware: [...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false })],
+  middleware: [
+    ...getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    }),
+  ],
 });

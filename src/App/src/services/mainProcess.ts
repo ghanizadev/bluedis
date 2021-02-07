@@ -141,6 +141,7 @@ export const connect = (connection: any) => {
 export const disconnect = () => {
   ipcRenderer.send("disconnect");
   store.dispatch(actions.setConnected(false));
+  store.dispatch(actions.resetTerminal());
 };
 
 ipcRenderer.on("preferences", (event: any, preferences: any) => {

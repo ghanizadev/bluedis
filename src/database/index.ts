@@ -25,10 +25,10 @@ class DatabaseManager {
     this._instance = new Redis(port, host, {
       password,
       tls,
-      retryStrategy: (times) => { 
-        if(times > 3) throw new Error("timeout")
+      retryStrategy: (times) => {
+        if (times > 3) throw new Error("timeout");
       },
-      maxRetriesPerRequest: 3
+      maxRetriesPerRequest: 3,
     });
   }
 
@@ -38,24 +38,33 @@ class DatabaseManager {
 
   public command = async (command: string): Promise<any> => {
     return new Promise<any>((res, rej) => {
-      try{
+      try {
         const c = (availableCommands as string[]).find((str) =>
-          command.toUpperCase().startsWith(str)
+          command.toLowerCase().startsWith(str)
         );
-  
+
         if (!c) return rej("Command not found");
-  
-        const query = [c, ...command.slice(c.length).trim().split(" ").filter(i => i !== "")];
-  
-        console.log(query);
-  
-        this._instance.multi([query]).exec((err, reply) => {
-          if (err) return rej(err);
-          return res(reply);
-        });
-        
-      }catch(e){
-        console.error(e)
+
+        this._instance
+          .send_command(
+            c,
+            ...command
+              .slice(c.length)
+              .trim()
+              .split(" ")
+              .filter((i) => i !== "")
+          )
+          .then((reply) => {
+            return res(reply);
+          })
+          .catch((e) => {
+            return rej(e);
+          });
+
+
+        this._instance;
+      } catch (e) {
+        console.error(e);
       }
     });
   };

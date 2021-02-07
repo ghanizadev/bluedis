@@ -24,16 +24,17 @@ export const Background = styled.div`
 `;
 
 const Container = styled.section`
-  flex: 0 1;
-  height: 180px;
+  /* flex: 0 1; */
+  min-height: 100px;
+  overflow: auto;
   background-color: ${(props) => props.theme.sidebarBackground};
   color: ${(props) => props.theme.text};
   border: 1px solid ${(props) => props.theme.text};
   transition: height 250ms ease-out;
+  resize: vertical;
 
   display: flex;
   flex-direction: column;
-  z-index: 10;
 `;
 
 const Terminal = styled.div`
@@ -42,6 +43,7 @@ const Terminal = styled.div`
   font-family: "Fira Code", monospace;
   flex: 1;
   flex-basis: 0;
+  overflow: auto;
   overflow-y: scroll;
   padding: 5px;
   font-size: 12px;
@@ -71,6 +73,7 @@ const Shell: React.FC = () => {
   const terminal = useSelector<State, { open: boolean; stdout: string[] }>(
     (state) => state.terminal
   );
+
   const dispatch = useDispatch();
 
   const handleCommandsubmit = (
@@ -85,7 +88,7 @@ const Shell: React.FC = () => {
 
       if ((command as any)[value]) (command as any)[value]();
       else if (
-        availableCommands.filter((v) => value.toUpperCase().startsWith(v))
+        availableCommands.filter((v) => value.toLowerCase().startsWith(v))
           .length > 0
       ) {
         executeCommand(value);
