@@ -13,6 +13,7 @@ import { Page } from "./Types/Page";
 import { State } from "./Types/State";
 
 const initialState: State = {
+  isLoading: false,
   data: [],
   selected: [],
   currentPage: "home",
@@ -138,6 +139,9 @@ const slice = createSlice({
     },
     clearSTDOUT:(state)=>{
       state.terminal.stdout = [];
+    },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     }
   },
 });

@@ -32,11 +32,16 @@ ipcMain.on("close", () => {
 });
 
 ipcMain.on("connect", async (event, options) => {
-  const { host, port, password, tls } = options;
+  try {
+    const { host, port, password, tls } = options;
+  
+    database.connect(host, port, password, tls);
+    const docs = await database.findAll();
+    event.sender.send("data", docs);
 
-  database.connect(host, port, password, tls);
-  const docs = await database.findAll();
-  event.sender.send("data", docs);
+  }catch(e) {
+    return event.sender.send("error", e);
+  }
 });
 
 ipcMain.on("disconnect", () => {
@@ -169,7 +174,7 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
   store.set("favorites", JSON.stringify(favorites));
 });
 
-ipcMain.on("wipeData", async (event, favorites) => {
+ipcMain.on("wipeData", async () => {
   store.clear();
 });
 
@@ -190,8 +195,8 @@ ipcMain.on("find", async (event, match) => {
   event.sender.send("data", result);
 });
 
-ipcMain.on("loadMore", async (event, match, cursor, count) => {
-  const result = await database.loadMore(match, cursor || 0, count || 10);
+ipcMain.on("loadMore", async (event, match, cursor) => {
+  const result = await database.loadMore(match, cursor || 0);
   event.sender.send("loadedData", result);
 });
 

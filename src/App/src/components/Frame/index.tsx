@@ -46,19 +46,25 @@ const Frame: React.FC = (props) => {
       } else {
         setHost(` - redis://${connection.host}:${connection.port}`);
       }
-      if (connection.name && connection.name.length > 30) {
-        setName(
-          ` | [${connection.name.slice(0, 12)}...${connection.name.slice(-12)}]`
-        );
+      if (connection.name) {
+        if (connection.name.length > 30) {
+          setName(
+            ` | [${connection.name.slice(0, 12)}...${connection.name.slice(
+              -12
+            )}]`
+          );
+        } else {
+          setName(` | [${connection.name}]`);
+        }
       } else {
-        setName(` | [${connection.name}]`);
+        setName("");
       }
     } else {
       setHost("");
       setName("");
     }
 
-    console.log(connection)
+    console.log(connection);
   }, [connection, connected]);
 
   return (

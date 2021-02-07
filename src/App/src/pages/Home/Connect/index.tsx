@@ -7,6 +7,7 @@ import { actions, store } from "../../../redux/store";
 import { State } from "../../../redux/Types/State";
 import { Connection } from "../../../redux/Types/Connection";
 import Favorite from "./Favorite";
+import SocialMedia from "../../../components/SocialMedia";
 
 const Container = styled.div`
   flex: 1;
@@ -87,6 +88,7 @@ const Connect = () => {
 
   const handleConnect = () => {
     dispatch(actions.currentConnection({ ...connection, id: nanoid(8) }));
+    dispatch(actions.setLoading(true));
     connect(connection);
   };
 
@@ -101,53 +103,60 @@ const Connect = () => {
   };
 
   return (
-  <>
-    <Container>
-      <Content>
-        <Form data-testid="connect-form">
-          <h1>Connect</h1>
-          <label>
-            Host:
+    <>
+      <Container>
+        <Content>
+          <Form data-testid="connect-form">
+            <h1>Connect</h1>
+            <label>
+              Host:
+              <br />
+              <input
+                defaultValue={connection.host}
+                onChange={handleHostChange}
+              />
+            </label>
+            <label>
+              Port:
+              <br />
+              <input
+                defaultValue={connection.port}
+                onChange={handlePortChange}
+              />
+            </label>
+            <label>
+              Password:
+              <br />
+              <input type="password" onChange={handlePasswordChange} />
+            </label>
+            <LoginButton onClick={handleConnect}>Connect</LoginButton>
+          </Form>
+          <Recent>
+            <p>Favorites</p>
             <br />
-            <input defaultValue={connection.host} onChange={handleHostChange} />
-          </label>
-          <label>
-            Port:
-            <br />
-            <input defaultValue={connection.port} onChange={handlePortChange} />
-          </label>
-          <label>
-            Password:
-            <br />
-            <input type="password" onChange={handlePasswordChange} />
-          </label>
-          <LoginButton onClick={handleConnect}>Connect</LoginButton>
-        </Form>
-        <Recent>
-          <p>Favorites</p>
-          <br />
-          <ListWrapper>
-            <ConnectionsList>
-              {favorites.map((connection) => {
-                return (
-                  <Favorite
-                    key={connection.id}
-                    connection={connection}
-                    onRemove={handleRemoveFromHistory}
-                    onConnect={handleConnectFromHistory}
-                  />
-                );
-              })}
-              {favorites.length === 0 && (
-                <>
-                  <p style={{ color: "gray" }}>No favorites so far...</p>
-                </>
-              )}
-            </ConnectionsList>
-          </ListWrapper>
-        </Recent>
-      </Content>
-    </Container>
+            <ListWrapper>
+              <ConnectionsList>
+                {favorites.map((connection) => {
+                  return (
+                    <Favorite
+                      key={connection.id}
+                      connection={connection}
+                      onRemove={handleRemoveFromHistory}
+                      onConnect={handleConnectFromHistory}
+                    />
+                  );
+                })}
+                {favorites.length === 0 && (
+                  <>
+                    <p style={{ color: "gray" }}>No favorites so far...</p>
+                  </>
+                )}
+              </ConnectionsList>
+            </ListWrapper>
+          </Recent>
+        </Content>
+      </Container>
+      <SocialMedia />
     </>
   );
 };
