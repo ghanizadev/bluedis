@@ -153,7 +153,7 @@ describe("<Settings />", () => {
       fireEvent.change(dropdown, { target: { value: "JetBrains Mono" } });
     });
 
-    const fontFamily = store.getState().settings.appearence.fontFamily;
+    const fontFamily = store.getState().settings.appearance.fontFamily;
     expect(fontFamily).toBe("JetBrains Mono");
 
     done();
@@ -172,7 +172,7 @@ describe("<Settings />", () => {
     });
 
     expect(input.value).toBe("10");
-    const fontSize = store.getState().settings.appearence.fontSize;
+    const fontSize = store.getState().settings.appearance.fontSize;
     expect(fontSize).toBe("10pt");
 
     done();

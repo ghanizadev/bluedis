@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import styled from "styled-components";
 import { nanoid } from "nanoid";
 import { connect, saveFavorites } from "../../../services/mainProcess";
@@ -101,6 +101,13 @@ const Connect = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, password: e.target.value });
   };
+  const handleTLSChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConnection({ ...connection, tls: e.target.checked });
+  };
+  
+  // useEffect(() => {
+  //   alert(connection.tls)
+  // }, [connection])
 
   return (
     <>
@@ -128,6 +135,10 @@ const Connect = () => {
               Password:
               <br />
               <input type="password" onChange={handlePasswordChange} />
+            </label>
+            <label>
+              <input type="checkbox" onChange={handleTLSChange} />
+              {" "}Use TLS
             </label>
             <LoginButton onClick={handleConnect}>Connect</LoginButton>
           </Form>

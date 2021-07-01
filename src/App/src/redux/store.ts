@@ -1,16 +1,11 @@
-import {
-  createSlice,
-  configureStore,
-  getDefaultMiddleware,
-  PayloadAction,
-} from "@reduxjs/toolkit";
-import { Appearence } from "./Types/Appearence";
-import { Confirmation } from "./Types/Confirmation";
-import { Connection } from "./Types/Connection";
-import { Error } from "./Types/Error";
-import { Item } from "./Types/Item";
-import { Page } from "./Types/Page";
-import { State } from "./Types/State";
+import {configureStore, createSlice, getDefaultMiddleware, PayloadAction,} from "@reduxjs/toolkit";
+import {Appearance} from "./Types/Appearance";
+import {Confirmation} from "./Types/Confirmation";
+import {Connection} from "./Types/Connection";
+import {Error} from "./Types/Error";
+import {Item} from "./Types/Item";
+import {Page} from "./Types/Page";
+import {State} from "./Types/State";
 
 const initialState: State = {
   isLoading: false,
@@ -18,7 +13,7 @@ const initialState: State = {
   selected: [],
   currentPage: "home",
   settings: {
-    appearence: {
+    appearance: {
       darkTheme: false,
       fontFamily: "Roboto",
       fontSize: "14pt",
@@ -80,8 +75,8 @@ const slice = createSlice({
     changePage: (state, action: PayloadAction<Page>) => {
       state.currentPage = action.payload;
     },
-    changeAppearence: (state, action: PayloadAction<Appearence>) => {
-      state.settings.appearence = action.payload;
+    changeAppearance: (state, action: PayloadAction<Appearance>) => {
+      state.settings.appearance = action.payload;
     },
     updatePreferences: (state, action) => {
       state.settings = { ...state.settings, ...action.payload };
@@ -90,17 +85,15 @@ const slice = createSlice({
       state.connection = action.payload;
     },
     addFavorite: (state, action: PayloadAction<Connection>) => {
-      const newFavorites = [...state.favorites, action.payload];
-      state.favorites = newFavorites;
+      state.favorites = [...state.favorites, action.payload];
     },
     updateFavorites: (state, action) => {
       state.favorites = action.payload;
     },
     removeFavorite: (state, action: PayloadAction<string>) => {
-      const newFavorites = state.favorites.filter(
+      state.favorites = state.favorites.filter(
         (favorite) => favorite.id !== action.payload
       );
-      state.favorites = newFavorites;
     },
     updateLicense: (state, action: PayloadAction<string>) => {
       state.settings.license = action.payload;
@@ -153,9 +146,9 @@ const slice = createSlice({
     resetTerminal: (state) => {
       state.terminal.open = false;
       state.terminal.stdout = [
-        "Bluedis Terminal",
+        "Bluedis Terminal (Beta)",
         "\u00a0",
-        'Type "help" to check for commands or go to Help tab.',
+        'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
         "\u00a0",
       ];
     },

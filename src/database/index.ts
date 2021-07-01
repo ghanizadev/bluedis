@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Redis from "ioredis";
-import { v4 } from "uuid";
+import {v4} from "uuid";
 import availableCommands from "./availableCommands.json";
 
 type DBResponse =
@@ -11,20 +11,13 @@ type DBResponse =
 class DatabaseManager {
   private _instance: Redis.Redis;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor() {}
-
   public connect(
     host = "localhost",
     port = 6379,
     password?: string,
-    tls?: {
-      ca: string;
-    }
+    tls = false
   ): void {
-    this._instance = new Redis(port, host, {
-      password,
-      tls,
+    this._instance = new Redis(`redis${tls ? 's' : ''}://:${password}@${host}:${port}`, {
       retryStrategy: (times) => {
         if (times > 3) throw new Error("timeout");
       },
@@ -62,7 +55,7 @@ class DatabaseManager {
           });
 
 
-        this._instance;
+        return this._instance;
       } catch (e) {
         console.error(e);
       }
@@ -330,7 +323,7 @@ class DatabaseManager {
     }
   }
 
-  private async hydratateShallow(items: string[]) {
+  private async hydrateShallow(items: string[]) {
     const promises = items.map(async (item) => {
       const response = {
         key: item,
@@ -339,13 +332,11 @@ class DatabaseManager {
         ttl: -1,
       };
 
-      const type = await new Promise<string>((res) => {
+      response.type = await new Promise<string>((res) => {
         this._instance.type(item, (err, reply) => {
           res(reply);
         });
       });
-
-      response.type = type;
 
       return response;
     });
@@ -445,7 +436,7 @@ class DatabaseManager {
         if (err) rej(err);
 
         const [replycursor, items] = reply;
-        const response = await this.hydratateShallow(items);
+        const response = await this.hydrateShallow(items);
         res({
           docs: response,
           cursor: Number(replycursor),
@@ -462,7 +453,7 @@ class DatabaseManager {
         if (err) rej(err);
 
         const [cursor, items] = reply;
-        const response = await this.hydratateShallow(items);
+        const response = await this.hydrateShallow(items);
         res({
           docs: response,
           cursor: Number(cursor),
@@ -481,11 +472,11 @@ class DatabaseManager {
         if (err) rej(err);
 
         const totalCount = await this.countDocuments();
-        const [replycursor, items] = reply;
-        const response = await this.hydratateShallow(items);
+        const [replyCursor, items] = reply;
+        const response = await this.hydrateShallow(items);
         res({
           docs: response,
-          cursor: Number(replycursor),
+          cursor: Number(replyCursor),
           totalDocs: totalCount,
         });
       });

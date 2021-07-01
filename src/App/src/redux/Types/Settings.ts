@@ -1,9 +1,9 @@
-import { Appearence } from "./Appearence";
+import { Appearance } from "./Appearance";
 import { General } from "./General";
 import { Region } from "./Region";
 
 export interface Settings {
-  appearence: Appearence;
+  appearance: Appearance;
   general: General;
   region: Region;
   license: string;

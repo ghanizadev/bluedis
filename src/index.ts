@@ -2,9 +2,9 @@ import { app, BrowserWindow, globalShortcut, ipcMain, screen } from "electron";
 import "./listeners";
 import path from "path";
 import dotenv from "dotenv";
-import { autoUpdater } from "electron-updater";
 
 dotenv.config();
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 if (require("electron-squirrel-startup")) {
   app.quit();

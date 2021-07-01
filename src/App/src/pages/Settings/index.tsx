@@ -26,9 +26,9 @@ const Settings = () => {
 
   const handleDarkModeChange = () => {
     dispatch(
-      actions.changeAppearence({
-        ...settings.appearence,
-        darkTheme: !settings.appearence.darkTheme,
+      actions.changeAppearance({
+        ...settings.appearance,
+        darkTheme: !settings.appearance.darkTheme,
       })
     );
 
@@ -37,8 +37,8 @@ const Settings = () => {
 
   const handleFontFamilyChange = (value: string) => {
     dispatch(
-      actions.changeAppearence({
-        ...settings.appearence,
+      actions.changeAppearance({
+        ...settings.appearance,
         fontFamily: value as any,
       })
     );
@@ -51,8 +51,8 @@ const Settings = () => {
     const value = fontSizeRef.current.value.match(/\d+/)?.join("");
 
     dispatch(
-      actions.changeAppearence({
-        ...settings.appearence,
+      actions.changeAppearance({
+        ...settings.appearance,
         fontSize: `${value}pt`,
       })
     );
@@ -86,7 +86,7 @@ const Settings = () => {
           <span>Dark mode</span>
           <span>
             <Toggle
-              checked={settings.appearence.darkTheme}
+              checked={settings.appearance.darkTheme}
               onChange={handleDarkModeChange}
             />
           </span>
@@ -94,7 +94,7 @@ const Settings = () => {
         <Row>
           <span>Font</span>
           <span>
-            <Dropdown defaultValue={settings.appearence.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
+            <Dropdown defaultValue={settings.appearance.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
           </span>
         </Row>
         <Row>
@@ -104,7 +104,7 @@ const Settings = () => {
               ref={fontSizeRef}
               type="text"
               style={{ width: "100px", textAlign: "right" }}
-              defaultValue={settings.appearence.fontSize}
+              defaultValue={settings.appearance.fontSize}
               onBlur={handleFontSizeChange}
               onKeyDown={handleFontSizeChangeOnEnter}
             />

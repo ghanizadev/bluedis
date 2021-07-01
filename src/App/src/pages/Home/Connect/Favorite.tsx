@@ -58,7 +58,6 @@ const Favorite: React.FC<Props> = (props) => {
         <strong>{connection.name}</strong>
         <br />
         redis://{connection.host}:{connection.port}
-        {/* redis://{connection.host}:{connection.port} */}
       </InnerText>
       <CloseIcon onClick={handleRemove(connection)} />
     </Container>
