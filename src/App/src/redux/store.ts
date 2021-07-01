@@ -153,9 +153,9 @@ const slice = createSlice({
     resetTerminal: (state) => {
       state.terminal.open = false;
       state.terminal.stdout = [
-        "Bluedis Terminal",
+        "Bluedis Terminal (Beta)",
         "\u00a0",
-        'Type "help" to check for commands or go to Help tab.',
+        'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
         "\u00a0",
       ];
     },
