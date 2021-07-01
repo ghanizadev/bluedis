@@ -3,7 +3,7 @@ import { General } from "./General";
 import { Region } from "./Region";
 
 export interface Settings {
-  appearence: Appearence;
+  appearance: Appearence;
   general: General;
   region: Region;
   license: string;

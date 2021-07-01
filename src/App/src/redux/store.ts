@@ -18,7 +18,7 @@ const initialState: State = {
   selected: [],
   currentPage: "home",
   settings: {
-    appearence: {
+    appearance: {
       darkTheme: false,
       fontFamily: "Roboto",
       fontSize: "14pt",
@@ -81,7 +81,7 @@ const slice = createSlice({
       state.currentPage = action.payload;
     },
     changeAppearence: (state, action: PayloadAction<Appearence>) => {
-      state.settings.appearence = action.payload;
+      state.settings.appearance = action.payload;
     },
     updatePreferences: (state, action) => {
       state.settings = { ...state.settings, ...action.payload };

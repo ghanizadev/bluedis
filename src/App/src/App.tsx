@@ -37,13 +37,13 @@ const App = () => {
   const registerStore = React.useCallback(() => {
     store.subscribe(() => {
       const {
-        settings: { appearence },
+        settings: { appearance },
       } = store.getState();
 
       const t: ColorSchema & AppearenceSettings = {
-        ...(appearence.darkTheme ? DarkTheme : LightTheme),
-        fontFamily: appearence.fontFamily,
-        fontSize: appearence.fontSize,
+        ...(appearance.darkTheme ? DarkTheme : LightTheme),
+        fontFamily: appearance.fontFamily,
+        fontSize: appearance.fontSize,
       };
 
       setTheme(t);
