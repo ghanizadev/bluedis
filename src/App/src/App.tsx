@@ -68,9 +68,18 @@ const App = () => {
             }}
           >
             <Sidebar />
-            {currentPage === "home" && <Home />}
-            {currentPage === "settings" && <Settings />}
-            {currentPage === "help" && <Help />}
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                padding: "15px 20px"
+              }}
+            >
+              {currentPage === "home" && <Home />}
+              {currentPage === "settings" && <Settings />}
+              {currentPage === "help" && <Help />}
+            </div>
           </div>
         </Frame>
         <GlobalStyles />

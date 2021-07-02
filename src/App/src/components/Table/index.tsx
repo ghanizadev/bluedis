@@ -53,6 +53,7 @@ type Props = {
 const Table: React.FC<Props> = (props) => {
   const { data, onItemEdit } = props;
   const selected = useSelector<State, string[]>((state) => state.selected);
+  const translation = useSelector<State, {[key: string]: string}>((state) => state.settings.translation);
   const query = useSelector<State, { count: number; cursor: number }>(
     (state) => state.query
   );
@@ -90,8 +91,8 @@ const Table: React.FC<Props> = (props) => {
                 onChangeValue={() => handleSelect("", { all: true })}
               />
             </Header>
-            <Header style={{ width: "100px" }}>Type</Header>
-            <Header>Key</Header>
+            <Header style={{ width: "100px" }}>{translation.type}</Header>
+            <Header>{translation.key}</Header>
           </Row>
           {data.map((item, index) => {
             return (
@@ -127,11 +128,12 @@ const Table: React.FC<Props> = (props) => {
       </TableContainer>
       <LoadMore>
         <span>
-          showing {currentCount} of {totalCount} documents
+          {/*showing {currentCount} of {totalCount} documents*/}
+          {translation.totaldocs.replace('{{c}}', currentCount.toString()).replace('{{t}}', totalCount.toString())}
           {query.cursor !== 0 && " - "}
           {query.cursor !== 0 && (
             <button disabled={query.cursor === 0} onClick={handleLoadMore}>
-              Load more ...
+              {translation.loadmore} ...
             </button>
           )}
         </span>

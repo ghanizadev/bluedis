@@ -11,6 +11,7 @@ import { Error } from "./Types/Error";
 import { Item } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
+import languages, {Language} from "../i18n/languages";
 
 const initialState: State = {
   isLoading: false,
@@ -32,6 +33,8 @@ const initialState: State = {
       dateFormat: "system",
     },
     license: "teste",
+    language: Language.English,
+    translation: languages['en']
   },
   terminal: {
     open: false,
@@ -161,6 +164,10 @@ const slice = createSlice({
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setLanguage: (state, action: PayloadAction<Language>) => {
+      state.settings.language = action.payload;
+      state.settings.translation = languages[action.payload];
     },
   },
 });

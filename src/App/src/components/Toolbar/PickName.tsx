@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import Button from "../Button";
 import Input from "../Input";
+import {useSelector} from "react-redux";
+import {State} from "../../redux/Types/State";
 
 const Container = styled.div`
   position: absolute;
@@ -59,6 +61,7 @@ type Props = {
 };
 const PickName: React.FC<Props> = (props) => {
   const { onConfirm, onCancel } = props;
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation)
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -74,12 +77,12 @@ const PickName: React.FC<Props> = (props) => {
       <Container />
       <Content>
         <div id="input-container">
-          <span>Pick a name: </span>
+          <span>{translation.pickname}: </span>
           <InputName ref={inputRef} />
         </div>
         <ButtonsWrapper>
-          <Button label="Cancel" onClick={handleCancel} />
-          <Button label="Confirm" onClick={handleConfirm} />
+          <Button label={translation.cancel} onClick={handleCancel} />
+          <Button label={translation.confirm} onClick={handleConfirm} />
         </ButtonsWrapper>
       </Content>
     </>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { actions } from "../../redux/store";
@@ -73,12 +73,66 @@ const Shell: React.FC = () => {
   const terminal = useSelector<State, { open: boolean; stdout: string[] }>(
     (state) => state.terminal
   );
+  const [lastCommands, setLastCommands] = useState<string[]>([]);
+  const [current, setCurrent] = useState(-1)
 
   const dispatch = useDispatch();
+  
+  useEffect(() => {
+    console.log({current, lastCommands})
+  }, [current, lastCommands])
+  
+  useEffect(() => {
+    setCurrent(-1)
+  }, [terminal])
+  
+  const roverCommands = (direction: 'ASC' | "DESC") => {
+    if(!inputRef.current) return;
+    
+    if(direction === "ASC") {
+      let value = 0;
 
-  const handleCommandsubmit = (
+      if(current === -1) {
+        value = lastCommands.length
+      }
+      
+      if(current >= 1) {
+        value = current - 1;
+      }
+      
+      if(value) {
+        inputRef.current.value = lastCommands[value - 1];
+        setCurrent(value)
+      }
+    } else {
+      if(current === lastCommands.length) {
+        inputRef.current.value = "";
+      } else {
+        const value = current + 1;
+        inputRef.current.value = lastCommands[value - 1];
+        setCurrent(value)
+      }
+    }
+  }
+
+  const handleCommandSubmit = (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
+    if(event.ctrlKey && event.key === "c") {
+      const value = inputRef.current!.value;
+      
+      inputRef.current!.value = "";
+      dispatch(actions.updateSTDOUT(`> ${value}^C`));
+    }
+    
+    if(event.key === "ArrowUp") {
+      return roverCommands("ASC")
+    }
+    
+    if(event.key === "ArrowDown") {
+      return roverCommands("DESC")
+    }
+    
     if (event.key === "Enter" && inputRef.current) {
       const value = inputRef.current!.value;
       if (!value) return;
@@ -92,6 +146,10 @@ const Shell: React.FC = () => {
           .length > 0
       ) {
         executeCommand(value);
+        setLastCommands(previous => {
+          if(previous[previous.length - 1] === value) return previous
+          return [...previous, value]
+        })
       } else {
         dispatch(actions.updateSTDOUT(`> Command not recognized: ${value}`));
       }
@@ -121,17 +179,23 @@ const Shell: React.FC = () => {
       {terminal.open && (
         <Container>
           <Terminal id="terminal" onClick={handleOnTerminalClick}>
-            {terminal.stdout.map((command) => (
-              <div>{command}</div>
+            {terminal.stdout.map((command, index) => (
+              <div key={index}>{command}</div>
             ))}
-            <p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center"
+              }}
+            >
               <div>{"> "}</div>
               <input
                 spellCheck={false}
                 ref={inputRef}
-                onKeyDown={handleCommandsubmit}
+                onKeyDown={handleCommandSubmit}
               />
-            </p>
+            </div>
           </Terminal>
         </Container>
       )}

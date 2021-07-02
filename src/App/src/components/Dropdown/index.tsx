@@ -40,14 +40,20 @@ type Props = {
 
 const Dropdown: React.FC<Props> = (props) => {
   const { items, onChange, defaultValue } = props;
+  const [value, setValue] = React.useState(defaultValue)
   
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange && onChange(e.target.value);
+    setValue(e.target.value)
   }
+  
+  React.useEffect(() => {
+    setValue(defaultValue)
+  }, [defaultValue])
   
   return (
     <Container>
-      <Select onChange={handleChange} defaultValue={defaultValue}>
+      <Select onChange={handleChange} value={value}>
         {items.map((item, index) => {
           return <Option key={index}>{item}</Option>;
         })}

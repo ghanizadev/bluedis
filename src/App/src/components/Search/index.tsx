@@ -5,6 +5,8 @@ import Dropdown from "../Dropdown";
 import Input from "../Input";
 
 import { find, selectDatabase } from "../../services/mainProcess";
+import {useSelector} from "react-redux";
+import {State} from "../../redux/Types/State";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -20,6 +22,7 @@ const SearchInput = styled(Input)`
 
 const Search = () => {
   const [match, setMatch] = React.useState<string>();
+  const translation = useSelector<State, {[key: string]: any}>(state => state.settings.translation)
   const databases = [
     { value: 0, name: "DB 0" },
     { value: 1, name: "DB 1" },
@@ -51,13 +54,13 @@ const Search = () => {
 
   return (
     <Container>
-      <span>Search:</span>
+      <span>{translation.search}:</span>
       <SearchInput onChange={handleChange} onKeyDown={handleKeyListener} />
       <Dropdown
         items={databases.map((db) => db.name)}
         onChange={handleDatabaseChange}
       />
-      <Button label="Apply" onClick={handleSearch} />
+      <Button label={translation.apply} onClick={handleSearch} />
     </Container>
   );
 };

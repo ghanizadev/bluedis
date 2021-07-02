@@ -30,6 +30,7 @@ type Props = {
 
 const Toolbar: React.FC<Props> = (props) => {
   const { onRefresh, onAddKey } = props;
+  const translation = useSelector<State, {[key: string]: any}>(state => state.settings.translation)
 
   const selected = useSelector<State, string[]>((state) => state.selected);
   const favorites = useSelector<State, Connection[]>(
@@ -58,12 +59,12 @@ const Toolbar: React.FC<Props> = (props) => {
   const handleDeleteSelected = () => {
     dispatch(
       actions.setConfirmation({
-        message: `Do you really want to delete ${
-          selected.length > 0
-            ? "THIS KEY"
-            : "THESE " + selected.length + " KEYS"
+        message: `${translation.deleteconfirm} ${
+          selected.length === 1
+            ? translation.deletesingle
+            : translation.deletemulti.replace('{{n}}', selected.length)
         }?`,
-        title: "Attention",
+        title: translation.attention,
         onConfirm: () => {
           deleteKey(selected);
           dispatch(actions.clearSelection());
@@ -104,14 +105,14 @@ const Toolbar: React.FC<Props> = (props) => {
       <Container data-testid="toolbar">
         <SquareButton
           data-testid="data-add"
-          title="Add a new key"
+          title={translation.addkey}
           onClick={handleAdd}
         >
           <AddIcon />
         </SquareButton>
         <SquareButton
           data-testid="data-refresh"
-          title="Refresh list"
+          title={translation.refresh}
           onClick={handleRefresh}
         >
           <RefreshIcon />
@@ -121,7 +122,7 @@ const Toolbar: React.FC<Props> = (props) => {
           data-testid="data-remove"
           disabled={selected.length === 0}
           remove
-          title="Remove selected"
+          title={translation.multidelete}
           onClick={handleDeleteSelected}
         >
           <RemoveIcon />
@@ -129,7 +130,7 @@ const Toolbar: React.FC<Props> = (props) => {
         <SquareButton
           data-testid="data-export"
           disabled={selected.length === 0}
-          title="Export selected"
+          title={translation.export}
           onClick={handleDownloadSelected}
         >
           <DownloadIcon />
@@ -137,7 +138,7 @@ const Toolbar: React.FC<Props> = (props) => {
         <Separator />
         <SquareButton
           data-testid="data-shell"
-          title="Open terminal"
+          title={translation.showterminal}
           onClick={handleTerminal}
         >
           <TerminalIcon />
@@ -145,7 +146,7 @@ const Toolbar: React.FC<Props> = (props) => {
         <Separator />
         <SquareButton
           data-testid="data-disconnect"
-          title="Close this connection"
+          title={translation.closeconnection}
           onClick={handleDisconnect}
         >
           <DisconnectIcon />
@@ -155,14 +156,14 @@ const Toolbar: React.FC<Props> = (props) => {
         ) && (
           <SquareButton
             data-testid="data-favorite"
-            title="Favorite this connection"
+            title={translation.favoriteconnection}
             onClick={handleFavorite}
           >
             <FavoriteIcon />
           </SquareButton>
         )}
         <LastRefresh>
-          Last update: {lastRefresh.toLocaleTimeString()}
+          {translation.lastupdate}: {lastRefresh.toLocaleTimeString()}
         </LastRefresh>
       </Container>
       {newName && (
