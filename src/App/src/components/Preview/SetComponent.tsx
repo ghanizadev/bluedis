@@ -106,7 +106,7 @@ const SetComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            `TTL: ${new Date(ttl!).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
         </span>
       </div>
       <PreviewActions>

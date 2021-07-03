@@ -15,7 +15,7 @@ gulp.task('compile-react', function (cb) {
 })
 
 gulp.task('dist', function (cb) {
-  exec('npx electron-builder', function (err) {
+  exec('npx electron-builder -mwl', function (err) {
     cb(err);
   });
 })

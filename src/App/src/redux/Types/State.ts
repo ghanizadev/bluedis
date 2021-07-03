@@ -8,6 +8,7 @@ import { Settings } from './Settings';
 export type State = {
   connected: boolean;
   isLoading: boolean;
+  ready: boolean;
   data: Item[];
   preview?: Item;
   editTTL?: Item;

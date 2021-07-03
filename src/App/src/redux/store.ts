@@ -41,6 +41,7 @@ const initialState: State = {
   favorites: [],
   lastRefresh: new Date(),
   query: { cursor: 0, count: 0, totalDocs: 0 },
+  ready: false
 };
 
 const slice = createSlice({
@@ -80,11 +81,12 @@ const slice = createSlice({
     changePage: (state, action: PayloadAction<Page>) => {
       state.currentPage = action.payload;
     },
-    changeAppearence: (state, action: PayloadAction<Appearence>) => {
+    changeAppearance: (state, action: PayloadAction<Appearence>) => {
       state.settings.appearence = action.payload;
     },
     updatePreferences: (state, action) => {
       state.settings = { ...state.settings, ...action.payload };
+      state.ready = true;
     },
     currentConnection: (state, action: PayloadAction<Connection>) => {
       state.connection = action.payload;
