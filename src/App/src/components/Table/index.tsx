@@ -116,7 +116,7 @@ const Table: React.FC<Props> = (props) => {
                 </Data>
                 <Data
                   style={{ width: "75%" }}
-                  title="Click to view"
+                  title={translation.clicktoview}
                   onClick={() => handleItemEdit(item)}
                 >
                   <span>{item.key}</span>

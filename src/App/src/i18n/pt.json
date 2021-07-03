@@ -3,7 +3,11 @@
   "addedititem": "Adicionar/Editar Item",
   "addmember": "Adicionar membro",
   "removedoc": "Remover esta entrada (pressione e segure)",
-
+  "actual": "Atual",
+  "removettl": "Remover TTL",
+  "ok": "Entendido",
+  "clicktoview": "Clique para expandir",
+  "newvalue": "Novo Valor...",
   "database": "Banco de dados",
   "attention": "Atenção",
   "search": "Pesquisar",

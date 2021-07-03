@@ -162,6 +162,14 @@ const slice = createSlice({
         "\u00a0",
       ];
     },
+    terminalWelcome: (state) => {
+      state.terminal.stdout = [
+        "Bluedis Terminal (Beta)",
+        "\u00a0",
+        'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
+        "\u00a0",
+      ];
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },

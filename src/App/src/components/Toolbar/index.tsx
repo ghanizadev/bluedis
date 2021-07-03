@@ -78,6 +78,7 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleTerminal = () => {
+    if(!store.getState().terminal.open) dispatch(actions.terminalWelcome())
     dispatch(actions.setTerminal(!store.getState().terminal.open));
   };
 

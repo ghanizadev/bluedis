@@ -95,4 +95,11 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+[data-active="true"] {
+  color: ${props => props.theme.foreground};
+  & span {
+    text-decoration: underline;
+  }
+}
 `;

@@ -10,7 +10,7 @@ export const Item = styled.button`
   align-items: center;
   justify-content: flex-start;
   cursor: pointer;
-  transition: all 100ms ease-out;
+  transition: color 100ms ease-out;
 
   color: ${props => props.theme.text};
 
@@ -20,6 +20,9 @@ export const Item = styled.button`
   }
 
   &:hover {
-    transform: scale(1.05);
+    color: ${props => props.theme.foreground};
+    & span {
+      text-decoration: underline;
+    }
   }
 `;
