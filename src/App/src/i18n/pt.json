@@ -1,4 +1,9 @@
 {
+  "removeprop": "Remover esta propriedade",
+  "addedititem": "Adicionar/Editar Item",
+  "addmember": "Adicionar membro",
+  "removedoc": "Remover esta entrada (pressione e segure)",
+
   "database": "Banco de dados",
   "attention": "Atenção",
   "search": "Pesquisar",

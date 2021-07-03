@@ -1,4 +1,9 @@
 {
+  "removeprop": "Remove property",
+  "addedititem": "Add/Edit Item",
+  "removedoc": "Remove document (press and hold)",
+  "addmember": "Add Member",
+  
   "database": "Database",
   "attention": "Attention",
   "search": "Search",
@@ -19,7 +24,7 @@
   "additem": "Add new item",
   "deletedoc": "Press and hold to delete this document",
   "copydoc": "Copy to clipboard as JSON",
-  "setttl": "Set/remove TTL from this document",
+  "set ": "Set/remove TTL from this document",
   "newmember": "New member",
   "newmemberhere": "New member here...",
   "edititem": "Edit item",

@@ -17,8 +17,9 @@ import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { actions } from "../../redux/store";
+import {State} from "../../redux/Types/State";
 
 let timeout: number;
 
@@ -28,6 +29,7 @@ type Props = {
 
 const ZSetComponent: React.FC<Props> = (props) => {
   const { key, value, ttl } = props.item;
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation);
 
   const [itemValue, setItemValue] = React.useState<{
     score: string;
@@ -95,9 +97,9 @@ const ZSetComponent: React.FC<Props> = (props) => {
           <tbody>
             <tr>
               <th align="center" style={{ width: "80px" }}>
-                Score
+                {translation.score}
               </th>
-              <th>Value</th>
+              <th>{translation.value}</th>
             </tr>
             {(value as { score: string; value: string }[]).map(
               (item, index) => {
@@ -126,28 +128,28 @@ const ZSetComponent: React.FC<Props> = (props) => {
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"
-          title="Add new member"
+          title={translation.addmember}
           onClick={handleAddOpen}
         >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-copy"
-          title="Copy document as JSON"
+          title={translation.copydoc}
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={translation.setttl}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-remove"
-          title="Remove document"
+          title={translation.removedoc}
           remove
           inAction={deleting}
           onMouseUp={handleDeleteCancel}
