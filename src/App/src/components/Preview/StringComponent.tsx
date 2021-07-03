@@ -10,8 +10,9 @@ import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as SaveIcon } from "../../assets/save.svg";
 import { PreviewActionButton } from "../common/PreviewActionButton";
 import { PreviewActions } from "../common/PreviewActions";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { actions } from "../../redux/store";
+import {State} from "../../redux/Types/State";
 
 const Container = styled.textarea`
   resize: none;
@@ -31,6 +32,7 @@ const StringComponent: React.FC<Props> = (props) => {
   const [itemValue, setItemValue] = React.useState("");
   const [deleting, setDeleting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation);
 
   const dispatch = useDispatch();
 
@@ -86,7 +88,7 @@ const StringComponent: React.FC<Props> = (props) => {
               whiteSpace: "nowrap",
             }}
           >
-            Document saved!
+            {translation.docsaved}!
           </span>
         )}
       <div>
@@ -97,7 +99,7 @@ const StringComponent: React.FC<Props> = (props) => {
       </div>
         <PreviewActions>
           <PreviewActionButton
-            title="Save document"
+            title={translation.savedoc}
             onClick={handleDocumentSave}
             data-testid="item-save"
           >
@@ -105,21 +107,21 @@ const StringComponent: React.FC<Props> = (props) => {
           </PreviewActionButton>
           <PreviewActionButton
             data-testid="item-copy"
-            title="Copy document as JSON"
+            title={translation.copydoc}
             onClick={handleDocumentCopy}
           >
             <CopyIcon />
           </PreviewActionButton>
           <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={translation.setttl}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
           <PreviewActionButton
             data-testid="item-remove"
-            title="Remove document"
+            title={translation.removedoc}
             remove
             inAction={deleting}
             onMouseDown={handleDocumentDelete}

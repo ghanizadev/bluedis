@@ -6,6 +6,8 @@ import { MessageContent } from "../common/MessageContent";
 import Dropdown from "../Dropdown";
 import Input from "../Input";
 import Toggle from "../Toggle";
+import {useSelector} from "react-redux";
+import {State} from "../../redux/Types/State";
 
 const Row = styled.div`
   display: flex;
@@ -13,9 +15,7 @@ const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-
   margin-top: 15px;
-  width: 100%;
 
   & input {
     margin: 0 !important;
@@ -42,6 +42,7 @@ const AddKey: React.FC<Props> = (props) => {
   const [ttl, setTTL] = React.useState<string | number>(0);
   const [useTTL, setUseTTL] = React.useState(false);
   const [ttlAbsolute, setTTLAbsolute] = React.useState(false);
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation)
 
   const handleConfirm = () => {
     if (!type || !key) return;
@@ -70,13 +71,13 @@ const AddKey: React.FC<Props> = (props) => {
     <>
       <MessageBackground />
       <MessageContent data-testid="data-add-message">
-        <h3>Add new key</h3>
+        <h3>{translation.addkey}</h3>
         <Row>
-          <span>Name: </span>
+          <span>{translation.name}: </span>
           <Key onChange={handleKeyChange} />
         </Row>
         <Row>
-          <span>Type: </span>
+          <span>{translation.type}: </span>
           <Dropdown
             onChange={handleTypeChange}
             items={["set", "zset", "hash", "string", "list"]}
@@ -93,7 +94,7 @@ const AddKey: React.FC<Props> = (props) => {
         {useTTL && (
           <>
             <Row>
-              <span>Absolute TTL: </span>
+              <span>{translation.absolutettl}: </span>
               <Toggle
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
@@ -102,7 +103,7 @@ const AddKey: React.FC<Props> = (props) => {
             </Row>
             <Row>
               <span>
-                {ttlAbsolute ? "Expires At" : "Expiration (seconds)"}:{" "}
+                {ttlAbsolute ? translation.expiresat : translation.expirationsec}:{" "}
               </span>
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
@@ -113,8 +114,8 @@ const AddKey: React.FC<Props> = (props) => {
           </>
         )}
         <Row style={{ justifyContent: "flex-end" }}>
-          <Button label="Cancel" onClick={handleCancel} />
-          <Button label="Confirm" onClick={handleConfirm} />
+          <Button label={translation.cancel} onClick={handleCancel} />
+          <Button label={translation.confirm} onClick={handleConfirm} />
         </Row>
       </MessageContent>
     </>

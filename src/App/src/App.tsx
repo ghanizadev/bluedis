@@ -37,13 +37,13 @@ const App = () => {
   const registerStore = React.useCallback(() => {
     store.subscribe(() => {
       const {
-        settings: { appearence },
+        settings: { appearance },
       } = store.getState();
 
       const t: ColorSchema & AppearenceSettings = {
-        ...(appearence.darkTheme ? DarkTheme : LightTheme),
-        fontFamily: appearence.fontFamily,
-        fontSize: appearence.fontSize,
+        ...(appearance.darkTheme ? DarkTheme : LightTheme),
+        fontFamily: appearance.fontFamily,
+        fontSize: appearance.fontSize,
       };
 
       setTheme(t);
@@ -68,9 +68,18 @@ const App = () => {
             }}
           >
             <Sidebar />
-            {currentPage === "home" && <Home />}
-            {currentPage === "settings" && <Settings />}
-            {currentPage === "help" && <Help />}
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                padding: "15px 20px"
+              }}
+            >
+              {currentPage === "home" && <Home />}
+              {currentPage === "settings" && <Settings />}
+              {currentPage === "help" && <Help />}
+            </div>
           </div>
         </Frame>
         <GlobalStyles />

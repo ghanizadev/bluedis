@@ -11,6 +11,7 @@ import { Error } from "./Types/Error";
 import { Item } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
+import languages, {Language} from "../i18n/languages";
 
 const initialState: State = {
   isLoading: false,
@@ -18,7 +19,7 @@ const initialState: State = {
   selected: [],
   currentPage: "home",
   settings: {
-    appearence: {
+    appearance: {
       darkTheme: false,
       fontFamily: "Roboto",
       fontSize: "14pt",
@@ -32,6 +33,8 @@ const initialState: State = {
       dateFormat: "system",
     },
     license: "teste",
+    language: Language.English,
+    translation: languages['en']
   },
   terminal: {
     open: false,
@@ -81,7 +84,7 @@ const slice = createSlice({
       state.currentPage = action.payload;
     },
     changeAppearence: (state, action: PayloadAction<Appearence>) => {
-      state.settings.appearence = action.payload;
+      state.settings.appearance = action.payload;
     },
     updatePreferences: (state, action) => {
       state.settings = { ...state.settings, ...action.payload };
@@ -159,8 +162,20 @@ const slice = createSlice({
         "\u00a0",
       ];
     },
+    terminalWelcome: (state) => {
+      state.terminal.stdout = [
+        "Bluedis Terminal (Beta)",
+        "\u00a0",
+        'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
+        "\u00a0",
+      ];
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setLanguage: (state, action: PayloadAction<Language>) => {
+      state.settings.language = action.payload;
+      state.settings.translation = languages[action.payload];
     },
   },
 });

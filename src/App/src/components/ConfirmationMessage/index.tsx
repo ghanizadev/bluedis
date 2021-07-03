@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import Button from "../Button";
@@ -20,6 +20,7 @@ const ErrorMessage = () => {
     (state) => state.confirmation
   );
   const dispatch = useDispatch();
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation)
 
   const handleConfirm = () => {
     confirm && confirm.onConfirm();
@@ -43,11 +44,11 @@ const ErrorMessage = () => {
             <ButtonsWrapper>
               <Button
                 onClick={handleCancel}
-                label="Cancel"
+                label={translation.cancel}
               />
               <Button
                 onClick={handleConfirm}
-                label="Confirm"
+                label={translation.confirm}
               />
             </ButtonsWrapper>
           </MessageContent>

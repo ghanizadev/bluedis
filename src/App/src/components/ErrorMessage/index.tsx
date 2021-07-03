@@ -18,6 +18,7 @@ const ButtonsWrapper = styled.div`
 const ErrorMessage = () => {
   const message = useSelector<State, Error | undefined>((state) => state.error);
   const dispatch = useDispatch();
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation);
 
   const handleClose = () => {
     dispatch(actions.setError(undefined));
@@ -31,7 +32,7 @@ const ErrorMessage = () => {
             <h3>{message.title}</h3>
             <p>{message.message}</p>
             <ButtonsWrapper>
-              <Button onClick={handleClose} label="Ok" />
+              <Button onClick={handleClose} label={translation.ok} />
             </ButtonsWrapper>
           </MessageContent>
         </>

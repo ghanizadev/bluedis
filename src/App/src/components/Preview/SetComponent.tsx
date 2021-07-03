@@ -17,8 +17,9 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import { actions } from "../../redux/store";
+import {State} from "../../redux/Types/State";
 
 let timeout: number;
 
@@ -32,6 +33,7 @@ const SetComponent: React.FC<Props> = (props) => {
     value: string;
   }>();
   const [deleting, setDeleting] = React.useState(false);
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation);
 
   const dispatch = useDispatch();
   
@@ -88,7 +90,7 @@ const SetComponent: React.FC<Props> = (props) => {
         <PreviewTable>
           <tbody>
             <tr>
-              <th>Member</th>
+              <th>{translation.member}</th>
             </tr>
             {(value as string[]).map((item, index) => {
               return (
@@ -112,27 +114,27 @@ const SetComponent: React.FC<Props> = (props) => {
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"
-          title="Add Item"
+          title={translation.additem}
           onClick={handleAddOpen}
         >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-copy"
-          title="Copy document as JSON"
+          title={translation.copydoc}
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={translation.setttl}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
-          title="Remove document"
+          title={translation.removedoc}
           data-testid="item-remove"
           remove
           inAction={deleting}

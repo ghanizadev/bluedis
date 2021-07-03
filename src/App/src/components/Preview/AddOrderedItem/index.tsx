@@ -10,6 +10,8 @@ import { PreviewActionButton } from "../../common/PreviewActionButton";
 
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
+import {useSelector} from "react-redux";
+import {State} from "../../../redux/Types/State";
 
 const Input = styled.input`
   width: 100%;
@@ -30,6 +32,7 @@ type Props = {
 const AddOrderedItem: React.FC<Props> = (props) => {
   const { onSubmit, onDelete, onClose, item } = props;
   const { score, value, isNew } = item;
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation);
 
   const valueRef = React.useRef<HTMLTextAreaElement>(null);
   const scoreRef = React.useRef<HTMLInputElement>(null);
@@ -65,13 +68,13 @@ const AddOrderedItem: React.FC<Props> = (props) => {
     <>
       <MessageBackground />
       <MessageContent>
-        <h3>{isNew ? "Add" : "Edit"} Item</h3>
+        <h3>{isNew ? translation.additem : translation.edititem}</h3>
         <Label>
-          Score: <br />
+          {translation.score}: <br />
           <Input ref={scoreRef} defaultValue={score} />
         </Label>
         <Label style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          Value: <br />
+          {translation.value}: <br />
           <TextArea ref={valueRef} defaultValue={value} />
         </Label>
         <PreviewActions>
@@ -79,19 +82,19 @@ const AddOrderedItem: React.FC<Props> = (props) => {
             data-testid="message-copy"
             onClick={handleItemCopy}
           >
-            <CopyIcon title="Copy as JSON" />
+            <CopyIcon title={translation.copydoc} />
           </PreviewActionButton>
           <PreviewActionButton
             data-testid="message-remove"
             remove
             onClick={handleItemRemove}
           >
-            <RemoveIcon title="Remove property" />
+            <RemoveIcon title={translation.removeprop} />
           </PreviewActionButton>
         </PreviewActions>
         <MessageButtonWrapper>
-          <Button label="Close" onClick={handleClose} />
-          <Button label="Save" onClick={handleSave} />
+          <Button label={translation.close} onClick={handleClose} />
+          <Button label={translation.save} onClick={handleSave} />
         </MessageButtonWrapper>
       </MessageContent>
     </>

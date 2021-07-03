@@ -17,9 +17,7 @@ const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-
   margin-top: 15px;
-  width: 100%;
 
   & input {
     margin: 0 !important;
@@ -31,6 +29,7 @@ const EditTTL: React.FC = () => {
   const [ttlAbsolute, setTTLAbsolute] = React.useState(false);
   const [ttl, setTTL] = React.useState<number | string>(0);
   const [displayTTL, setDisplayTTL] = React.useState<string>("");
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation);
 
   const dispatch = useDispatch();
 
@@ -59,7 +58,7 @@ const EditTTL: React.FC = () => {
 
     setDisplayTTL(
       item.ttl === -1
-        ? "not set"
+        ? "-"
         : new Date(item.ttl).toLocaleString(navigator.language, {
             timeZoneName: "short",
           })
@@ -72,10 +71,10 @@ const EditTTL: React.FC = () => {
         <>
           <MessageBackground />
           <MessageContent>
-            <h3>Set TTL</h3>
-            <small>Actual: {displayTTL}</small>
+            <h3>{translation.setttl}</h3>
+            <small>{translation.actual}: {displayTTL}</small>
             <Row>
-              <span>Absolute TTL: </span>
+              <span>{translation.absolutettl}: </span>
               <Toggle
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
@@ -84,7 +83,7 @@ const EditTTL: React.FC = () => {
             </Row>
             <Row>
               <span>
-                {ttlAbsolute ? "Expires At" : "Expiration (seconds)"}:{" "}
+                {ttlAbsolute ? translation.expiresat : translation.expirationsec}:{" "}
               </span>
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
@@ -95,11 +94,11 @@ const EditTTL: React.FC = () => {
             <Row style={{ justifyContent: "flex-end" }}>
               <Button
                 disabled={item?.ttl === -1}
-                label="Remove"
+                label={translation.removettl}
                 onClick={handleRemove}
               />
-              <Button label="Cancel" onClick={handleCancel} />
-              <Button label="Confirm" onClick={handleConfirm} />
+              <Button label={translation.cancel} onClick={handleCancel} />
+              <Button label={translation.confirm} onClick={handleConfirm} />
             </Row>
           </MessageContent>
         </>

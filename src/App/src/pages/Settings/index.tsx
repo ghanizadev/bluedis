@@ -12,9 +12,11 @@ import { Container } from "./Container";
 import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
+import { Language } from "../../i18n/languages";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
+  const translation = useSelector<State, {[key: string]: any}>(state => state.settings.translation)
   const dispatch = useDispatch();
 
   const fontSizeRef = useRef<HTMLInputElement>(null);
@@ -23,26 +25,30 @@ const Settings = () => {
     const settings = store.getState().settings;
     savePreferences(settings);
   }
+  
+  React.useEffect(() => {
+    saveChanges()
+  }, [settings])
 
   const handleDarkModeChange = () => {
     dispatch(
       actions.changeAppearence({
-        ...settings.appearence,
-        darkTheme: !settings.appearence.darkTheme,
+        ...settings.appearance,
+        darkTheme: !settings.appearance.darkTheme,
       })
     );
 
-    saveChanges();
+    // saveChanges();
   };
 
   const handleFontFamilyChange = (value: string) => {
     dispatch(
       actions.changeAppearence({
-        ...settings.appearence,
+        ...settings.appearance,
         fontFamily: value as any,
       })
     );
-    saveChanges();
+    // saveChanges();
   };
 
   const changeFont = () => {
@@ -52,11 +58,11 @@ const Settings = () => {
 
     dispatch(
       actions.changeAppearence({
-        ...settings.appearence,
+        ...settings.appearance,
         fontSize: `${value}pt`,
       })
     );
-    saveChanges();
+    // saveChanges();
   }
 
   const handleFontSizeChange = () => {
@@ -69,58 +75,68 @@ const Settings = () => {
 
   const handleWipeData = () => {
     dispatch(actions.setConfirmation({
-      title: "Confirmation",
-      message: "Do you really want to wipe all stored data? This includes all your preferences and favorites",
+      title: translation.confirmation,
+      message: translation.wipeconfirm,
       onConfirm: () => {
         wipeData();
       }
     }))
   }
+  
+  const handleLanguageChange = (value: string) => {
+    dispatch(actions.setLanguage((Language as any)[value]))
+    // saveChanges();
+  }
 
   return (
     <Container>
-      <h1>Settings</h1>
+      <h1>{translation.settings}</h1>
       <Content>
-        <Subtitle>Appearence</Subtitle>
+        <Subtitle>{translation.appearance}</Subtitle>
         <Row>
-          <span>Dark mode</span>
+          <span>{translation.darkmode}</span>
           <span>
             <Toggle
-              checked={settings.appearence.darkTheme}
+              checked={settings.appearance.darkTheme}
               onChange={handleDarkModeChange}
             />
           </span>
         </Row>
         <Row>
-          <span>Font</span>
+          <span>{translation.font}</span>
           <span>
-            <Dropdown defaultValue={settings.appearence.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
+            <Dropdown defaultValue={settings.appearance.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
           </span>
         </Row>
         <Row>
-          <span>Font size</span>
+          <span>{translation.fontsize}</span>
           <span>
             <Input
               ref={fontSizeRef}
               type="text"
               style={{ width: "100px", textAlign: "right" }}
-              defaultValue={settings.appearence.fontSize}
+              defaultValue={settings.appearance.fontSize}
               onBlur={handleFontSizeChange}
               onKeyDown={handleFontSizeChangeOnEnter}
             />
           </span>
         </Row>
-        <Subtitle>Data</Subtitle>
+        <Subtitle>{translation.data}</Subtitle>
         <Row>
-          <span>Clear preferences</span>
+          <span>{translation.clearpref}</span>
           <span>
-            <Button label="Wipe data" onClick={handleWipeData} />
+            <Button label={translation.wipedata} onClick={handleWipeData} />
+          </span>
+        </Row>
+        <Row>
+          <span>{translation.language}</span>
+          <span>
+            <Dropdown defaultValue={Object.keys(Language).find(key => (Language as any)[key] === settings.language)} onChange={handleLanguageChange} items={Object.keys(Language)} />
           </span>
         </Row>
         {
         /**
          * Maximum DB default 5
-         * Language preferences
          * fetch data => load step = 10
          * date format
          */

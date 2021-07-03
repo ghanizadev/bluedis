@@ -63,8 +63,6 @@ const Frame: React.FC = (props) => {
       setHost("");
       setName("");
     }
-
-    console.log(connection);
   }, [connection, connected]);
 
   return (

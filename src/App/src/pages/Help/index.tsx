@@ -54,6 +54,7 @@ const Help = () => {
   const license = useSelector<State, string | undefined>(
     (state) => state.settings.license
   );
+  const translation = useSelector<State, {[key: string]: string}>(state => state.settings.translation)
 
   const handleOpenLink = (link: string) => {
     return () => {
@@ -63,13 +64,13 @@ const Help = () => {
 
   return (
     <Container>
-      <h1>Help</h1>
+      <h1>{translation.help}</h1>
       <Content>
         <Header>
           <GhanizadevIcon src={`${process.env.PUBLIC_URL}/logo_blue.png`} />
           <div>
             <h2>
-              Bluedis <small>v1.0.0</small>
+              Bluedis <small>v1.1.0</small>
             </h2>
             <p>ghanizadev ltd.</p>
             <Link onClick={handleOpenLink("https://ghanizadev.com")}>
@@ -79,18 +80,18 @@ const Help = () => {
         </Header>
         <br />
         <br />
-        <p>author: Jean Felipe de Melo</p>
+        <p>{translation.author}: Jean Felipe de Melo</p>
         <p>
-          email:{" "}
+          {translation.email}:{" "}
           <Link onClick={handleOpenLink("mailto:jf.melo6@gmail.com")}>
             jf.melo6@gmail.com
           </Link>
         </p>
         <br />
-        <TextArea readOnly value={license}></TextArea>
+        <TextArea readOnly value={translation.mitlicense}></TextArea>
         <br />
         <p>
-          repository:{" "}
+          {translation.repository}:{" "}
           <Link
             onClick={handleOpenLink("https://github.com/ghanizadev/bluedis")}
           >
@@ -99,7 +100,7 @@ const Help = () => {
         </p>
         <br />
         <p>
-          issues:{" "}
+          {translation.issues}:{" "}
           <Link
             onClick={handleOpenLink("https://github.com/ghanizadev/bluedis")}
           >
@@ -109,7 +110,7 @@ const Help = () => {
         <br />
         <br />
         <div>
-          core icons made by{" "}
+          {translation.iconsby}{" "}
           <Link
             title="Feather Icons"
             onClick={handleOpenLink("https://feathericons.com")}
@@ -118,7 +119,7 @@ const Help = () => {
           </Link>
         </div>
         <div>
-          application icon made by{" "}
+          {translation.mainiconby}{" "}
           <Link
             onClick={handleOpenLink(
               "https://www.flaticon.com/free-icon/server_957472"
@@ -127,7 +128,7 @@ const Help = () => {
           >
             Kiranshastry
           </Link>{" "}
-          from{" "}
+          {translation.from}{" "}
           <Link
             onClick={handleOpenLink("https://www.flaticon.com/")}
             title="Flaticon"

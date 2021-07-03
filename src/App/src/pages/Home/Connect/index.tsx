@@ -73,6 +73,8 @@ const Connect = () => {
   const favorites = useSelector<State, Connection[]>(
     (state) => state.favorites
   );
+  const translation = useSelector<State, {[key: string]: any}>(state => state.settings.translation)
+
   const dispatch = useDispatch();
 
   const handleRemoveFromHistory = (connection: Connection) => {
@@ -107,9 +109,9 @@ const Connect = () => {
       <Container>
         <Content>
           <Form data-testid="connect-form">
-            <h1>Connect</h1>
+            <h1>{translation.connect}</h1>
             <label>
-              Host:
+              {translation.host}:
               <br />
               <input
                 defaultValue={connection.host}
@@ -117,7 +119,7 @@ const Connect = () => {
               />
             </label>
             <label>
-              Port:
+              {translation.port}:
               <br />
               <input
                 defaultValue={connection.port}
@@ -125,14 +127,14 @@ const Connect = () => {
               />
             </label>
             <label>
-              Password:
+              {translation.pw}:
               <br />
               <input type="password" onChange={handlePasswordChange} />
             </label>
-            <LoginButton onClick={handleConnect}>Connect</LoginButton>
+            <LoginButton onClick={handleConnect}>{translation.connect}</LoginButton>
           </Form>
           <Recent>
-            <p>Favorites</p>
+            <p>{translation.favorites}</p>
             <br />
             <ListWrapper>
               <ConnectionsList>
@@ -148,7 +150,7 @@ const Connect = () => {
                 })}
                 {favorites.length === 0 && (
                   <>
-                    <p style={{ color: "gray" }}>No favorites so far...</p>
+                    <p style={{ color: "gray" }}>{translation.nofavorites}</p>
                   </>
                 )}
               </ConnectionsList>
