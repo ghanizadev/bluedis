@@ -60,7 +60,7 @@ const EditTTL: React.FC = () => {
     setDisplayTTL(
       item.ttl === -1
         ? "not set"
-        : new Date(item.ttl).toLocaleString(navigator.language, {
+        : new Date(item.ttl!).toLocaleString(navigator.language, {
             timeZoneName: "short",
           })
     );

@@ -33,6 +33,7 @@ const App = () => {
     ...defaultSettings,
   });
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
+  const ready = useSelector<State, boolean>((state) => state.ready);
 
   const registerStore = React.useCallback(() => {
     store.subscribe(() => {
@@ -54,6 +55,8 @@ const App = () => {
     registerStore();
     getPreferences();
   }, [registerStore]);
+  
+  if(!ready) return <div/>
 
   return (
     <SettingsContext.Provider value={{ theme }}>

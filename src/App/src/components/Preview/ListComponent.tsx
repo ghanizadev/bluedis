@@ -111,7 +111,7 @@ const ListComponent: React.FC<Props> = (props) => {
       </PreviewContainer>
       <span>
         {ttl !== -1 &&
-          `TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+          `TTL: ${new Date(ttl!).toLocaleString(navigator.language, {
             timeZoneName: "short",
           })}`}
       </span>

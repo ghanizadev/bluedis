@@ -26,7 +26,7 @@ const Settings = () => {
 
   const handleDarkModeChange = () => {
     dispatch(
-      actions.changeAppearence({
+      actions.changeAppearance({
         ...settings.appearence,
         darkTheme: !settings.appearence.darkTheme,
       })
@@ -37,7 +37,7 @@ const Settings = () => {
 
   const handleFontFamilyChange = (value: string) => {
     dispatch(
-      actions.changeAppearence({
+      actions.changeAppearance({
         ...settings.appearence,
         fontFamily: value as any,
       })
@@ -51,7 +51,7 @@ const Settings = () => {
     const value = fontSizeRef.current.value.match(/\d+/)?.join("");
 
     dispatch(
-      actions.changeAppearence({
+      actions.changeAppearance({
         ...settings.appearence,
         fontSize: `${value}pt`,
       })
