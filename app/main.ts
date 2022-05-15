@@ -13,7 +13,7 @@ if (require("electron-squirrel-startup")) {
 
 let mainWindow: BrowserWindow;
 
-const createWindow = (): void => {
+const createWindow = async (): Promise<void> => {
     mainWindow = new BrowserWindow({
         height: 800,
         width: 1000,
@@ -23,7 +23,6 @@ const createWindow = (): void => {
         resizable: false,
         webPreferences: {
             nodeIntegration: true,
-            // enableRemoteModule: true,
             contextIsolation: false,
         },
     });
@@ -40,7 +39,7 @@ const createWindow = (): void => {
     if (process.env.NODE_ENV === "development") {
         mainWindow.loadURL("http://localhost:3000");
     } else {
-        mainWindow.loadFile(path.resolve(app.getAppPath(), "build", "index.html"));
+        mainWindow.loadFile(path.resolve(__dirname, "app", "index.html"));
     }
 
     process.on("uncaughtException", (error) => {
@@ -78,8 +77,8 @@ app.on("will-quit", () => {
     globalShortcut.unregisterAll();
 });
 
-app.on("activate", () => {
+app.on("activate", async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
+        await createWindow();
     }
 });

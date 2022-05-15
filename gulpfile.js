@@ -12,6 +12,19 @@ const execAsync = async (command, displayError = true) => {
     })
 }
 
+const setEnv = (env = 'development') => {
+  const setEnvironment = cb => {
+    process.env.BUILD_ENV = env;
+    cb();
+  }
+  
+  return setEnvironment;
+}
+
+const copy = async () => {
+  await execAsync('mv build-react dist/app');
+}
+
 const checkDevServerStatus = async () => {
     try {
         const headers = await execAsync('curl -I http://localhost:3000', false);
@@ -22,16 +35,22 @@ const checkDevServerStatus = async () => {
     }
 }
 
+const compileReact = async() => {
+  return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} BUILD_PATH=./build react-scripts build`)
+}
+
 const compileElectron = async () => {
     return execAsync('npx tsc --project tsconfig.app.json')
 }
 
 const devReact = async () => {
-    return execAsync('npx cross-env NODE_ENV=development BROWSER=none PORT=3000 react-scripts start')
+    return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} BROWSER=none PORT=3000 react-scripts start`)
 }
 
 const devElectron = async () => {
-    process.stdout.write('Awaiting for dev-server');
+  if(process.env.BUILD_ENV === 'production') return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start`)
+  
+    process.stdout.write('Awaiting for dev-server...');
 
     while(!(await checkDevServerStatus())) {
         await new Promise(res => setTimeout(res, 1000));
@@ -39,9 +58,39 @@ const devElectron = async () => {
     }
 
     process.stdout.write(' Done\n');
-    return execAsync('npx cross-env NODE_ENV=development electron-forge start')
+    return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start`)
+}
+
+const startElectron = async () => {
+  return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start --app-path ./dist/main.js`)
+}
+
+const dir = async () => {
+  let arg = "";
+  
+  switch(process.env.SNAP_ARCH)  {
+    case "amd64":
+      arg = " --x64"
+      break;
+    case "i386":
+      arg = " --ia32";
+      break;
+    case "arm64":
+      arg = " --arm64";
+      break;
+    case "armhf":
+      arg = " --armv7l";
+      break;
+  }
+  
+  return execAsync('npx electron-builder --dir' + arg)
+}
+
+const make = async() => {
+  return execAsync('npx electron-builder')
 }
 
 module.exports = {
-    'start-dev': gulp.series(compileElectron, gulp.parallel(devReact, devElectron)),
+  'start-dev': gulp.series(setEnv('development'), compileElectron, gulp.parallel(devReact, devElectron)),
+  'start-prod': gulp.series(setEnv('production'), compileReact, compileElectron, copy, startElectron),
 }

@@ -56,7 +56,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start:dev": "npx gulp start-dev"
+    "start:dev": "npx gulp start-dev",
+    "start:prod": "npx gulp start-prod"
   },
   "eslintConfig": {
     "extends": [
