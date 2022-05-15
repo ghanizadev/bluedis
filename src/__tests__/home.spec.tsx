@@ -10,11 +10,8 @@ import { ThemeWrapper } from "../utils/ThemeWrapper";
 import {
   fireEvent,
   getAllByTestId,
-  getAllByText,
   getByTestId,
   getByText,
-  getByTitle,
-  waitFor,
 } from "@testing-library/react";
 import { actions, store } from "../redux/store";
 import mocks from "../utils/WindowRequireMock";
@@ -93,6 +90,7 @@ describe("<Home />", () => {
             key: "new:string",
             type: "string",
             value: "some value",
+            ttl: 15000,
           },
           {
             key: "new:hash",
@@ -100,21 +98,25 @@ describe("<Home />", () => {
             value: {
               "New Key": "New Value",
             },
+            ttl: 15000,
           },
           {
             key: "new:set",
             type: "set",
             value: ["New Set Member"],
+            ttl: 15000,
           },
           {
             key: "new:list",
             type: "list",
             value: ["New List Member"],
+            ttl: 15000,
           },
           {
             key: "new:zset",
             type: "zset",
             value: [{ value: "New ZSet Member", score: "50" }],
+            ttl: 15000,
           },
         ])
       );

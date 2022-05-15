@@ -22,6 +22,7 @@ import { ReactComponent as TerminalIcon } from "../../assets/terminal.svg";
 import { Connection } from "../../redux/Types/Connection";
 import { Container } from "./Container";
 import { LastRefresh } from "./LastRefresh";
+import {t} from "../../i18n";
 
 type Props = {
   onRefresh: () => void;
@@ -56,14 +57,15 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleDeleteSelected = () => {
+    const title = t`Attention`;
+    const message = selected.length === 1
+      ? t`Do you really want to delete THIS KEY?`
+      : t`Do you really want to delete THESE ${selected.length} KEYS?`;
+    
     dispatch(
       actions.setConfirmation({
-        message: `Do you really want to delete ${
-          selected.length === 1
-            ? "THIS KEY"
-            : "THESE " + selected.length + " KEYS"
-        }?`,
-        title: "Attention",
+        message,
+        title,
         onConfirm: () => {
           deleteKey(selected);
           dispatch(actions.clearSelection());
@@ -104,14 +106,14 @@ const Toolbar: React.FC<Props> = (props) => {
       <Container data-testid="toolbar">
         <SquareButton
           data-testid="data-add"
-          title="Add a new key"
+          title={t`Add a new key`}
           onClick={handleAdd}
         >
           <AddIcon />
         </SquareButton>
         <SquareButton
           data-testid="data-refresh"
-          title="Refresh list"
+          title={t`Refresh list`}
           onClick={handleRefresh}
         >
           <RefreshIcon />
@@ -121,7 +123,7 @@ const Toolbar: React.FC<Props> = (props) => {
           data-testid="data-remove"
           disabled={selected.length === 0}
           remove
-          title="Remove selected"
+          title={t`Remove selected`}
           onClick={handleDeleteSelected}
         >
           <RemoveIcon />
@@ -129,7 +131,7 @@ const Toolbar: React.FC<Props> = (props) => {
         <SquareButton
           data-testid="data-export"
           disabled={selected.length === 0}
-          title="Export selected"
+          title={t`Export selected`}
           onClick={handleDownloadSelected}
         >
           <DownloadIcon />
@@ -137,7 +139,7 @@ const Toolbar: React.FC<Props> = (props) => {
         <Separator />
         <SquareButton
           data-testid="data-shell"
-          title="Open terminal"
+          title={t`Open terminal`}
           onClick={handleTerminal}
         >
           <TerminalIcon />
@@ -145,7 +147,7 @@ const Toolbar: React.FC<Props> = (props) => {
         <Separator />
         <SquareButton
           data-testid="data-disconnect"
-          title="Close this connection"
+          title={t`Close this connection`}
           onClick={handleDisconnect}
         >
           <DisconnectIcon />
@@ -155,14 +157,14 @@ const Toolbar: React.FC<Props> = (props) => {
         ) && (
           <SquareButton
             data-testid="data-favorite"
-            title="Favorite this connection"
+            title={t`Favorite this connection`}
             onClick={handleFavorite}
           >
             <FavoriteIcon />
           </SquareButton>
         )}
         <LastRefresh>
-          Last update: {lastRefresh.toLocaleTimeString()}
+          {t`Last update`}: {lastRefresh.toLocaleTimeString()}
         </LastRefresh>
       </Container>
       {newName && (

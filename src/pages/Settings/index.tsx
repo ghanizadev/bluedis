@@ -13,6 +13,7 @@ import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
 import {DarkTheme, LightTheme} from "../../theme";
+import {t} from "../../i18n";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -73,8 +74,8 @@ const Settings = () => {
 
   const handleWipeData = () => {
     dispatch(actions.setConfirmation({
-      title: "Confirmation",
-      message: "Do you really want to wipe all stored data? This includes all your preferences and favorites",
+      title: t`Confirmation`,
+      message: t`Do you really want to wipe all stored data? This includes all your preferences and favorites`,
       onConfirm: () => {
         wipeData();
       }
@@ -83,11 +84,11 @@ const Settings = () => {
 
   return (
     <Container>
-      <h1>Settings</h1>
+      <h1>{t`Settings`}</h1>
       <Content>
-        <Subtitle>Appearence</Subtitle>
+        <Subtitle>{t`Appearence`}</Subtitle>
         <Row>
-          <span>Dark mode</span>
+          <span>{t`Dark mode`}</span>
           <span>
             <Toggle
               checked={settings.appearance.darkTheme}
@@ -96,13 +97,13 @@ const Settings = () => {
           </span>
         </Row>
         <Row>
-          <span>Font</span>
+          <span>{t`Font`}</span>
           <span>
             <Dropdown defaultValue={settings.appearance.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
           </span>
         </Row>
         <Row>
-          <span>Font size</span>
+          <span>{t`Font size`}</span>
           <span>
             <Input
               ref={fontSizeRef}
@@ -114,11 +115,11 @@ const Settings = () => {
             />
           </span>
         </Row>
-        <Subtitle>Data</Subtitle>
+        <Subtitle>{t`Data`}</Subtitle>
         <Row>
-          <span>Clear preferences</span>
+          <span>{t`Clear preferences`}</span>
           <span>
-            <Button label="Wipe data" onClick={handleWipeData} />
+            <Button label={t`Wipe data`} onClick={handleWipeData} />
           </span>
         </Row>
         {

@@ -12,6 +12,7 @@ import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { loadMore } from "../../services/mainProcess";
 import {Query} from "../../redux/Types/Query";
+import {t} from "../../i18n";
 
 const Row = styled.tr`
   height: 32px;
@@ -89,8 +90,8 @@ const Table: React.FC<Props> = (props) => {
                 onChangeValue={() => handleSelect("", { all: true })}
               />
             </Header>
-            <Header style={{ width: "100px" }}>Type</Header>
-            <Header>Key</Header>
+            <Header style={{ width: "100px" }}>{t`Type`}</Header>
+            <Header>{t`Key`}</Header>
           </Row>
           {data.map((item, index) => {
             return (
@@ -114,7 +115,7 @@ const Table: React.FC<Props> = (props) => {
                 </Data>
                 <Data
                   style={{ width: "75%" }}
-                  title="Click to view"
+                  title={t`Click to view`}
                   onClick={() => handleItemEdit(item)}
                 >
                   <span>{item.key}</span>
@@ -126,11 +127,11 @@ const Table: React.FC<Props> = (props) => {
       </TableContainer>
       <LoadMore>
         <span>
-          {query.done && `showing all ${currentCount} keys`}
-          {!query.done && `showing ${currentCount} keys - `}
+          {query.done && t`showing all ${currentCount} keys`}
+          {!query.done && t`showing ${currentCount} keys - `}
           {query.cursor !== 0 && (
             <button disabled={query.cursor === 0} onClick={handleLoadMore}>
-              load more ...
+              {t`load more...`}
             </button>
           )}
         </span>

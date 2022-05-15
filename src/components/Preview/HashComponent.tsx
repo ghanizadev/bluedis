@@ -19,6 +19,7 @@ import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
+import {t} from "../../i18n";
 
 let timeout: any;
 
@@ -87,8 +88,8 @@ const HashComponent: React.FC<Props> = (props) => {
         <PreviewTable>
           <tbody>
             <tr>
-              <th>Key</th>
-              <th>Value</th>
+              <th>{t`Key`}</th>
+              <th>{t`Value`}</th>
             </tr>
             {Object.keys(value).map((key, index) => {
               return (
@@ -107,34 +108,34 @@ const HashComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
         </span>
       </div>
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"
-          title="Add Item"
+          title={t`Add Item`}
           onClick={handleAddOpen}
         >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-copy"
-          title="Copy document as JSON"
+          title={t`Copy key as JSON`}
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={t`Edit TTL`}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-remove"
-          title="Remove document"
+          title={t`Remove key`}
           remove
           inAction={deleting}
           onMouseUp={handleDeleteCancel}

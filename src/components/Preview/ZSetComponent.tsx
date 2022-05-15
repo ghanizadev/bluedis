@@ -19,6 +19,7 @@ import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
+import {t} from "../../i18n";
 
 let timeout: any;
 
@@ -39,7 +40,7 @@ const ZSetComponent: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
   
   const handleAddOpen = () => {
-    setItemValue({ isNew: true, score: "0", value: "New value here..." });
+    setItemValue({ isNew: true, score: "0", value: t`New value here...` });
   };
   const handleItemSubmit = (
     oldValue: string,
@@ -95,9 +96,9 @@ const ZSetComponent: React.FC<Props> = (props) => {
           <tbody>
             <tr>
               <th align="center" style={{ width: "80px" }}>
-                Score
+                {t`Score`}
               </th>
-              <th>Value</th>
+              <th>{t`Value`}</th>
             </tr>
             {(value as { score: string; value: string }[]).map(
               (item, index) => {
@@ -120,34 +121,34 @@ const ZSetComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
         </span>
       </div>
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"
-          title="Add new member"
+          title={t`Add new member`}
           onClick={handleAddOpen}
         >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-copy"
-          title="Copy document as JSON"
+          title={t`Copy key as JSON`}
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={t`Edit TTL`}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-remove"
-          title="Remove document"
+          title={t`Remove key`}
           remove
           inAction={deleting}
           onMouseUp={handleDeleteCancel}

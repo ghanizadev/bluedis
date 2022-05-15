@@ -11,6 +11,7 @@ import { PreviewActionButton } from "../../common/PreviewActionButton";
 
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
+import {t} from "../../../i18n";
 
 type Props = {
   onSubmit: (value: { key: string; value: string }) => void;
@@ -55,18 +56,18 @@ const AddHashItem: React.FC<Props> = (props) => {
     <>
       <MessageBackground />
       <MessageContent>
-        <h4>{newItem ? "Add" : "Edit"} Item</h4>
+        <h4>{newItem ? t`Add item` : t`Edit item`}</h4>
         <Label>
-          Key: <br />
+          {t`Key`}: <br />
           <Input
             ref={inputRef}
             disabled={!!item.key}
-            defaultValue={item?.key || "New Key"}
+            defaultValue={item?.key || t`New Key`}
           />
         </Label>
         <Label>
-          Value: <br />
-          <TextArea ref={textAreaRef} defaultValue={item?.value || "New item here..."} />
+          {t`Value`}: <br />
+          <TextArea ref={textAreaRef} defaultValue={item?.value || t`New item here...`} />
         </Label>
         {!newItem && (
           <PreviewActions>
@@ -74,20 +75,20 @@ const AddHashItem: React.FC<Props> = (props) => {
               data-testid="message-copy"
               onClick={handleItemCopy}
             >
-              <CopyIcon title="Copy as JSON" />
+              <CopyIcon title={t`Copy as JSON`} />
             </PreviewActionButton>
             <PreviewActionButton
               data-testid="message-remove"
               remove
               onClick={handleItemRemove}
             >
-              <RemoveIcon title="Remove property" />
+              <RemoveIcon title={t`Remove property`} />
             </PreviewActionButton>
           </PreviewActions>
         )}
         <MessageButtonWrapper>
-          <Button label="Close" onClick={handleClose} />
-          <Button label="Save" onClick={handleSave} />
+          <Button label={t`Close`} onClick={handleClose} />
+          <Button label={t`Save`} onClick={handleSave} />
         </MessageButtonWrapper>
       </MessageContent>
     </>

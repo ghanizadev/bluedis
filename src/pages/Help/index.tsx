@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { t } from "../../i18n";
 import { State } from "../../redux/Types/State";
 import { openLink } from "../../services/mainProcess";
 
@@ -63,25 +64,25 @@ const Help = () => {
 
   return (
     <Container>
-      <h1>Help</h1>
+      <h1>{t`Help`}</h1>
       <Content>
         <Header>
           <GhanizadevIcon src={`${process.env.PUBLIC_URL}/logo_blue.png`} />
           <div>
             <h2>
-              Bluedis <small>v1.0.0</small>
+              Bluedis <small>v0.2.0</small>
             </h2>
             <p>ghanizadev ltd.</p>
             <Link onClick={handleOpenLink("https://ghanizadev.com")}>
-              https://ghanizadev.com
+              https://www.ghanizadev.com
             </Link>
           </div>
         </Header>
         <br />
         <br />
-        <p>author: Jean Felipe de Melo</p>
+        <p>{t`author`}: Jean Felipe de Melo</p>
         <p>
-          email:{" "}
+          {t`email`}:{" "}
           <Link onClick={handleOpenLink("mailto:jf.melo6@gmail.com")}>
             jf.melo6@gmail.com
           </Link>
@@ -90,7 +91,7 @@ const Help = () => {
         <TextArea readOnly value={license}></TextArea>
         <br />
         <p>
-          repository:{" "}
+          {t`repository`}:{" "}
           <Link
             onClick={handleOpenLink("https://github.com/ghanizadev/bluedis")}
           >
@@ -99,7 +100,7 @@ const Help = () => {
         </p>
         <br />
         <p>
-          issues:{" "}
+          {t`issues`}:{" "}
           <Link
             onClick={handleOpenLink("https://github.com/ghanizadev/bluedis")}
           >
@@ -109,7 +110,7 @@ const Help = () => {
         <br />
         <br />
         <div>
-          core icons made by{" "}
+          {t`core icons made by`}{" "}
           <Link
             title="Feather Icons"
             onClick={handleOpenLink("https://feathericons.com")}
@@ -118,7 +119,7 @@ const Help = () => {
           </Link>
         </div>
         <div>
-          application icon made by{" "}
+          {t`application icon made by`}{" "}
           <Link
             onClick={handleOpenLink(
               "https://www.flaticon.com/free-icon/server_957472"
@@ -127,7 +128,7 @@ const Help = () => {
           >
             Kiranshastry
           </Link>{" "}
-          from{" "}
+          {t`from`}{" "}
           <Link
             onClick={handleOpenLink("https://www.flaticon.com/")}
             title="Flaticon"

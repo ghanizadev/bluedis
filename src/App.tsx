@@ -15,6 +15,7 @@ import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";
 import Loading from "./components/Loading";
 import {Appearance} from "./redux/Types/Appearance";
+import {t} from "./i18n";
 
 const App = () => {
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
@@ -22,6 +23,7 @@ const App = () => {
 
   React.useEffect(() => {
     getPreferences();
+    console.log(t`something that ${9 + 2} needs to be translated ${9 + 2}`)
   }, []);
 
   return (

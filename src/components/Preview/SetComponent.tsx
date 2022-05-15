@@ -19,6 +19,7 @@ import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
 import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
+import {t} from "../../i18n";
 
 let timeout: any;
 
@@ -88,7 +89,7 @@ const SetComponent: React.FC<Props> = (props) => {
         <PreviewTable>
           <tbody>
             <tr>
-              <th>Member</th>
+              <th>{t`Member`}</th>
             </tr>
             {(value as string[]).map((item, index) => {
               return (
@@ -106,33 +107,33 @@ const SetComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
         </span>
       </div>
       <PreviewActions>
         <PreviewActionButton
           data-testid="item-add"
-          title="Add Item"
+          title={t`Add Item`}
           onClick={handleAddOpen}
         >
           <AddIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-copy"
-          title="Copy document as JSON"
+          title={t`Copy key as JSON`}
           onClick={handleDocumentCopy}
         >
           <CopyIcon />
         </PreviewActionButton>
         <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={t`Edit TTL`}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
         <PreviewActionButton
-          title="Remove document"
+          title={t`Remove key`}
           data-testid="item-remove"
           remove
           inAction={deleting}

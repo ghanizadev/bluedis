@@ -7,6 +7,7 @@ import { Error } from "../../redux/Types/Error";
 import { State } from "../../redux/Types/State";
 import { MessageContent } from "../common/MessageContent";
 import { MessageBackground } from "../common/MessageBackground";
+import {t} from "../../i18n";
 
 const ButtonsWrapper = styled.div`
   display: flex;
@@ -31,7 +32,7 @@ const ErrorMessage = () => {
             <h3>{message.title}</h3>
             <p>{message.message}</p>
             <ButtonsWrapper>
-              <Button onClick={handleClose} label="Ok" />
+              <Button onClick={handleClose} label={t`Ok`} />
             </ButtonsWrapper>
           </MessageContent>
         </>

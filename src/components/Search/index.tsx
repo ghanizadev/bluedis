@@ -5,6 +5,7 @@ import Dropdown from "../Dropdown";
 import Input from "../Input";
 
 import { find, selectDatabase } from "../../services/mainProcess";
+import {t} from "../../i18n";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -50,13 +51,13 @@ const Search = () => {
 
   return (
     <Container>
-      <span>Search:</span>
+      <span>{t`Search`}:</span>
       <SearchInput onChange={handleChange} onKeyDown={handleKeyListener} />
       <Dropdown
         items={databases.map((db) => db.name)}
         onChange={handleDatabaseChange}
       />
-      <Button label="Apply" onClick={handleSearch} />
+      <Button label={t`Apply`} onClick={handleSearch} />
     </Container>
   );
 };

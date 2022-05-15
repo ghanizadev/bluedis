@@ -11,6 +11,7 @@ export const Item = styled.button`
   justify-content: flex-start;
   cursor: pointer;
   transition: all 100ms ease-out;
+  width: 200px;
 
   color: ${props => props.theme.text};
 

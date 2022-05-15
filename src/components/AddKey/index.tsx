@@ -6,6 +6,7 @@ import { MessageContent } from "../common/MessageContent";
 import Dropdown from "../Dropdown";
 import Input from "../Input";
 import Toggle from "../Toggle";
+import {t} from "../../i18n";
 
 const Row = styled.div`
   display: flex;
@@ -70,13 +71,13 @@ const AddKey: React.FC<Props> = (props) => {
     <>
       <MessageBackground />
       <MessageContent data-testid="data-add-message">
-        <h3>Add new key</h3>
+        <h3>{t`Add key`}</h3>
         <Row>
-          <span>Name: </span>
+          <span>{t`Name`}: </span>
           <Key onChange={handleKeyChange} />
         </Row>
         <Row>
-          <span>Type: </span>
+          <span>{t`Type`}: </span>
           <Dropdown
             onChange={handleTypeChange}
             items={["set", "zset", "hash", "string", "list"]}
@@ -93,7 +94,7 @@ const AddKey: React.FC<Props> = (props) => {
         {useTTL && (
           <>
             <Row>
-              <span>Absolute TTL: </span>
+              <span>{t`Absolute TTL`}: </span>
               <Toggle
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
@@ -102,7 +103,7 @@ const AddKey: React.FC<Props> = (props) => {
             </Row>
             <Row>
               <span>
-                {ttlAbsolute ? "Expires At" : "Expiration (seconds)"}:{" "}
+                {ttlAbsolute ? t`Expires At` : t`Expiration (seconds)`}:{" "}
               </span>
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
@@ -113,8 +114,8 @@ const AddKey: React.FC<Props> = (props) => {
           </>
         )}
         <Row style={{ justifyContent: "flex-end" }}>
-          <Button label="Cancel" onClick={handleCancel} />
-          <Button label="Confirm" onClick={handleConfirm} />
+          <Button label={t`Cancel`} onClick={handleCancel} />
+          <Button label={t`Confirm`} onClick={handleConfirm} />
         </Row>
       </MessageContent>
     </>

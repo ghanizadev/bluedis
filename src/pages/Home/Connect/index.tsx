@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import styled from "styled-components";
 import { nanoid } from "nanoid";
 import { connect, saveFavorites } from "../../../services/mainProcess";
@@ -8,6 +8,7 @@ import { State } from "../../../redux/Types/State";
 import { Connection } from "../../../redux/Types/Connection";
 import Favorite from "./Favorite";
 import SocialMedia from "../../../components/SocialMedia";
+import { t } from "../../../i18n";
 
 const Container = styled.div`
   flex: 1;
@@ -104,19 +105,15 @@ const Connect = () => {
   const handleTLSChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, tls: e.target.checked });
   };
-  
-  // useEffect(() => {
-  //   alert(connection.tls)
-  // }, [connection])
 
   return (
     <>
       <Container>
         <Content>
           <Form data-testid="connect-form">
-            <h1>Connect</h1>
+            <h1>{t`Connect`}</h1>
             <label>
-              Host:
+              {t`Host`}:
               <br />
               <input
                 defaultValue={connection.host}
@@ -124,7 +121,7 @@ const Connect = () => {
               />
             </label>
             <label>
-              Port:
+              {t`Port`}:
               <br />
               <input
                 defaultValue={connection.port}
@@ -132,18 +129,18 @@ const Connect = () => {
               />
             </label>
             <label>
-              Password:
+              {t`Password`}:
               <br />
               <input type="password" onChange={handlePasswordChange} />
             </label>
             <label>
               <input type="checkbox" onChange={handleTLSChange} />
-              {" "}Use TLS
+              {" "}{t`Use TLS`}
             </label>
-            <LoginButton onClick={handleConnect}>Connect</LoginButton>
+            <LoginButton onClick={handleConnect}>{t`Connect`}</LoginButton>
           </Form>
           <Recent>
-            <p>Favorites</p>
+            <p>{t`Favorites`}</p>
             <br />
             <ListWrapper>
               <ConnectionsList>
@@ -159,7 +156,7 @@ const Connect = () => {
                 })}
                 {favorites.length === 0 && (
                   <>
-                    <p style={{ color: "gray" }}>No favorites so far...</p>
+                    <p style={{ color: "gray" }}>{t`No favorites so far...`}</p>
                   </>
                 )}
               </ConnectionsList>

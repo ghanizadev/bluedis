@@ -12,6 +12,7 @@ import { PreviewActionButton } from "../common/PreviewActionButton";
 import { PreviewActions } from "../common/PreviewActions";
 import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
+import {t} from "../../i18n";
 
 const Container = styled.textarea`
   resize: none;
@@ -86,18 +87,18 @@ const StringComponent: React.FC<Props> = (props) => {
               whiteSpace: "nowrap",
             }}
           >
-            Document saved!
+            {t`Key saved`}!
           </span>
         )}
       <div>
         <span>
           {ttl !== -1 &&
-            `TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
         </span>
       </div>
         <PreviewActions>
           <PreviewActionButton
-            title="Save document"
+            title={t`Save key`}
             onClick={handleDocumentSave}
             data-testid="item-save"
           >
@@ -105,21 +106,21 @@ const StringComponent: React.FC<Props> = (props) => {
           </PreviewActionButton>
           <PreviewActionButton
             data-testid="item-copy"
-            title="Copy document as JSON"
+            title={t`Copy key as JSON`}
             onClick={handleDocumentCopy}
           >
             <CopyIcon />
           </PreviewActionButton>
           <PreviewActionButton
           data-testid="item-ttl"
-          title="Edit TTL"
+          title={t`Edit TTL`}
           onClick={handleTTLOpen}
         >
           <TTLIcon />
         </PreviewActionButton>
           <PreviewActionButton
             data-testid="item-remove"
-            title="Remove document"
+            title={t`Remove key`}
             remove
             inAction={deleting}
             onMouseDown={handleDocumentDelete}

@@ -10,6 +10,7 @@ import { ReactComponent as HelpIcon } from "../../assets/help.svg";
 import { useDispatch } from "react-redux";
 import { Page } from "../../redux/Types/Page";
 import { actions } from "../../redux/store";
+import {t} from "../../i18n";
 
 const Sidebar = () => {
   const [open, setOpen] = React.useState(false);
@@ -25,15 +26,15 @@ const Sidebar = () => {
       <Items open={open}>
         <Item onClick={() => handlePageChange("home")}>
           <DatabaseIcon />
-          <span>Database</span>
+          <span>{t`Database`}</span>
         </Item>
         <Item onClick={() => handlePageChange("settings")}>
           <SettingsIcon />
-          <span>Settings</span>
+          <span>{t`Settings`}</span>
         </Item>
         <Item onClick={() => handlePageChange("help")}>
           <HelpIcon />
-          <span>Help</span>
+          <span>{t`Help`}</span>
         </Item>
       </Items>
     </Container>

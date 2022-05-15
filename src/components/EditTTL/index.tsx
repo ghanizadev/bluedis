@@ -10,6 +10,7 @@ import { MessageContent } from "../common/MessageContent";
 import Input from "../Input";
 import Toggle from "../Toggle";
 import * as services from "../../services/mainProcess";
+import {t} from "../../i18n";
 
 const Row = styled.div`
   display: flex;
@@ -59,7 +60,7 @@ const EditTTL: React.FC = () => {
 
     setDisplayTTL(
       item.ttl === -1
-        ? "not set"
+        ? t`not set`
         : new Date(item.ttl).toLocaleString(navigator.language, {
             timeZoneName: "short",
           })
@@ -72,10 +73,10 @@ const EditTTL: React.FC = () => {
         <>
           <MessageBackground />
           <MessageContent>
-            <h3>Set TTL</h3>
-            <small>Actual: {displayTTL}</small>
+            <h3>{t`Set TTL`}</h3>
+            <small>{t`Actual`}: {displayTTL}</small>
             <Row>
-              <span>Absolute TTL: </span>
+              <span>{t`Absolute TTL`}: </span>
               <Toggle
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
@@ -84,7 +85,7 @@ const EditTTL: React.FC = () => {
             </Row>
             <Row>
               <span>
-                {ttlAbsolute ? "Expires At" : "Expiration (seconds)"}:{" "}
+                {ttlAbsolute ? t`Expires At` : t`Expiration (seconds)`}:{" "}
               </span>
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
@@ -95,11 +96,11 @@ const EditTTL: React.FC = () => {
             <Row style={{ justifyContent: "flex-end" }}>
               <Button
                 disabled={item?.ttl === -1}
-                label="Remove"
+                label={t`Remove`}
                 onClick={handleRemove}
               />
-              <Button label="Cancel" onClick={handleCancel} />
-              <Button label="Confirm" onClick={handleConfirm} />
+              <Button label={t`Cancel`} onClick={handleCancel} />
+              <Button label={t`Confirm`} onClick={handleConfirm} />
             </Row>
           </MessageContent>
         </>

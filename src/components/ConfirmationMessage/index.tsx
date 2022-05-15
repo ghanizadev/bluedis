@@ -7,6 +7,7 @@ import { State } from "../../redux/Types/State";
 import { MessageContent } from "../common/MessageContent";
 import { MessageBackground } from "../common/MessageBackground";
 import { Confirmation } from "../../redux/Types/Confirmation";
+import {t} from "../../i18n";
 
 const ButtonsWrapper = styled.div`
   display: flex;
@@ -41,11 +42,11 @@ const ConfirmationMessage = () => {
             <ButtonsWrapper>
               <Button
                 onClick={handleCancel}
-                label="Cancel"
+                label={t`Cancel`}
               />
               <Button
                 onClick={handleConfirm}
-                label="Confirm"
+                label={t`Confirm`}
               />
             </ButtonsWrapper>
           </MessageContent>
