@@ -58,8 +58,8 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.env.test
+.env*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -87,6 +87,3 @@ typings/
 
 # Electron-Forge
 out/
-
-dist
-*.snap

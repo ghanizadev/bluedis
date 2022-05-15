@@ -1,72 +1,47 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const gulp = require("gulp");
-var exec = require('child_process').exec;
+const gulp = require('gulp');
+const { exec } = require('child_process');
 
-gulp.task('compile-electron', function (cb) {
-    exec('npx tsc', function (err) {
-      cb(err);
-    });
-  })
+const execAsync = async (command, displayError = true) => {
+    return new Promise((res, rej) => {
+        exec(command, (err, stdout, stderr) => {
+            if(displayError) console.log(stderr);
 
-gulp.task('compile-react', function (cb) {
-  exec('yarn --cwd ./src/App build', function (err) {
-    cb(err);
-  });
-})
+            if(err) return rej(err);
+            res(stdout);
+        })
+    })
+}
 
-gulp.task('dist', function (cb) {
-  exec('npx electron-builder', function (err) {
-    cb(err);
-  });
-})
-
-gulp.task('dir', function (cb) {
-    const { SNAP_ARCH } = process.env;
-
-    let arg = "";
-
-    if(SNAP_ARCH === "amd64"){
-      arg = " --x64";
-    } else if(SNAP_ARCH === "i386") {
-      arg = " --ia32";
-    } else if(SNAP_ARCH === "arm64") {
-      arg = " --arm64";
-    } else if(SNAP_ARCH === "armhf") {
-      arg = " --armv7l";
+const checkDevServerStatus = async () => {
+    try {
+        const headers = await execAsync('curl -I http://localhost:3000', false);
+        if(headers.split('\n')[0].search('200')) return 1;
+        return 0;
+    } catch(e) {
+        return 0
     }
-    
-    exec('electron-builder --dir' + arg, function (err, out, error) {
-      console.log(out, error)
-      cb(err);
-    });
-})
+}
 
-gulp.task('make', function (cb) {
-    exec('electron-builder', function (err, out, error) {
-      console.log(out, error)
-      cb(err);
-    });
-})
+const compileElectron = async () => {
+    return execAsync('npx tsc --project tsconfig.app.json')
+}
 
-gulp.task('copy-react', function () {
-    return gulp.src('./src/App/build/**/*')
-        .pipe(gulp.dest('./dist/build'));
-});
+const devReact = async () => {
+    return execAsync('npx cross-env NODE_ENV=development BROWSER=none PORT=3000 react-scripts start')
+}
 
-gulp.task('start-electron', function (cb) {
-    exec('npx cross-env NODE_ENV=development npx electron .', function (err) {
-        cb(err);
-    });
-});
+const devElectron = async () => {
+    process.stdout.write('Awaiting for dev-server');
 
-gulp.task('start-react', function (cb) {
-    exec('npx cross-env PORT=8080 BROWSER=none yarn --cwd ./src/App start', function (err) {
-        cb(err);
-    });
-});
+    while(!(await checkDevServerStatus())) {
+        await new Promise(res => setTimeout(res, 1000));
+        process.stdout.write('.');
+    }
 
-gulp.task('build', gulp.series(['compile-electron', 'compile-react', 'copy-react']));
-gulp.task('dist', gulp.series(['build', 'dist']));
-gulp.task('pack', gulp.series(['build', 'dir']));
-gulp.task('compile', gulp.series(['build', "make"]));
-gulp.task('dev', gulp.series(['compile-electron', gulp.parallel(['start-react', 'start-electron'])]));
+    process.stdout.write(' Done\n');
+    return execAsync('npx cross-env NODE_ENV=development electron-forge start')
+}
+
+module.exports = {
+    'start-dev': gulp.series(compileElectron, gulp.parallel(devReact, devElectron)),
+}

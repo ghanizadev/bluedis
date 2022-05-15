@@ -1,90 +1,97 @@
 {
-  "name": "bluedis",
-  "productName": "Bluedis",
+  "name": "bluedis-v2",
+  "productName": "bluedis-v2",
   "version": "0.1.0",
-  "description": "An elegant Redis GUI interface",
-  "main": "./dist/index.js",
-  "scripts": {
-    "lint": "npx eslint --ext .ts .",
-    "dev": "npx gulp dev",
-    "dir": "npx gulp pack",
-    "dist": "npx gulp dist",
-    "build": "npx gulp build",
-    "compile": "npx gulp compile",
-    "publish": "build --mac --win --linux -p always"
-  },
-  "keywords": [
-    "redis",
-    "gui",
-    "database",
-    "bluedis",
-    "management",
-    "data",
-    "visualization"
-  ],
-  "author": {
-    "name": "Jean Felipe de Melo",
-    "email": "jf.melo6@gmail.com"
-  },
-  "build": {
-    "appId": "com.ghanizadev.bluedis",
-    "mac": {
-      "category": "public.app-category.developer-tools"
-    },
-    "files": [
-      "assets/**/*",
-      "dist/**/*.js",
-      "dist/**/*.js.map",
-      "dist/database/**/*",
-      "dist/build/**/*",
-      "dist/listeners/**/*"
-    ],
-    "directories": {
-      "buildResources": "assets"
-    },
-    "extends": null,
-    "nsis": {
-      "installerIcon": "assets/icon.ico",
-      "uninstallerIcon": "assets/icon.ico"
-    },
-    "win": {
-      "publish": [
-        "github"
+  "private": true,
+  "main": "dist/main.js",
+  "homepage": "./",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "bluedis_electron"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
       ]
-    },
-    "linux": {
-      "target": "snap",
-      "desktop": "Bluedis",
-      "category": "Development",
-      "icon": "assets/icon.png"
     }
   },
-  "license": "MIT",
-  "devDependencies": {
-    "@types/dotenv": "^8.2.0",
-    "@types/electron": "^1.6.10",
-    "@types/ioredis": "^4.19.3",
-    "@types/redis": "^2.8.28",
-    "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
-    "electron": "11.1.0",
-    "electron-builder": "^22.9.1",
-    "electron-builder-squirrel-windows": "^22.10.3",
-    "eslint": "^7.6.0",
-    "eslint-plugin-import": "^2.20.0",
-    "gulp": "^4.0.2",
-    "typescript": "^4.0.2"
-  },
   "dependencies": {
-    "cross-env": "^7.0.3",
-    "dotenv": "^8.2.0",
+    "@reduxjs/toolkit": "^1.8.1",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.1",
+    "@types/node": "^16.11.35",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.4",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-store": "^6.0.1",
-    "electron-updater": "^4.3.5",
-    "ioredis": "^4.22.0",
-    "npm-run-all": "^4.1.5",
-    "redis": "^3.0.2",
-    "uuid": "^8.3.2"
+    "electron-store": "^8.0.1",
+    "ioredis": "^5.0.4",
+    "nanoid": "^3.3.4",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
+    "react-redux": "^8.0.1",
+    "react-scripts": "^5.0.1",
+    "react-test-renderer": "^18.1.0",
+    "styled-components": "^5.3.5",
+    "typescript": "^4.6.4",
+    "uuid": "^8.3.2",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start:dev": "npx gulp start-dev"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/maker-deb": "^6.0.0-beta.63",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "@types/react-redux": "^7.1.24",
+    "@types/react-test-renderer": "^18.0.0",
+    "@types/styled-components": "^5.1.25",
+    "@types/uuid": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "electron": "^18.2.3",
+    "eslint": "^8.15.0",
+    "eslint-plugin-import": "^2.26.0",
+    "gulp": "^4.0.2",
+    "jest-styled-components": "^7.0.8"
   }
 }
