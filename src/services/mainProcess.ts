@@ -1,5 +1,6 @@
 import { store, actions } from "../redux/store";
 import { Item } from "../redux/Types/Item";
+import {DarkTheme, defaultAppearanceSettings, LightTheme} from "../theme";
 const { ipcRenderer, shell } = window.require("electron");
 
 export const close = () => {
@@ -145,7 +146,21 @@ export const disconnect = () => {
 };
 
 ipcRenderer.on("preferences", (event: any, preferences: any) => {
-  preferences && store.dispatch(actions.updatePreferences(preferences));
+  const darkTheme = typeof preferences.appearance.darkTheme !== 'undefined'
+    ? preferences.appearance.darkTheme
+    : preferences.appearance.systemTheme === 'dark';
+  
+  console.log({preferences, darkTheme})
+  
+  preferences && store.dispatch(actions.updatePreferences({
+    ...preferences,
+    appearance: {
+      ...defaultAppearanceSettings,
+      ...preferences.appearance,
+      ...(darkTheme ? DarkTheme : LightTheme),
+      darkTheme,
+    }
+  }));
 });
 
 ipcRenderer.on("favorites", (event: any, favorites: any) => {

@@ -3,61 +3,33 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 import Frame from "./components/Frame";
 import Home from "./pages/Home";
-import {
-  DarkTheme,
-  defaultSettings,
-  ColorSchema,
-  AppearenceSettings,
-  LightTheme,
-} from "./theme";
 import { State } from "./redux/Types/State";
 import { Page } from "./redux/Types/Page";
 import Help from "./pages/Help";
 import Settings from "./pages/Settings";
 import Sidebar from "./components/Sidebar";
 import { GlobalStyles } from "./theme/globalStyles";
-import { store } from "./redux/store";
 import { getPreferences } from "./services/mainProcess";
 import ErrorMessage from "./components/ErrorMessage";
 import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";
 import Loading from "./components/Loading";
-
-export const SettingsContext = React.createContext({
-  theme: { ...DarkTheme, fontFamily: "", fontSize: "14pt" },
-});
+import {Appearance} from "./redux/Types/Appearance";
 
 const App = () => {
-  const [theme, setTheme] = React.useState<ColorSchema & AppearenceSettings>({
-    ...LightTheme,
-    ...defaultSettings,
-  });
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
-
-  const registerStore = React.useCallback(() => {
-    store.subscribe(() => {
-      const {
-        settings: { appearance },
-      } = store.getState();
-
-      const t: ColorSchema & AppearenceSettings = {
-        ...(appearance.darkTheme ? DarkTheme : LightTheme),
-        fontFamily: appearance.fontFamily,
-        fontSize: appearance.fontSize,
-      };
-
-      setTheme(t);
-    });
-  }, []);
+  const appearance = useSelector<State, Appearance>((state) => state.settings.appearance);
 
   React.useEffect(() => {
-    registerStore();
     getPreferences();
-  }, [registerStore]);
+  }, []);
+  
+  React.useEffect(() => {
+    console.log({appearance})
+  }, [appearance])
 
   return (
-    <SettingsContext.Provider value={{ theme }}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={appearance}>
         <Frame>
           <div
             style={{
@@ -79,7 +51,6 @@ const App = () => {
         <ConfirmationMessage />
         <Loading />
       </ThemeProvider>
-    </SettingsContext.Provider>
   );
 };
 

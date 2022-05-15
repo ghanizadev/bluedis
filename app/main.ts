@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, screen } from "electron";
+import { app, BrowserWindow, globalShortcut, ipcMain, screen, nativeTheme } from "electron";
 import path from "path";
 import dotenv from "dotenv";
 
@@ -19,7 +19,7 @@ const createWindow = async (): Promise<void> => {
         width: 1000,
         frame: false,
         transparent: true,
-        icon: "assets/icon.ico",
+        icon: "assets/icon.png",
         resizable: false,
         webPreferences: {
             nodeIntegration: true,

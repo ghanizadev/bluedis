@@ -1,18 +1,39 @@
 {
-  "name": "bluedis-v2",
-  "productName": "bluedis-v2",
-  "version": "0.1.0",
+  "name": "bluedis",
+  "productName": "bluedis",
+  "author": {
+    "name": "Jean Felipe de Melo",
+    "email": "jf.melo6@gmail.com"
+  },
+  "version": "0.2.0",
+  "keywords": [
+    "redis",
+    "gui",
+    "database",
+    "bluedis",
+    "management",
+    "data",
+    "visualization"
+  ],
   "private": true,
   "main": "dist/main.js",
   "homepage": "./",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "appBundleId": "com.ghanizadev.bluedis",
+        "appVersion": "0.2.0",
+        "dir": "./app",
+        "name": "Bluedis",
+        "out": "bundle",
+        "appCategoryType": "public.app-category.developer-tools",
+        "darwinDarkModeSupport": true
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "bluedis_electron"
+            "name": "Bluedis"
           }
         },
         {
@@ -33,6 +54,7 @@
     }
   },
   "dependencies": {
+    "@electron-forge/core": "^6.0.0-beta.63",
     "@reduxjs/toolkit": "^1.8.1",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
@@ -57,7 +79,9 @@
   },
   "scripts": {
     "start:dev": "npx gulp start-dev",
-    "start:prod": "npx gulp start-prod"
+    "start:prod": "npx gulp start-prod",
+    "build": "npx gulp build",
+    "pack": "npx gulp pack"
   },
   "eslintConfig": {
     "extends": [

@@ -22,7 +22,7 @@ const setEnv = (env = 'development') => {
 }
 
 const copy = async () => {
-  await execAsync('mv build-react dist/app');
+  await execAsync('mv build dist/app');
 }
 
 const checkDevServerStatus = async () => {
@@ -93,4 +93,6 @@ const make = async() => {
 module.exports = {
   'start-dev': gulp.series(setEnv('development'), compileElectron, gulp.parallel(devReact, devElectron)),
   'start-prod': gulp.series(setEnv('production'), compileReact, compileElectron, copy, startElectron),
+  build: gulp.series(setEnv('production'), compileReact, compileElectron, copy, dir),
+  pack: gulp.series(setEnv('production'), compileReact, compileElectron, copy, make),
 }

@@ -1,4 +1,4 @@
-import { ipcMain, app } from "electron";
+import { ipcMain, app, nativeTheme } from "electron";
 import DatabaseManager from "../database";
 import Store from "electron-store";
 
@@ -184,8 +184,15 @@ ipcMain.on("initial", async (event) => {
 
   event.sender.send("license", license);
 
-  if (preferences)
-    event.sender.send("preferences", JSON.parse(preferences as string));
+  let pref: any = { appearance: { systemTheme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' } };
+  
+  if (preferences) {
+    const saved = JSON.parse(preferences as string);
+    pref = { ...saved, appearance: { ...saved.appearance, ...pref.appearance } };
+  }
+  
+  event.sender.send("preferences", pref);
+  
   if (favorites)
     event.sender.send("favorites", JSON.parse(favorites as string));
 });

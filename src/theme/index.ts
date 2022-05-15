@@ -30,7 +30,7 @@ export const LightTheme : ColorSchema = {
   sidebarBackground: "#edf5f4"
 }
 
-export const defaultSettings : AppearenceSettings = {
+export const defaultAppearanceSettings : AppearenceSettings = {
   fontFamily: "JetBrains Mono",
   fontSize: "10pt"
 }

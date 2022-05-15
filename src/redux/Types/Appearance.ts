@@ -1,5 +1,6 @@
 export interface Appearance {
-  darkTheme: boolean;
+  darkTheme?: boolean;
+  systemTheme?: 'dark' | 'light';
   fontFamily: "Roboto" | "JetBrains Mono" | "Montserrat" | "Open Sans";
   fontSize: string;
 }

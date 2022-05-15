@@ -12,6 +12,7 @@ import { Container } from "./Container";
 import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
+import {DarkTheme, LightTheme} from "../../theme";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -25,10 +26,13 @@ const Settings = () => {
   }
 
   const handleDarkModeChange = () => {
+    const darkTheme = !settings.appearance.darkTheme;
+    
     dispatch(
       actions.changeAppearance({
         ...settings.appearance,
-        darkTheme: !settings.appearance.darkTheme,
+        ...(darkTheme ? DarkTheme : LightTheme),
+        darkTheme,
       })
     );
 

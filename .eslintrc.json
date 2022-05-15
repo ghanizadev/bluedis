@@ -13,5 +13,5 @@
     "plugin:import/typescript"
   ],
   "parser": "@typescript-eslint/parser",
-  "ignorePatterns": ["gulpfile.js"]
+  "ignorePatterns": ["*.js"]
 }
