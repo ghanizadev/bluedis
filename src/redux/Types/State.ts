@@ -4,6 +4,7 @@ import { Error } from './Error';
 import { Item } from './Item';
 import { Page } from './Page';
 import { Settings } from './Settings';
+import {Query} from "./Query";
 
 export type State = {
   connected: boolean;
@@ -19,13 +20,10 @@ export type State = {
   error?: Error,
   confirmation?: Confirmation,
   lastRefresh: Date,
+  currentTotalDocs: number;
   terminal: {
     open: boolean;
     stdout: string[]
   }
-  query: {
-    cursor: number;
-    count: number;
-    totalDocs: number
-  }
+  query: Query
 };

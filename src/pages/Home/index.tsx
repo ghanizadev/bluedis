@@ -8,7 +8,7 @@ import { Item } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-import { updateData, addKey, updatePreview } from "../../services/mainProcess";
+import {updateData, addKey, updatePreview, getDBCount} from "../../services/mainProcess";
 import AddKey from "../../components/AddKey";
 import Connect from "./Connect";
 import { State } from "../../redux/Types/State";
@@ -69,6 +69,10 @@ const Home = () => {
     setAddItem(false);
     addKey(key, type, ttl);
   };
+
+  React.useEffect(() => {
+    connected && getDBCount();
+  }, [data, connected])
 
   return (
     <>

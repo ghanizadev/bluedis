@@ -6,6 +6,6 @@ export const Input = styled.button<{checked: boolean}> `
   border: 1px solid lightgray;
   transition: all 250ms ease-out;
   font-size: 0.65rem;
-  background-color: ${(props) => props.checked ? props.theme.foreground : "#fff"};
-  color: ${(props) => (props.checked ? props.theme.innertext : "transparent")};
+  background-color: ${(props) => props.checked ? props.theme.accent : "#fff"};
+  color: ${(props) => (props.checked ? props.theme.innerText : "transparent")};
 `;

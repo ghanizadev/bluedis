@@ -6,6 +6,6 @@ export const PreviewTableRow = styled.tr`
 
   &:hover {
     background-color: ${(props) => props.theme.foreground};
-    color: ${(props) => props.theme.innertext};
+    color: ${(props) => props.theme.innerText};
   }
 `;

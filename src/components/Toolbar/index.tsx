@@ -59,7 +59,7 @@ const Toolbar: React.FC<Props> = (props) => {
     dispatch(
       actions.setConfirmation({
         message: `Do you really want to delete ${
-          selected.length > 0
+          selected.length === 1
             ? "THIS KEY"
             : "THESE " + selected.length + " KEYS"
         }?`,

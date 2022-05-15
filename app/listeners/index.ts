@@ -36,7 +36,7 @@ ipcMain.on("connect", async (event, options) => {
     const { host, port, password, tls } = options;
   
     database.connect(host, port, password, tls);
-    const docs = await database.findAll();
+    const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
     event.sender.send("data", docs);
 
   }catch(e) {
@@ -48,8 +48,8 @@ ipcMain.on("disconnect", () => {
   database.disconnect();
 });
 
-ipcMain.on("update", async (event) => {
-  const docs = await database.findAll();
+ipcMain.on("update", async (event, cursor: number) => {
+  const docs = await database.findAll(cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("data", docs);
 });
 
@@ -162,8 +162,13 @@ ipcMain.on("removeZSetMember", async (event, key, index) => {
 ipcMain.on("selectDatabase", async (event, index) => {
   await database.selectDatabase(index);
 
-  const docs = await database.findAll();
+  const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
   event.sender.send("data", docs);
+});
+
+ipcMain.on("getCountDB", async (event) => {
+  const count = await database.countDocuments();
+  event.sender.send("setCountDB", count);
 });
 
 ipcMain.on("savePreferences", async (event, preferences) => {
@@ -174,8 +179,10 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
   store.set("favorites", JSON.stringify(favorites));
 });
 
-ipcMain.on("wipeData", async () => {
+ipcMain.on("wipeData", async (event: any) => {
   store.clear();
+  event.sender.send("preferences", { appearance: { systemTheme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' } });
+  event.sender.send("favorites", []);
 });
 
 ipcMain.on("initial", async (event) => {
@@ -197,13 +204,13 @@ ipcMain.on("initial", async (event) => {
     event.sender.send("favorites", JSON.parse(favorites as string));
 });
 
-ipcMain.on("find", async (event, match) => {
-  const result = await database.findByName(match);
+ipcMain.on("find", async (event, match: string, cursor: number) => {
+  const result = await database.find(match, cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("data", result);
 });
 
 ipcMain.on("loadMore", async (event, match, cursor) => {
-  const result = await database.loadMore(match, cursor || 0);
+  const result = await database.find(match, cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("loadedData", result);
 });
 

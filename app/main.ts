@@ -16,7 +16,7 @@ let mainWindow: BrowserWindow;
 const createWindow = async (): Promise<void> => {
     mainWindow = new BrowserWindow({
         height: 800,
-        width: 1000,
+        width: 1200,
         frame: false,
         transparent: true,
         icon: "assets/icon.png",

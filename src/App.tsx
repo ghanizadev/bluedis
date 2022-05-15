@@ -23,10 +23,6 @@ const App = () => {
   React.useEffect(() => {
     getPreferences();
   }, []);
-  
-  React.useEffect(() => {
-    console.log({appearance})
-  }, [appearance])
 
   return (
       <ThemeProvider theme={appearance}>

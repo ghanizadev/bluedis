@@ -2,8 +2,9 @@ export interface ColorSchema {
   background: string;
   foreground: string;
   text: string;
-  innertext: string;
+  innerText: string;
   title: string;
+  accent: string;
   sidebarBackground: string;
 }
 
@@ -16,7 +17,8 @@ export const DarkTheme : ColorSchema = {
   background: "#1f2f30",
   foreground: "#2ad4c3",
   text: "#fff",
-  innertext: "#fff",
+  innerText: "#fff",
+  accent: "#0b9d8e",
   title: "#fff",
   sidebarBackground: "#355052"
 }
@@ -25,7 +27,8 @@ export const LightTheme : ColorSchema = {
   background: "#fdfdfd",
   foreground: "#2ad4c3",
   text: "#1f2f30",
-  innertext: "#fff",
+  innerText: "#fff",
+  accent: "#2ad4c3",
   title: "#1f2f30",
   sidebarBackground: "#edf5f4"
 }

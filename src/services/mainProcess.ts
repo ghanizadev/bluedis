@@ -1,6 +1,7 @@
 import { store, actions } from "../redux/store";
 import { Item } from "../redux/Types/Item";
 import {DarkTheme, defaultAppearanceSettings, LightTheme} from "../theme";
+import {Query} from "../redux/Types/Query";
 const { ipcRenderer, shell } = window.require("electron");
 
 export const close = () => {
@@ -20,7 +21,12 @@ export const deleteKey = (key: string[]) => {
 };
 
 export const updateData = () => {
-  ipcRenderer.send("update");
+  const cursor = store.getState().query.cursor;
+  ipcRenderer.send("update", cursor);
+};
+
+export const getDBCount = () => {
+  ipcRenderer.send("getCountDB");
 };
 
 export const addKey = (key: string, type: string, ttl: number | string) => {
@@ -82,12 +88,12 @@ export const selectDatabase = (index: number) => {
   ipcRenderer.send("selectDatabase", index);
 };
 
-export const find = (match: string, cursor?: number, count?: number) => {
-  ipcRenderer.send("find", match, cursor, count);
+export const find = (match: string, cursor: number) => {
+  ipcRenderer.send("find", match, cursor);
 };
 
-export const loadMore = (match: string, cursor?: number, count?: number) => {
-  ipcRenderer.send("loadMore", match, cursor, count);
+export const loadMore = (match: string, cursor: number) => {
+  ipcRenderer.send("loadMore", match, cursor);
 };
 
 export const findByKey = (key: string) => {
@@ -119,6 +125,7 @@ export const executeCommand = (command: string) => {
 };
 
 export const exportItems = (items: string[]) => {
+  console.log({ items })
   ipcRenderer.send("exportItems", items);
 };
 
@@ -150,8 +157,6 @@ ipcRenderer.on("preferences", (event: any, preferences: any) => {
     ? preferences.appearance.darkTheme
     : preferences.appearance.systemTheme === 'dark';
   
-  console.log({preferences, darkTheme})
-  
   preferences && store.dispatch(actions.updatePreferences({
     ...preferences,
     appearance: {
@@ -161,6 +166,10 @@ ipcRenderer.on("preferences", (event: any, preferences: any) => {
       darkTheme,
     }
   }));
+});
+
+ipcRenderer.on("setCountDB", (event: any, count: number) => {
+  store.dispatch(actions.setCount(count));
 });
 
 ipcRenderer.on("favorites", (event: any, favorites: any) => {
@@ -175,9 +184,7 @@ ipcRenderer.on("keyRemoved", (event: any, key: string[]) => {
   store.dispatch(actions.removeDocument(key));
 });
 
-ipcRenderer.on(
-  "data",
-  (event: any, data: { docs: Item[]; cursor: number; count: number, totalDocs: number }) => {
+ipcRenderer.on("data", (event: any, data: { docs: Item[]; } & Query) => {
     store.dispatch(actions.setQuery(data));
     store.dispatch(actions.setData(data.docs));
     store.dispatch(actions.setConnected(true));
@@ -186,16 +193,8 @@ ipcRenderer.on(
   }
 );
 
-ipcRenderer.on(
-  "loadedData",
-  (event: any, data: { docs: Item[]; cursor: number; count: number }) => {
-    store.dispatch(
-      actions.setQuery({
-        cursor: data.cursor,
-        count: data.count,
-      })
-    );
-
+ipcRenderer.on("loadedData", (event: any, data: { docs: Item[]; } & Query ) => {
+    store.dispatch(actions.setQuery(data));
     store.dispatch(actions.pushData(data.docs));
   }
 );
@@ -213,6 +212,7 @@ ipcRenderer.on("dataPreview", (event: any, doc: any) => {
 });
 
 ipcRenderer.on("exportedItems", (event: any, response: { docs: any[] }) => {
+  console.log({ response })
   const items = response.docs.reduce(
     (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
     {}

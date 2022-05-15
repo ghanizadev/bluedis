@@ -15,10 +15,8 @@ const ButtonsWrapper = styled.div`
   margin-top: 5px;
 `;
 
-const ErrorMessage = () => {
-  const confirm = useSelector<State, Confirmation | undefined>(
-    (state) => state.confirmation
-  );
+const ConfirmationMessage = () => {
+  const confirm = useSelector<State, Confirmation | undefined>((state) => state.confirmation);
   const dispatch = useDispatch();
 
   const handleConfirm = () => {
@@ -57,4 +55,4 @@ const ErrorMessage = () => {
   );
 };
 
-export default ErrorMessage;
+export default ConfirmationMessage;

@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const Container = styled.div`
   margin: 0 5px;
-  color: ${(props) => props.theme.innertext};
+  color: ${(props) => props.theme.innerText};
 `;
 
 const Select = styled.select`
@@ -15,7 +15,7 @@ const Select = styled.select`
 
   background-color: ${(props) => props.theme.foreground};
 
-  color: ${(props) => props.theme.innertext};
+  color: ${(props) => props.theme.innerText};
 `;
 
 const Option = styled.option`

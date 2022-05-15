@@ -6,8 +6,10 @@ import {Error} from "./Types/Error";
 import {Item} from "./Types/Item";
 import {Page} from "./Types/Page";
 import {State} from "./Types/State";
+import {Query} from "./Types/Query";
 
 const initialState: State = {
+  currentTotalDocs: 0,
   isLoading: false,
   data: [],
   selected: [],
@@ -35,7 +37,7 @@ const initialState: State = {
   connected: false,
   favorites: [],
   lastRefresh: new Date(),
-  query: { cursor: 0, count: 0, totalDocs: 0 },
+  query: { input: '*', cursor: 0, count: 0, done: false },
 };
 
 const slice = createSlice({
@@ -110,29 +112,19 @@ const slice = createSlice({
     setEditTTL: (state, action: PayloadAction<Item | undefined>) => {
       state.editTTL = action.payload;
     },
-    setQuery: (
-      state,
-      action: PayloadAction<{
-        cursor: number;
-        count: number;
-        totalDocs?: number;
-      }>
-    ) => {
-      state.query = {
-        ...action.payload,
-        totalDocs: action.payload.totalDocs ?? state.query.totalDocs,
-      };
+    setQuery: (state, action: PayloadAction<Query>) => {
+      state.query = action.payload;
     },
     addDocument: (state, action: PayloadAction<Item>) => {
       state.data = [action.payload, ...state.data];
-      state.query.totalDocs = state.query.totalDocs + 1;
+      state.query.count = state.query.count + 1;
     },
     removeDocument: (state, action: PayloadAction<string[]>) => {
       state.data = state.data.filter(
         (doc) => !action.payload.includes(doc.key)
       );
       state.preview = undefined;
-      state.query.totalDocs = state.query.totalDocs - action.payload.length;
+      state.query.count = state.query.count - action.payload.length;
     },
     setTerminal: (state, action: PayloadAction<boolean>) => {
       state.terminal.open = action.payload;
@@ -154,6 +146,9 @@ const slice = createSlice({
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setCount: (state, action: PayloadAction<number>) => {
+      state.currentTotalDocs = action.payload;
     },
   },
 });

@@ -1,4 +1,4 @@
-import Redis, {Command} from "ioredis";
+import Redis from "ioredis";
 import { v4 } from "uuid";
 import availableCommands from "./availableCommands.json";
 
@@ -339,54 +339,43 @@ class DatabaseManager {
         ttl: -1,
       };
 
-      const type = await new Promise<string>((res) => {
-        this._instance.type(item, (err, reply) => {
-          res(reply);
-        });
-      });
+      const type = await this._instance.type(item);
 
-      const value = await new Promise<DBResponse>((res) => {
-        if (type === "string") {
-          this._instance.get(item, (err, reply) => {
-            res(reply);
-          });
-        } else if (type === "hash") {
-          this._instance.hgetall(item, (err, reply) => {
-            res(reply);
-          });
-        } else if (type === "set") {
-          this._instance.smembers(item, (err, reply) => {
-            res(reply);
-          });
-        } else if (type === "list") {
-          this._instance.lrange(item, 0, -1, (err, reply) => {
-            res(reply);
-          });
-        } else if (type === "zset") {
-          this._instance.zrange(item, 0, -1, "WITHSCORES", (err, reply) => {
-            const result: { value: string; score: string }[] = [];
+      const value = await (async (): Promise<DBResponse> => {
+        if (type === "string") 
+          return this._instance.get(item);
+          
+        if (type === "hash") 
+          return this._instance.hgetall(item);
+        
+        if (type === "set")
+          return this._instance.smembers(item);
+          
+        if (type === "list") 
+          return this._instance.lrange(item, 0, -1);
+        
+        if (type === "zset") return this._instance.zrange(item, 0, -1, "WITHSCORES")
+            .then((reply) => {
+              const result: { value: string; score: string }[] = [];
 
-            reply.forEach((item, index) => {
-              if (index % 2 === 1) return;
+              reply.forEach((item, index) => {
+                if (index % 2 === 1) return;
 
-              result.push({
-                value: item,
-                score: reply[index + 1],
+                result.push({
+                  value: item,
+                  score: reply[index + 1],
+                });
               });
+              
+              return result;
             });
-            res(result);
-          });
-        }
-      });
+      })();
 
-      const ttl = await new Promise<number>((res, rej) => {
-        this._instance.pttl(item, (err, ttl) => {
-          if (err) rej(err);
-
-          if (ttl === -1) return res(-1);
-          return res(new Date(Date.now() + ttl).getTime());
+      const ttl = await this._instance.pttl(item)
+        .then((ttl) => {
+          if (ttl === -1) return -1;
+          return new Date(Date.now() + ttl).getTime()
         });
-      });
 
       response.value = value;
       response.type = type;
@@ -402,61 +391,39 @@ class DatabaseManager {
     return this._instance.dbsize();
   }
 
-  public async loadMore(
-    match: string,
-    cursor = 0
-    // count = 10
-  ): Promise<{ docs: any[]; cursor: number }> {
-    return await new Promise((res, rej) => {
-      this._instance.scan(cursor, "MATCH", match, async (err, reply) => {
-        if (err) rej(err);
+  public async find(match: string, cursor = 0, limit = Number.MAX_SAFE_INTEGER,
+  ): Promise<{ docs: any[]; cursor: number; count: number, input: string, done: boolean }> {
+    let newCursor = cursor > 0 ? cursor : -1;
+    let resultItems: any[] = [];
 
-        const [replycursor, items] = reply;
-        const response = await this.hydrateShallow(items);
-        res({
-          docs: response,
-          cursor: Number(replycursor),
-        });
-      });
-    });
-  }
+    while(newCursor !== 0 && resultItems.length <= limit) {
+      if(newCursor === -1) newCursor = 0;
+      
+      const [replyCursor, items] = await this._instance.scan(newCursor, "MATCH", match, 'COUNT', 10);
+      newCursor = +replyCursor;
+      resultItems = [...resultItems, ...items]
+    }
 
-  public async findByName(
-    match: string
-  ): Promise<{ docs: any[]; cursor: number; totalDocs: number }> {
-    return await new Promise((res, rej) => {
-      this._instance.scan(0, "MATCH", match, async (err, reply) => {
-        if (err) rej(err);
+    const response = await this.hydrateShallow(resultItems);
 
-        const [cursor, items] = reply;
-        const response = await this.hydrateShallow(items);
-        res({
-          docs: response,
-          cursor: Number(cursor),
-          totalDocs: items.length,
-        });
-      });
-    });
+    return {
+      cursor: newCursor,
+      docs: response,
+      input: match,
+      count: resultItems.length,
+      done: newCursor === 0,
+    }
   }
 
   public async findAll(
-    cursor = 0
-    // count = 10
-  ): Promise<{ docs: any[]; cursor: number; totalDocs: number }> {
-    const [replyCursor, items] = await this._instance.scan(cursor, "MATCH", "*");
-    const totalCount = await this.countDocuments();
-    
-    console.log({ totalCount })
-    const response = await this.hydrateShallow(items);
-    
-    return {
-      docs: response,
-      cursor: Number(replyCursor),
-      totalDocs: totalCount,
-    };
+    cursor = 0,
+    limit = Number.MAX_SAFE_INTEGER,
+  ): Promise<{ docs: any[]; cursor: number; count: number, input: string }> {
+    return this.find('*', cursor, limit)
   }
 
   public async findByKeys(keys: string[]): Promise<any[]> {
+    console.log(keys.length)
     return this.hydrateItems(keys);
   }
 }

@@ -56,7 +56,7 @@ const LoginButton = styled.button`
   padding: 5px 8px;
 
   background-color: ${(props) => props.theme.foreground};
-  color: ${(props) => props.theme.innertext};
+  color: ${(props) => props.theme.innerText};
 
   &:hover {
     filter: brightness(0.95);

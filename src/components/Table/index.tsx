@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import styled from "styled-components";
 import { Item } from "../../redux/Types/Item";
 
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { loadMore } from "../../services/mainProcess";
+import {Query} from "../../redux/Types/Query";
 
 const Row = styled.tr`
   height: 32px;
@@ -54,14 +55,10 @@ type Props = {
 
 const Table: React.FC<Props> = (props) => {
   const { data, onItemEdit } = props;
-  const selected = useSelector<State, string[]>((state) => state.selected);
-  const query = useSelector<State, { count: number; cursor: number }>(
-    (state) => state.query
-  );
   const dispatch = useDispatch();
-  const totalCount = useSelector<State, number>(
-    (state) => state.query.totalDocs
-  );
+  
+  const selected = useSelector<State, string[]>((state) => state.selected);
+  const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
 
   const handleItemEdit = (item: Item) => {
@@ -77,9 +74,9 @@ const Table: React.FC<Props> = (props) => {
     else dispatch(actions.pushSelected(key));
   };
 
-  const handleLoadMore = () => {
-    loadMore("*", query.cursor, query.count);
-  };
+  const handleLoadMore = useCallback(() => {
+    loadMore(query.input, query.cursor);
+  }, [query]);
 
   return (
     <Container data-testid="home-table">
@@ -129,11 +126,11 @@ const Table: React.FC<Props> = (props) => {
       </TableContainer>
       <LoadMore>
         <span>
-          showing {currentCount} of {totalCount} documents
-          {query.cursor !== 0 && " - "}
+          {query.done && `showing all ${currentCount} keys`}
+          {!query.done && `showing ${currentCount} keys - `}
           {query.cursor !== 0 && (
             <button disabled={query.cursor === 0} onClick={handleLoadMore}>
-              Load more ...
+              load more ...
             </button>
           )}
         </span>
