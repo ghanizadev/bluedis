@@ -21,6 +21,7 @@ class DatabaseManager {
         if (times > 3) throw new Error("timeout");
       },
       maxRetriesPerRequest: 3,
+      keepAlive: 5
     });
   }
 

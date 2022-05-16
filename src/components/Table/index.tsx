@@ -22,7 +22,8 @@ const Row = styled.tr`
 const TableContainer = styled.table`
   margin: 0 8px;
   border-spacing: 0;
-
+  border-collapse: collapse;
+  
   & th {
     position: sticky;
     top: 0;
@@ -100,17 +101,22 @@ const Table: React.FC<Props> = (props) => {
                   style={{
                     minWidth: "50px",
                     width: "5%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                   }}
                 >
-                  <Checkbox
-                    checked={selected.includes(item.key)}
-                    onChangeValue={() => handleSelect(item.key)}
-                  />
+                  <div style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: "center",
+                    justifyContent: 'center'
+                  }}>
+                    <Checkbox
+                      checked={selected.includes(item.key)}
+                      onChangeValue={() => handleSelect(item.key)}
+                    />
+                  </div>
                 </Data>
-                <Data align="center" style={{ width: "20%" }}>
+                <Data align="center" style={{ width: "15%" }}>
                   <Type>{item.type}</Type>
                 </Data>
                 <Data
