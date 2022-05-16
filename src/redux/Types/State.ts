@@ -20,7 +20,7 @@ export type State = {
   error?: Error,
   confirmation?: Confirmation,
   lastRefresh: Date,
-  currentTotalDocs: number;
+  currentTotalDocs: number; //TODO remove this thing here, for god sake
   terminal: {
     open: boolean;
     stdout: string[]

@@ -137,7 +137,7 @@ const Table: React.FC<Props> = (props) => {
           {!query.done && t`showing ${currentCount} keys - `}
           {query.cursor !== 0 && (
             <button disabled={query.cursor === 0} onClick={handleLoadMore}>
-              {t`load more...`}
+              {t`load more`}
             </button>
           )}
         </span>

@@ -1,0 +1,76 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.7.0
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+      - run:
+          name: Setup environment variables
+          command: |
+            echo 'export JWT_SIGNATURE="areallyfakesignature"' >> $BASH_ENV
+      - run:
+          command: npm run test
+          name: Run tests
+      - run:
+          command: npm run lint
+          name: Run lint
+
+  deploy_staging:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - attach_workspace:
+          at: .
+      - heroku/deploy-via-git:
+          force: true
+          app-name: "mba-registration-api-staging"
+
+  deploy_production:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - attach_workspace:
+          at: .
+      - heroku/deploy-via-git:
+          force: true
+          app-name: "mba-registration-api-prod"
+
+workflows:
+  test:
+    when:
+      matches:
+        pattern: "^(?!main|master|develop|release).*$"
+        value: << pipeline.git.branch >>
+    jobs:
+      - test
+
+  deploy_staging:
+    when:
+      equal: [develop, << pipeline.git.branch >>]
+    jobs:
+      - test
+      - deploy_staging:
+          requires:
+            - test
+
+  deploy_production:
+    when:
+      or:
+        - equal: [main, << pipeline.git.branch >>]
+        - equal: [master, << pipeline.git.branch >>]
+    jobs:
+      - test
+      - deploy_production:
+          requires:
+            - test

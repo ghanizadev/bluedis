@@ -153,7 +153,12 @@ const Toolbar: React.FC<Props> = (props) => {
           <DisconnectIcon />
         </SquareButton>
         {!favorites.find(
-          (connection) => connection.id === currentConnection?.id
+          (connection) => {
+              return currentConnection?.host === connection.host
+                && currentConnection?.port === connection.port
+                && currentConnection?.password === connection.password
+                && currentConnection?.tls === connection.tls
+          }
         ) && (
           <SquareButton
             data-testid="data-favorite"

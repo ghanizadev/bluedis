@@ -1,4 +1,4 @@
-import React, {FC, useEffect} from "react";
+import React, {FC, useEffect, useState} from "react";
 import { Background } from "./Background";
 import { Bar } from "./Bar";
 import { Close } from "./Close";
@@ -20,6 +20,9 @@ const Frame: FC<any> = (props) => {
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection
   );
+  const favorites = useSelector<State, Connection[]>(
+    (state) => state.favorites
+  );
   const [host, setHost] = React.useState("");
   const [name, setName] = React.useState("");
 
@@ -34,36 +37,47 @@ const Frame: FC<any> = (props) => {
   const handleMaximize = () => {
     maximize();
   };
-
-  useEffect(() => {
-    if (connection && connected) {
-      if (connection.host.length > 30) {
-        setHost(
-          ` - redis://${connection.host.slice(0, 12)}...${connection.host.slice(
-            -12
-          )}:${connection.port}`
-        );
-      } else {
-        setHost(` - redis://${connection.host}:${connection.port}`);
-      }
-      if (connection.name) {
-        if (connection.name.length > 30) {
-          setName(
-            ` | [${connection.name.slice(0, 12)}...${connection.name.slice(
-              -12
-            )}]`
-          );
-        } else {
-          setName(` | [${connection.name}]`);
-        }
-      } else {
-        setName("");
-      }
+  
+  const formatName = (name: string) => {
+    if (name.length > 30) {
+      return ` | [${name.slice(0, 12)}...${name.slice(-12)}]`;
     } else {
+      return ` | [${name}]`;
+    }
+  }
+  
+  useEffect(() => {
+    if(!connection || !connected) {
       setHost("");
       setName("");
+      return;
     }
-  }, [connection, connected]);
+    
+    if (connection.host.length > 30) {
+      setHost(
+        ` - redis://${connection.host.slice(0, 12)}...${connection.host.slice(
+          -12
+        )}:${connection.port}`
+      );
+    } else {
+      setHost(` - redis://${connection.host}:${connection.port}`);
+    }
+    
+    if(!connection.name) {
+      const conn = favorites.find(fav => {
+        return fav.host === connection.host
+        && fav.port === connection.port
+        && fav.password === connection.password
+        && fav.tls === connection.tls
+      });
+      
+      console.log({conn})
+      
+      if(conn) setName(formatName(conn.name ?? ""));
+    } else {
+      setName(formatName(connection.name))
+    }
+  }, [connection, favorites, connected])
 
   return (
     <Background data-testid="frame">

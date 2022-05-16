@@ -7,6 +7,8 @@ import {Item} from "./Types/Item";
 import {Page} from "./Types/Page";
 import {State} from "./Types/State";
 import {Query} from "./Types/Query";
+import {Language} from "../i18n";
+import {Region} from "./Types/Region";
 
 const initialState: State = {
   currentTotalDocs: 0,
@@ -25,7 +27,7 @@ const initialState: State = {
       stepSize: 10,
     },
     region: {
-      language: "en-US",
+      language: Language.en_US,
       dateFormat: "system",
     },
     license: "teste",
@@ -79,6 +81,9 @@ const slice = createSlice({
     },
     changeAppearance: (state, action: PayloadAction<Appearance>) => {
       state.settings.appearance = action.payload;
+    },
+    changeRegion: (state, action: PayloadAction<Region>) => {
+      state.settings.region = action.payload;
     },
     updatePreferences: (state, action) => {
       state.settings = { ...state.settings, ...action.payload };

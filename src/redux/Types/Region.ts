@@ -1,4 +1,6 @@
+import { Language } from "../../i18n";
+
 export interface Region {
-  language: "en-US";
+  language: Language;
   dateFormat: "system";
 }

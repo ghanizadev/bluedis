@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -36,10 +36,12 @@ type Props = {
   items: string[];
   onChange ?: (item: string) => void;
   defaultValue?: string;
+  defaultIndex?: number;
 };
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { items, onChange, defaultValue } = props;
+  const { items, onChange, defaultValue, defaultIndex } = props;
+  const [v] = useState(() => defaultValue ? defaultValue : items[defaultIndex ?? 0])
   
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange && onChange(e.target.value);
@@ -47,7 +49,7 @@ const Dropdown: React.FC<Props> = (props) => {
   
   return (
     <Container>
-      <Select onChange={handleChange} defaultValue={defaultValue}>
+      <Select onChange={handleChange} defaultValue={v}>
         {items.map((item, index) => {
           return <Option key={index}>{item}</Option>;
         })}

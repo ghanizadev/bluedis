@@ -65,7 +65,7 @@ const startElectron = async () => {
   return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start --app-path ./dist/main.js`)
 }
 
-const dir = async () => {
+const pack = async () => {
   let arg = "";
   
   switch(process.env.SNAP_ARCH)  {
@@ -83,16 +83,39 @@ const dir = async () => {
       break;
   }
   
-  return execAsync('npx electron-builder --dir' + arg)
+  return execAsync('npx electron-forge package' + arg)
 }
 
 const make = async() => {
-  return execAsync('npx electron-builder')
+  let arg = "";
+  const platform = process.env.BUILD_PLATFORM ? ` --platform ${process.env.BUILD_PLATFORM}` : "";
+
+  switch(process.env.SNAP_ARCH)  {
+    case "amd64":
+      arg = " --x64"
+      break;
+    case "i386":
+      arg = " --ia32";
+      break;
+    case "arm64":
+      arg = " --arm64";
+      break;
+    case "armhf":
+      arg = " --armv7l";
+      break;
+  }
+  
+  return execAsync('npx electron-forge make' + arg + platform)
+}
+
+const cleanup = async () => {
+  return execAsync('rm -rf build dist out')
+
 }
 
 module.exports = {
   'start-dev': gulp.series(setEnv('development'), compileElectron, gulp.parallel(devReact, devElectron)),
   'start-prod': gulp.series(setEnv('production'), compileReact, compileElectron, copy, startElectron),
-  build: gulp.series(setEnv('production'), compileReact, compileElectron, copy, dir),
-  pack: gulp.series(setEnv('production'), compileReact, compileElectron, copy, make),
+  build: gulp.series(setEnv('production'), compileReact, compileElectron, copy, make),
+  pack: gulp.series(setEnv('production'), compileReact, compileElectron, copy, pack),
 }

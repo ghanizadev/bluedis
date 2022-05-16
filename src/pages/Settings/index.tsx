@@ -13,7 +13,8 @@ import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
 import {DarkTheme, LightTheme} from "../../theme";
-import {t} from "../../i18n";
+import {Language, t} from "../../i18n";
+import {FONTS, LANGUAGES} from "./settings.constants";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -40,6 +41,19 @@ const Settings = () => {
     saveChanges();
   };
 
+  const handleLanguageChange = (value: string) => {
+    const language = LANGUAGES.find(l => l.label === value)?.value;
+    if(language === undefined) return;
+    
+    dispatch(
+      actions.changeRegion({
+        ...settings.region,
+        language,
+      })
+    );
+    saveChanges();
+  };
+  
   const handleFontFamilyChange = (value: string) => {
     dispatch(
       actions.changeAppearance({
@@ -86,6 +100,17 @@ const Settings = () => {
     <Container>
       <h1>{t`Settings`}</h1>
       <Content>
+        <Subtitle>{t`Region`}</Subtitle>
+        <Row>
+          <span>{t`Language`}</span>
+          <span>
+            <Dropdown
+              defaultIndex={settings.region.language}
+              onChange={handleLanguageChange}
+              items={LANGUAGES.map(({label})=> label)}
+            />
+          </span>
+        </Row>
         <Subtitle>{t`Appearence`}</Subtitle>
         <Row>
           <span>{t`Dark mode`}</span>
@@ -99,7 +124,7 @@ const Settings = () => {
         <Row>
           <span>{t`Font`}</span>
           <span>
-            <Dropdown defaultValue={settings.appearance.fontFamily} onChange={handleFontFamilyChange} items={["Roboto", "JetBrains Mono", "Montserrat", "Open Sans"]} />
+            <Dropdown defaultValue={settings.appearance.fontFamily} onChange={handleFontFamilyChange} items={FONTS} />
           </span>
         </Row>
         <Row>

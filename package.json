@@ -27,7 +27,8 @@
         "name": "Bluedis",
         "out": "bundle",
         "appCategoryType": "public.app-category.developer-tools",
-        "darwinDarkModeSupport": true
+        "darwinDarkModeSupport": true,
+        "productDescription": "An elegant Redis client"
       },
       "makers": [
         {

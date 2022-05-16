@@ -1,7 +1,7 @@
 name: bluedis
 title: Bluedis
 base: core18
-version: '2.0.0'
+version: '0.2.0'
 architectures: [amd64, i386]
 summary: An elegant Redis interface
 description: |
@@ -32,19 +32,21 @@ parts:
     plugin: nil
     source: .
     override-build: |
-        if [ -n "$http_proxy" ]; then
+      export NODE_ENV=production
+      export BUILD_PLATFORM=linux
+      
+      if [ -n "$http_proxy" ]; then
           export ELECTRON_GET_USE_PROXY=1
           export GLOBAL_AGENT_HTTP_PROXY="${http_proxy}"
           export GLOBAL_AGENT_HTTPS_PROXY="${http_proxy}"
         fi
 
-        yarn --frozen-lockfile
-        yarn --cwd ./src/App --frozen-lockfile
-        yarn dir
+        npm ci
+        npm run pack
         cp -rv $SNAPCRAFT_PART_BUILD/dist/linux-* $SNAPCRAFT_PART_INSTALL
         mv $SNAPCRAFT_PART_INSTALL/linux-* $SNAPCRAFT_PART_INSTALL/bin
     build-snaps:
-    - node/14/stable
+    - node/17/stable
     build-packages:
     - unzip
     stage-packages:
