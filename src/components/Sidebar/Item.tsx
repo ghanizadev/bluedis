@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Item = styled.button`
+export const Item = styled.button<{'data-selected'?: boolean}>`
   border: none;
   background-color: transparent;
   padding: 0;
@@ -21,6 +21,10 @@ export const Item = styled.button`
   }
 
   &:hover {
-    transform: scale(1.05);
+    transform: translateY(-3px);
+  }
+  
+  & svg {
+    stroke: ${(props)=> props['data-selected'] ? props.theme.accent : props.theme.text}
   }
 `;

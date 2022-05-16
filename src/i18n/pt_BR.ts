@@ -1,4 +1,5 @@
 export default {
+  "score": "Nota",
   "author": "autor",
   "email": "correio eletronico",
   "repository": "repositorio",
