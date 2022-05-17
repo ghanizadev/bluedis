@@ -90,3 +90,7 @@ build*/
 
 # Compiled app
 dist/
+
+# Snapcraft credentials
+credentials*
+parts/

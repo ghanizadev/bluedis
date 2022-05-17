@@ -27,8 +27,7 @@
         "name": "Bluedis",
         "out": "bundle",
         "appCategoryType": "public.app-category.developer-tools",
-        "darwinDarkModeSupport": true,
-        "productDescription": "An elegant Redis client"
+        "darwinDarkModeSupport": true
       },
       "makers": [
         {
@@ -45,11 +44,9 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "config": {
+            "description": "An elegant Redis client"
+          }
         }
       ]
     }

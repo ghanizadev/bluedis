@@ -109,13 +109,12 @@ const make = async() => {
 }
 
 const cleanup = async () => {
-  return execAsync('rm -rf build dist out')
-
+  return execAsync('rm -rf build dist out');
 }
 
 module.exports = {
   'start-dev': gulp.series(setEnv('development'), compileElectron, gulp.parallel(devReact, devElectron)),
   'start-prod': gulp.series(setEnv('production'), compileReact, compileElectron, copy, startElectron),
-  build: gulp.series(setEnv('production'), compileReact, compileElectron, copy, make),
-  pack: gulp.series(setEnv('production'), compileReact, compileElectron, copy, pack),
+  build: gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, make),
+  pack: gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, pack),
 }
