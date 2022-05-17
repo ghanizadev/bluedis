@@ -21,6 +21,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
+        "icon": "./assets/icon.ico",
         "appBundleId": "com.ghanizadev.bluedis",
         "appVersion": "0.2.0",
         "dir": "./app",
@@ -33,7 +34,9 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "Bluedis"
+            "name": "Bluedis",
+            "description": "A modern Redis client",
+            "icon": "../assets/icon.ico"
           }
         },
         {
@@ -45,7 +48,7 @@
         {
           "name": "@electron-forge/maker-deb",
           "config": {
-            "description": "An elegant Redis client"
+            "description": "A modern Redis client"
           }
         }
       ]

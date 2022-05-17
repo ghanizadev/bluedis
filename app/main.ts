@@ -1,8 +1,9 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, screen } from "electron";
+import { app, BrowserWindow, globalShortcut, ipcMain, screen, nativeImage } from "electron";
 import path from "path";
 import dotenv from "dotenv";
 
 import "./listeners";
+import {platform} from "os";
 
 dotenv.config({ path: '../' });
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -13,21 +14,34 @@ if (require("electron-squirrel-startup")) {
 
 let mainWindow: BrowserWindow;
 
+const icon = (function() {
+  const ext = process.platform === 'darwin'
+    ? "ics"
+    : process.platform === 'linux'
+    ? "png"
+    : "ico"
+  
+  const iconPath = path.resolve(app.getAppPath(), 'assets', 'icon.' + ext);
+  return nativeImage.createFromPath(iconPath);
+})();
+
 const createWindow = async (): Promise<void> => {
     mainWindow = new BrowserWindow({
         height: 800,
         width: 1200,
         frame: false,
         transparent: true,
-        icon: "assets/icon.png",
+        icon,
         resizable: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
         },
     });
+    
+  process.platform === 'darwin' && app.dock.setIcon(icon);
 
-    globalShortcut.register("F5", () => {
+  globalShortcut.register("F5", () => {
         process.env.NODE_ENV === "development" && mainWindow.reload();
     });
 

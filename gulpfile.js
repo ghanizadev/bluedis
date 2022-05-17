@@ -1,5 +1,22 @@
 const gulp = require('gulp');
 const { exec } = require('child_process');
+const os = require('os');
+
+let OS_NAME;
+
+switch(os.type()) {
+  case 'Darwin':
+    OS_NAME = "MacOS";
+    break;
+  case 'Linux':
+    OS_NAME = "Linux";
+    break;
+  case 'Windows_NT':
+    OS_NAME = "Windows";
+    break;
+  default:
+    OS_NAME = "Other";
+}
 
 const execAsync = async (command, displayError = true) => {
     return new Promise((res, rej) => {
@@ -10,6 +27,9 @@ const execAsync = async (command, displayError = true) => {
             res(stdout);
         })
     })
+      .catch(e => {
+        if(displayError) throw new Error(e);
+      })
 }
 
 const setEnv = (env = 'development') => {
@@ -22,7 +42,10 @@ const setEnv = (env = 'development') => {
 }
 
 const copy = async () => {
-  await execAsync('mv build dist/app');
+  if(OS_NAME === 'Windows')
+    await execAsync('powershell.exe cp -Recurse build -Destination dist/app');
+  else
+    await execAsync('mv build dist/app');
 }
 
 const checkDevServerStatus = async () => {
@@ -109,12 +132,20 @@ const make = async() => {
 }
 
 const cleanup = async () => {
-  return execAsync('rm -rf build dist out');
+  if(OS_NAME === 'Windows') {
+    await execAsync('powershell.exe Remove-Item -Recurse -Force build', false);
+    await execAsync('powershell.exe Remove-Item -Recurse -Force dist', false);
+    await execAsync('powershell.exe Remove-Item -Recurse -Force out', false);
+  }
+  else
+    await execAsync('rm -rf build dist out');
 }
 
 module.exports = {
   'start-dev': gulp.series(setEnv('development'), compileElectron, gulp.parallel(devReact, devElectron)),
   'start-prod': gulp.series(setEnv('production'), compileReact, compileElectron, copy, startElectron),
+  'build-win': gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, make),
+  'pack-win': gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, pack),
   build: gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, make),
   pack: gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, pack),
 }
