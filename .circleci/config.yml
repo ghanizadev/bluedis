@@ -25,19 +25,25 @@ jobs:
       - persist_to_workspace:
           root: ~/workspace
           paths: [ '*.snap' ]
+          
   release:
     <<: *defaults
     steps:
       - checkout
-
+      - node/install-packages:
+          pkg-manager: npm
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
       - attach_workspace:
           at: ~/workspace
-
+          
       - run:
           name: Install prerequisites
           command: |
             sudo apt update
-            apt install -y openssl nodejs
+            apt install -y openssl
 
       - run:
           name: Decrypt credentials
@@ -81,12 +87,11 @@ workflows:
     jobs:
       - test
 
-  commit:
+  deploy:
+    when:
+      equal: [ main, << pipeline.git.branch >> ]
     jobs:
       - build
       - release:
           requires:
             - build
-          filters:
-            branches:
-              only: master
