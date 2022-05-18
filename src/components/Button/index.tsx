@@ -6,12 +6,13 @@ type Props = {
   label: string;
   onClick ?: () => void;
   disabled?: boolean;
+  'data-testid'?: string;
 }
 
 const Button: React.FC<Props> = (props) => {
   const {label, onClick, disabled} = props;
   return(
-    <Container disabled={disabled} data-testid="square-button" onClick={onClick}>
+    <Container disabled={disabled} data-testid={props['data-testid'] ?? "square-button"} onClick={onClick}>
       <Text>
         {label}
       </Text>

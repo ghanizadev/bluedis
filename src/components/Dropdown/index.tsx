@@ -37,6 +37,7 @@ type Props = {
   onChange ?: (item: string) => void;
   defaultValue?: string;
   defaultIndex?: number;
+  'data-testid'?: string;
 };
 
 const Dropdown: React.FC<Props> = (props) => {
@@ -49,7 +50,7 @@ const Dropdown: React.FC<Props> = (props) => {
   
   return (
     <Container>
-      <Select onChange={handleChange} defaultValue={v}>
+      <Select onChange={handleChange} defaultValue={v} data-testid={props['data-testid'] ?? 'dropdown-select'}>
         {items.map((item, index) => {
           return <Option key={index}>{item}</Option>;
         })}

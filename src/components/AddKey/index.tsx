@@ -70,17 +70,18 @@ const AddKey: React.FC<Props> = (props) => {
   return (
     <>
       <MessageBackground />
-      <MessageContent data-testid="data-add-message">
+      <MessageContent data-testid="add-key-component">
         <h3>{t`Add key`}</h3>
         <Row>
           <span>{t`Name`}: </span>
-          <Key onChange={handleKeyChange} />
+          <Key onChange={handleKeyChange} data-testid={"add-key-name"} />
         </Row>
         <Row>
           <span>{t`Type`}: </span>
           <Dropdown
             onChange={handleTypeChange}
             items={["set", "zset", "hash", "string", "list"]}
+            data-testid={'add-key-select'}
           />
         </Row>
         <Row>
@@ -89,6 +90,7 @@ const AddKey: React.FC<Props> = (props) => {
             onChange={() => {
               setUseTTL(!useTTL);
             }}
+            data-testid={'add-key-toggle'}
           />
         </Row>
         {useTTL && (
@@ -109,13 +111,14 @@ const AddKey: React.FC<Props> = (props) => {
                 type={ttlAbsolute ? "datetime-local" : "number"}
                 style={{ width: ttlAbsolute ? "unset" : "80px" }}
                 onChange={handleTTLChange}
+                data-testid={'add-key-ttl'}
               />
             </Row>
           </>
         )}
         <Row style={{ justifyContent: "flex-end" }}>
-          <Button label={t`Cancel`} onClick={handleCancel} />
-          <Button label={t`Confirm`} onClick={handleConfirm} />
+          <Button label={t`Cancel`} onClick={handleCancel} data-testid={"add-key-cancel"} />
+          <Button label={t`Confirm`} onClick={handleConfirm} data-testid={"add-key-confirm"} />
         </Row>
       </MessageContent>
     </>

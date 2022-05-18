@@ -57,10 +57,7 @@
   "dependencies": {
     "@electron-forge/core": "^6.0.0-beta.63",
     "@reduxjs/toolkit": "^1.8.1",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.2.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.1",
     "@types/node": "^16.11.35",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.4",
@@ -87,7 +84,7 @@
     "predev:electron": "npm run build:electron",
     "start:dev": "npx gulp start-dev",
     "start:prod": "npx gulp start-prod",
-    "test": "cross-env NODE_ENV=test node -r dotenv/config node_modules/.bin/jest --runInBand"
+    "test": "react-scripts test --runInBand"
   },
   "eslintConfig": {
     "extends": [
@@ -113,8 +110,12 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.2.0",
+    "@types/jest": "^27.5.1",
     "@types/react-redux": "^7.1.24",
     "@types/react-test-renderer": "^18.0.0",
+    "@types/redux-mock-store": "^1.0.3",
     "@types/styled-components": "^5.1.25",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
@@ -124,6 +125,10 @@
     "eslint": "^8.15.0",
     "eslint-plugin-import": "^2.26.0",
     "gulp": "^4.0.2",
-    "jest-styled-components": "^7.0.8"
+    "jest": "^28.1.0",
+    "jest-styled-components": "^7.0.8",
+    "redux-mock-store": "^1.5.4",
+    "ts-jest": "^28.0.2",
+    "ts-node": "^10.7.0"
   }
 }

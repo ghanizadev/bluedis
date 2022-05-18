@@ -27,7 +27,7 @@ const initialState: State = {
       stepSize: 10,
     },
     region: {
-      language: Language.en_US,
+      language: 0,
       dateFormat: "system",
     },
     license: "teste",
