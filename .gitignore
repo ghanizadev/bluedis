@@ -93,4 +93,8 @@ dist/
 
 # Snapcraft credentials
 credentials*
+!.circleci/credentials.enc
+
 parts/
+
+prime

@@ -81,8 +81,12 @@
   "scripts": {
     "start:dev": "npx gulp start-dev",
     "start:prod": "npx gulp start-prod",
+    "build:electron": "tsc --project tsconfig.app.json",
     "build": "npx gulp build",
-    "pack": "npx gulp pack"
+    "pack": "npx gulp pack",
+    "predev:electron": "npm run build:electron",
+    "dev:react": "cross-env NODE_ENV=development BROWSER=none react-scripts start",
+    "dev:electron": "cross-env NODE_ENV=development electron-forge start"
   },
   "eslintConfig": {
     "extends": [
@@ -114,6 +118,7 @@
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
+    "cross-env": "^7.0.3",
     "electron": "^18.2.3",
     "eslint": "^8.15.0",
     "eslint-plugin-import": "^2.26.0",

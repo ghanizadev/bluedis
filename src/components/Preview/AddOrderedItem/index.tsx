@@ -10,6 +10,7 @@ import { PreviewActionButton } from "../../common/PreviewActionButton";
 
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
+import {t} from "../../../i18n";
 
 const Input = styled.input`
   width: 100%;
@@ -65,13 +66,13 @@ const AddOrderedItem: React.FC<Props> = (props) => {
     <>
       <MessageBackground />
       <MessageContent>
-        <h3>{isNew ? "Add" : "Edit"} Item</h3>
+        <h3>{isNew ? t`Add item` : t`Edit item`}</h3>
         <Label>
-          Score: <br />
+          {t`Score`}: <br />
           <Input ref={scoreRef} defaultValue={score} />
         </Label>
         <Label style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          Value: <br />
+          {t`Value`}: <br />
           <TextArea ref={valueRef} defaultValue={value} />
         </Label>
         <PreviewActions>
@@ -79,19 +80,19 @@ const AddOrderedItem: React.FC<Props> = (props) => {
             data-testid="message-copy"
             onClick={handleItemCopy}
           >
-            <CopyIcon title="Copy as JSON" />
+            <CopyIcon title={t`Copy as JSON`} />
           </PreviewActionButton>
           <PreviewActionButton
             data-testid="message-remove"
             remove
             onClick={handleItemRemove}
           >
-            <RemoveIcon title="Remove property" />
+            <RemoveIcon title={t`Remove property`} />
           </PreviewActionButton>
         </PreviewActions>
         <MessageButtonWrapper>
-          <Button label="Close" onClick={handleClose} />
-          <Button label="Save" onClick={handleSave} />
+          <Button label={t`Close`} onClick={handleClose} />
+          <Button label={t`Save`} onClick={handleSave} />
         </MessageButtonWrapper>
       </MessageContent>
     </>

@@ -37,7 +37,7 @@ jobs:
           name: Install prerequisites
           command: |
             sudo apt update
-            apt install -y openssl
+            apt install -y openssl nodejs
 
       - run:
           name: Decrypt credentials
@@ -65,10 +65,6 @@ jobs:
           root: .
           paths:
             - .
-      - run:
-          name: Setup environment variables
-          command: |
-            echo 'export JWT_SIGNATURE="areallyfakesignature"' >> $BASH_ENV
       - run:
           command: npm run test
           name: Run tests

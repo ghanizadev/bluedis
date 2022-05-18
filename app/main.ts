@@ -16,7 +16,7 @@ let mainWindow: BrowserWindow;
 
 const icon = (function() {
   const ext = process.platform === 'darwin'
-    ? "ics"
+    ? "icns"
     : process.platform === 'linux'
     ? "png"
     : "ico"
@@ -24,6 +24,8 @@ const icon = (function() {
   const iconPath = path.resolve(app.getAppPath(), 'assets', 'icon.' + ext);
   return nativeImage.createFromPath(iconPath);
 })();
+
+process.platform === 'darwin' && app.dock.setIcon(icon);
 
 const createWindow = async (): Promise<void> => {
     mainWindow = new BrowserWindow({
@@ -38,8 +40,6 @@ const createWindow = async (): Promise<void> => {
             contextIsolation: false,
         },
     });
-    
-  process.platform === 'darwin' && app.dock.setIcon(icon);
 
   globalShortcut.register("F5", () => {
         process.env.NODE_ENV === "development" && mainWindow.reload();

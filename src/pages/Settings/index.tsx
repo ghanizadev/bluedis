@@ -111,7 +111,7 @@ const Settings = () => {
             />
           </span>
         </Row>
-        <Subtitle>{t`Appearence`}</Subtitle>
+        <Subtitle>{t`Appearance`}</Subtitle>
         <Row>
           <span>{t`Dark mode`}</span>
           <span>
@@ -149,10 +149,8 @@ const Settings = () => {
         </Row>
         {
         /**
-         * Maximum DB default 5
-         * Language preferences
+         * Set DB: quantity and name
          * fetch data => load step = 10
-         * date format
          */
          }
       </Content>
