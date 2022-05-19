@@ -94,10 +94,10 @@ jobs:
       - run:
           name: Make coverage report
           command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.frontend.json coverage/lcov.info
-          - persist_to_workspace:
-              root: tmp
-              paths:
-                - codeclimate.frontend.json
+      - persist_to_workspace:
+          root: tmp
+          paths:
+            - codeclimate.frontend.json
       - run:
           name: Upload coverage results to Code Climate
           command: |
@@ -118,7 +118,7 @@ workflows:
       equal: [ master, << pipeline.git.branch >> ]
     jobs:
       - test
-      - coverage:
+      - code-coverage:
           requires:
             - test
 
