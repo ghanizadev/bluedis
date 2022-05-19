@@ -41,7 +41,7 @@ const Preview: React.FC<Props> = (props) => {
   };
 
   return (
-    <Container open={!!preview} data-testid="preview">
+    <Container open={!!preview} data-testid="preview-container">
       {!!preview && (
         <>
           <Header>

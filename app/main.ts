@@ -3,7 +3,6 @@ import path from "path";
 import dotenv from "dotenv";
 
 import "./listeners";
-import {platform} from "os";
 
 dotenv.config({ path: '../' });
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -27,17 +26,22 @@ const icon = (function() {
 
 process.platform === 'darwin' && app.dock.setIcon(icon);
 
+const HEIGHT = 800;
+const WIDTH = 1200;
+
 const createWindow = async (): Promise<void> => {
     mainWindow = new BrowserWindow({
-        height: 800,
-        width: 1200,
+        height: HEIGHT,
+        width: WIDTH,
+        minHeight: HEIGHT,
+        minWidth: WIDTH,
         frame: false,
         transparent: true,
         icon,
-        resizable: false,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
+          preload: path.resolve(__dirname, 'preload.js'),
+          nodeIntegration: true,
+          contextIsolation: true,
         },
     });
 
@@ -73,10 +77,10 @@ ipcMain.on("maximize", () => {
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
         mainWindow.setBounds({
-            x: width / 2 - 500,
-            y: height / 2 - 400,
-            width: 1000,
-            height: 800,
+            x: width / 2 - (WIDTH / 2),
+            y: height / 2 - (HEIGHT / 2),
+            width: WIDTH,
+            height: HEIGHT,
         });
     }
 });

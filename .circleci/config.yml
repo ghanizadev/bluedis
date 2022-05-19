@@ -79,7 +79,7 @@ workflows:
   test:
     when:
       matches:
-        pattern: "^(?!main|develop|release).*$"
+        pattern: "^(?!master|develop|release).*$"
         value: << pipeline.git.branch >>
     jobs:
       - test
