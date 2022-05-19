@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, { FC, useEffect } from "react";
 import { Background } from "./Background";
 import { Bar } from "./Bar";
 import { Close } from "./Close";
@@ -55,12 +55,12 @@ const Frame: FC<any> = (props) => {
     
     if (connection.host.length > 30) {
       setHost(
-        ` - redis://${connection.host.slice(0, 12)}...${connection.host.slice(
+        ` - redis${connection.tls ? 's' : ''}://${connection.host.slice(0, 12)}...${connection.host.slice(
           -12
         )}:${connection.port}`
       );
     } else {
-      setHost(` - redis://${connection.host}:${connection.port}`);
+      setHost(` - redis${connection.tls ? 's' : ''}://${connection.host}:${connection.port}`);
     }
     
     if(!connection.name) {
@@ -70,8 +70,6 @@ const Frame: FC<any> = (props) => {
         && fav.password === connection.password
         && fav.tls === connection.tls
       });
-      
-      console.log({conn})
       
       if(conn) setName(formatName(conn.name ?? ""));
     } else {
@@ -88,7 +86,7 @@ const Frame: FC<any> = (props) => {
             alt=""
             style={{ objectFit: "contain", width: 18, height: 18 }}
           />
-          <Title>
+          <Title data-testid={"frame-titlebar"}>
             Bluedis
             {host}
             {name}
