@@ -29,9 +29,6 @@ coverage
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-
 # Dependency directories
 node_modules/
 jspm_packages/
@@ -58,8 +55,8 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.env.test
+.env*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -88,5 +85,16 @@ typings/
 # Electron-Forge
 out/
 
-dist
-*.snap
+# Build output
+build*/
+
+# Compiled app
+dist/
+
+# Snapcraft credentials
+credentials*
+!.circleci/credentials.enc
+
+parts/
+
+prime

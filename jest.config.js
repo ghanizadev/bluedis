@@ -1,3 +1,0 @@
-module.esports = {
-    verbose: true,
-}

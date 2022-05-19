@@ -1,64 +1,151 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const gulp = require("gulp");
-var exec = require('child_process').exec;
+const gulp = require('gulp');
+const { exec } = require('child_process');
+const os = require('os');
 
-gulp.task('compile-electron', function (cb) {
-    exec('npx tsc', function (err) {
-      cb(err);
-    });
-  })
+let OS_NAME;
 
-gulp.task('compile-react', function (cb) {
-  exec('yarn --cwd ./src/App build', function (err) {
-    cb(err);
-  });
-})
+switch(os.type()) {
+  case 'Darwin':
+    OS_NAME = "MacOS";
+    break;
+  case 'Linux':
+    OS_NAME = "Linux";
+    break;
+  case 'Windows_NT':
+    OS_NAME = "Windows";
+    break;
+  default:
+    OS_NAME = "Other";
+}
 
-gulp.task('dist', function (cb) {
-  exec('npx electron-builder', function (err) {
-    cb(err);
-  });
-})
+const execAsync = async (command, displayError = true) => {
+    return new Promise((res, rej) => {
+        exec(command, (err, stdout, stderr) => {
+            if(displayError) console.log(stderr);
 
-gulp.task('dir', function (cb) {
-    const { SNAP_ARCH } = process.env;
+            if(err) return rej(err);
+            res(stdout);
+        })
+    })
+      .catch(e => {
+        if(displayError) throw new Error(e);
+      })
+}
 
-    let arg = "";
+const setEnv = (env = 'development') => {
+  const setEnvironment = cb => {
+    process.env.BUILD_ENV = env;
+    cb();
+  }
+  
+  return setEnvironment;
+}
 
-    if(SNAP_ARCH === "amd64"){
-      arg = " --x64";
-    } else if(SNAP_ARCH === "i386") {
-      arg = " --ia32";
-    } else if(SNAP_ARCH === "arm64") {
-      arg = " --arm64";
-    } else if(SNAP_ARCH === "armhf") {
-      arg = " --armv7l";
+const copy = async () => {
+  if(OS_NAME === 'Windows')
+    await execAsync('powershell.exe cp -Recurse build -Destination dist/app');
+  else
+    await execAsync('mv build dist/app');
+}
+
+const checkDevServerStatus = async () => {
+    try {
+        const headers = await execAsync('curl -I http://localhost:3000', false);
+        if(headers.split('\n')[0].search('200')) return 1;
+        return 0;
+    } catch(e) {
+        return 0
     }
-    
-    exec('electron-builder --dir' + arg, function (err, out, error) {
-      console.log(out, error)
-      cb(err);
-    });
-})
+}
 
-gulp.task('copy-react', function () {
-    return gulp.src('./src/App/build/**/*')
-        .pipe(gulp.dest('./dist/build'));
-});
+const compileReact = async() => {
+  return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} BUILD_PATH=./build react-scripts build`)
+}
 
-gulp.task('start-electron', function (cb) {
-    exec('npx cross-env NODE_ENV=development npx electron .', function (err) {
-        cb(err);
-    });
-});
+const compileElectron = async () => {
+    return execAsync('npx tsc --project tsconfig.app.json')
+}
 
-gulp.task('start-react', function (cb) {
-    exec('npx cross-env PORT=8080 BROWSER=none yarn --cwd ./src/App start', function (err) {
-        cb(err);
-    });
-});
+const devReact = async () => {
+    return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} BROWSER=none PORT=3000 react-scripts start`)
+}
 
-gulp.task('build', gulp.series(['compile-electron', 'compile-react', 'copy-react']));
-gulp.task('dist', gulp.series(['build', 'dist']));
-gulp.task('pack', gulp.series(['build', 'dir']));
-gulp.task('dev', gulp.series(['compile-electron', gulp.parallel(['start-react', 'start-electron'])]));
+const devElectron = async () => {
+  if(process.env.BUILD_ENV === 'production') return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start`)
+  
+    process.stdout.write('Awaiting for dev-server...');
+
+    while(!(await checkDevServerStatus())) {
+        await new Promise(res => setTimeout(res, 1000));
+        process.stdout.write('.');
+    }
+
+    process.stdout.write(' Done\n');
+    return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start`)
+}
+
+const startElectron = async () => {
+  return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} electron-forge start --app-path ./dist/main.js`)
+}
+
+const pack = async () => {
+  let arg = "";
+  
+  switch(process.env.SNAP_ARCH)  {
+    case "amd64":
+      arg = " --x64"
+      break;
+    case "i386":
+      arg = " --ia32";
+      break;
+    case "arm64":
+      arg = " --arm64";
+      break;
+    case "armhf":
+      arg = " --armv7l";
+      break;
+  }
+  
+  return execAsync('npx electron-forge package' + arg)
+}
+
+const make = async() => {
+  let arg = "";
+  const platform = process.env.BUILD_PLATFORM ? ` --platform ${process.env.BUILD_PLATFORM}` : "";
+
+  switch(process.env.SNAP_ARCH)  {
+    case "amd64":
+      arg = " --x64"
+      break;
+    case "i386":
+      arg = " --ia32";
+      break;
+    case "arm64":
+      arg = " --arm64";
+      break;
+    case "armhf":
+      arg = " --armv7l";
+      break;
+  }
+  
+  return execAsync('npx electron-forge make' + arg + platform)
+}
+
+const cleanup = async () => {
+  if(OS_NAME === 'Windows') {
+    await execAsync('powershell.exe Remove-Item -Recurse -Force build', false);
+    await execAsync('powershell.exe Remove-Item -Recurse -Force dist', false);
+    await execAsync('powershell.exe Remove-Item -Recurse -Force out', false);
+  }
+  else
+    await execAsync('rm -rf build dist out');
+}
+
+module.exports = {
+  'start-dev': gulp.series(setEnv('development'), compileElectron, gulp.parallel(devReact, devElectron)),
+  'start-prod': gulp.series(setEnv('production'), compileReact, compileElectron, copy, startElectron),
+  'build-win': gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, make),
+  'pack-win': gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, pack),
+  build: gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, make),
+  pack: gulp.series(setEnv('production'), cleanup, compileReact, compileElectron, copy, pack),
+}
