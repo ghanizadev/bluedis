@@ -35,7 +35,7 @@ const ConfirmationMessage = () => {
       {confirm && (
         <>
           <MessageBackground />
-          <MessageContent data-testid="confirmation-message">
+          <MessageContent data-testid="confirmation-message-container">
             <h3>{confirm.title}</h3>
             <br />
             <p>{confirm.message}</p>
@@ -43,10 +43,12 @@ const ConfirmationMessage = () => {
               <Button
                 onClick={handleCancel}
                 label={t`Cancel`}
+                data-testid={'confirmation-message-cancel'}
               />
               <Button
                 onClick={handleConfirm}
                 label={t`Confirm`}
+                data-testid={'confirmation-message-confirm'}
               />
             </ButtonsWrapper>
           </MessageContent>

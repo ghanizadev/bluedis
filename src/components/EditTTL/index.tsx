@@ -10,7 +10,7 @@ import { MessageContent } from "../common/MessageContent";
 import Input from "../Input";
 import Toggle from "../Toggle";
 import * as services from "../../services/mainProcess";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
 
 const Row = styled.div`
   display: flex;
@@ -18,9 +18,7 @@ const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-
   margin-top: 15px;
-  width: 100%;
 
   & input {
     margin: 0 !important;
@@ -66,18 +64,19 @@ const EditTTL: React.FC = () => {
           })
     );
   }, [item]);
-
+  
   return (
     <>
       {item && (
         <>
           <MessageBackground />
-          <MessageContent>
+          <MessageContent data-testid={'edit-ttl-container'}>
             <h3>{t`Set TTL`}</h3>
-            <small>{t`Actual`}: {displayTTL}</small>
+            <small data-testid={'edit-ttl-label'}>{t`Actual`}: {displayTTL}</small>
             <Row>
               <span>{t`Absolute TTL`}: </span>
               <Toggle
+                data-testid={'edit-ttl-toggle'}
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
                 }}
@@ -90,6 +89,7 @@ const EditTTL: React.FC = () => {
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
                 style={{ width: ttlAbsolute ? "unset" : "80px" }}
+                data-testid={'edit-ttl-input'}
                 onChange={handleTTLChange}
               />
             </Row>
@@ -98,9 +98,18 @@ const EditTTL: React.FC = () => {
                 disabled={item?.ttl === -1}
                 label={t`Remove`}
                 onClick={handleRemove}
+                data-testid={'edit-ttl-remove'}
               />
-              <Button label={t`Cancel`} onClick={handleCancel} />
-              <Button label={t`Confirm`} onClick={handleConfirm} />
+              <Button
+                label={t`Cancel`}
+                onClick={handleCancel}
+                data-testid={'edit-ttl-cancel'}
+              />
+              <Button
+                label={t`Confirm`}
+                onClick={handleConfirm}
+                data-testid={'edit-ttl-confirm'}
+              />
             </Row>
           </MessageContent>
         </>

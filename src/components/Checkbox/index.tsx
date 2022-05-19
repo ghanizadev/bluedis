@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {FC, useEffect} from "react";
 import { Input } from "./Input";
 
 type Props = {
@@ -6,9 +6,10 @@ type Props = {
   onChangeValue?: (value: boolean) => void;
   defaultChecked?: boolean;
   checked?: boolean;
+  'data-testid'?: string;
 };
 
-const Checkbox: React.FC<Props> = (props) => {
+const Checkbox: FC<Props> = (props) => {
   const { label, onChangeValue, defaultChecked } = props;
   const [checked, setChecked] = React.useState(
     props.checked || defaultChecked || false
@@ -24,9 +25,9 @@ const Checkbox: React.FC<Props> = (props) => {
   }, [props.checked]);
 
   return (
-    <label>
+    <label data-testid={'checkbox-label'}>
       <Input
-        data-testid="checkbox-input"
+        data-testid={props['data-testid'] ?? 'checkbox-input'}
         checked={checked}
         onClick={handleChecked}
       >

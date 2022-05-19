@@ -2,157 +2,156 @@ import { store, actions } from "../redux/store";
 import { Item } from "../redux/Types/Item";
 import {DarkTheme, defaultAppearanceSettings, LightTheme} from "../theme";
 import {Query} from "../redux/Types/Query";
-const { ipcRenderer, shell } = window.require("electron");
+import services from "./services";
 
 export const close = () => {
-  ipcRenderer.send("close");
+  services.send("close");
 };
 
 export const minimize = () => {
-  ipcRenderer.send("minimize");
+  services.send("minimize");
 };
 
 export const maximize = () => {
-  ipcRenderer.send("maximize");
+  services.send("maximize");
 };
 
 export const deleteKey = (key: string[]) => {
-  ipcRenderer.send("deleteKey", key);
+  services.send("deleteKey", key);
 };
 
 export const updateData = () => {
   const cursor = store.getState().query.cursor;
-  ipcRenderer.send("update", cursor);
+  services.send("update", cursor);
 };
 
 export const getDBCount = () => {
-  ipcRenderer.send("getCountDB");
+  services.send("getCountDB");
 };
 
 export const addKey = (key: string, type: string, ttl: number | string) => {
-  ipcRenderer.send("addKey", key, type, ttl);
+  services.send("addKey", key, type, ttl);
 };
 
 export const changeString = (key: string, value: string) => {
-  ipcRenderer.send("changeString", key, value);
+  services.send("changeString", key, value);
 };
 
 export const addListMember = (key: string, value: string) => {
-  ipcRenderer.send("addListMember", key, value);
+  services.send("addListMember", key, value);
 };
 
 export const removeListMember = (key: string, index: number) => {
-  ipcRenderer.send("removeListMember", key, index);
+  services.send("removeListMember", key, index);
 };
 
 export const alterListMember = (key: string, value: string, index: number) => {
-  ipcRenderer.send("alterListMember", key, value, index);
+  services.send("alterListMember", key, value, index);
 };
 
 export const addHashMember = (key: string, value: { [type: string]: any }) => {
-  ipcRenderer.send("addHashMember", key, value);
+  services.send("addHashMember", key, value);
 };
 
 export const alterHashMember = (
   key: string,
   value: { [type: string]: any }
 ) => {
-  ipcRenderer.send("alterHashMember", key, value);
+  services.send("alterHashMember", key, value);
 };
 
 export const removeHashMember = (key: string, value: string) => {
-  ipcRenderer.send("removeHashMember", key, value);
+  services.send("removeHashMember", key, value);
 };
 
 export const addSetMember = (key: string, value: string) => {
-  ipcRenderer.send("addSetMember", key, value);
+  services.send("addSetMember", key, value);
 };
 
 export const removeSetMember = (key: string, value: string) => {
-  ipcRenderer.send("removeSetMember", key, value);
+  services.send("removeSetMember", key, value);
 };
 
 export const addZSetMember = (key: string, value: string, score: string) => {
-  ipcRenderer.send("addZSetMember", key, value, score);
+  services.send("addZSetMember", key, value, score);
 };
 
 export const removeZSetMember = (key: string, value: string) => {
-  ipcRenderer.send("removeZSetMember", key, value);
+  services.send("removeZSetMember", key, value);
 };
 
 export const alterZSetMember = (key: string, value: string, score: string) => {
-  ipcRenderer.send("alterSetMember", key, value, score);
+  services.send("alterSetMember", key, value, score);
 };
 
 export const selectDatabase = (index: number) => {
-  ipcRenderer.send("selectDatabase", index);
+  services.send("selectDatabase", index);
 };
 
 export const find = (match: string, cursor: number) => {
-  ipcRenderer.send("find", match, cursor);
+  services.send("find", match, cursor);
 };
 
 export const loadMore = (match: string, cursor: number) => {
-  ipcRenderer.send("loadMore", match, cursor);
+  services.send("loadMore", match, cursor);
 };
 
 export const findByKey = (key: string) => {
-  ipcRenderer.send("findByKey", key);
+  services.send("findByKey", key);
 };
 
 export const updatePreview = (key: string) => {
-  ipcRenderer.send("updatePreview", key);
+  services.send("updatePreview", key);
 };
 
 export const setTTL = (key: string, ttl: number | string) => {
-  ipcRenderer.send("setTTL", key, ttl);
+  services.send("setTTL", key, ttl);
 };
 
 export const removeTTL = (key: string) => {
-  ipcRenderer.send("removeTTL", key);
+  services.send("removeTTL", key);
 };
 
 export const savePreferences = (preferences: any) => {
-  ipcRenderer.send("savePreferences", preferences);
+  services.send("savePreferences", preferences);
 };
 
 export const saveFavorites = (favorites: any) => {
-  ipcRenderer.send("saveFavorites", favorites);
+  services.send("saveFavorites", favorites);
 };
 
 export const executeCommand = (command: string) => {
-  ipcRenderer.send("executeCommand", command);
+  services.send("executeCommand", command);
 };
 
 export const exportItems = (items: string[]) => {
-  console.log({ items })
-  ipcRenderer.send("exportItems", items);
+  services.send("exportItems", items);
 };
 
 export const wipeData = () => {
-  ipcRenderer.send("wipeData");
+  services.send("wipeData");
 };
 
 export const openLink = (link: string) => {
-  shell.openExternal(link);
+  services.shell.openExternal(link);
 };
 
 export const getPreferences = () => {
-  ipcRenderer.send("initial");
+  services.send("initial");
 };
 
 export const connect = (connection: any) => {
   store.dispatch(actions.setLoading(true));
-  ipcRenderer.send("connect", connection);
+  services.send("connect", connection);
 };
 
 export const disconnect = () => {
-  ipcRenderer.send("disconnect");
+  services.send("disconnect");
   store.dispatch(actions.setConnected(false));
   store.dispatch(actions.resetTerminal());
 };
 
-ipcRenderer.on("preferences", (event: any, preferences: any) => {
+services.receive("preferences", (event: any, preferences: any) => {
   const darkTheme = typeof preferences.appearance.darkTheme !== 'undefined'
     ? preferences.appearance.darkTheme
     : preferences.appearance.systemTheme === 'dark';
@@ -168,23 +167,23 @@ ipcRenderer.on("preferences", (event: any, preferences: any) => {
   }));
 });
 
-ipcRenderer.on("setCountDB", (event: any, count: number) => {
+services.receive("setCountDB", (event: any, count: number) => {
   store.dispatch(actions.setCount(count));
 });
 
-ipcRenderer.on("favorites", (event: any, favorites: any) => {
+services.receive("favorites", (event: any, favorites: any) => {
   store.dispatch(actions.updateFavorites(favorites));
 });
 
-ipcRenderer.on("keyAdded", (event: any, key: Item) => {
+services.receive("keyAdded", (event: any, key: Item) => {
   store.dispatch(actions.addDocument(key));
 });
 
-ipcRenderer.on("keyRemoved", (event: any, key: string[]) => {
+services.receive("keyRemoved", (event: any, key: string[]) => {
   store.dispatch(actions.removeDocument(key));
 });
 
-ipcRenderer.on("data", (event: any, data: { docs: Item[]; } & Query) => {
+services.receive("data", (event: any, data: { docs: Item[]; } & Query) => {
     store.dispatch(actions.setQuery(data));
     store.dispatch(actions.setData(data.docs));
     store.dispatch(actions.setConnected(true));
@@ -193,25 +192,25 @@ ipcRenderer.on("data", (event: any, data: { docs: Item[]; } & Query) => {
   }
 );
 
-ipcRenderer.on("loadedData", (event: any, data: { docs: Item[]; } & Query ) => {
+services.receive("loadedData", (event: any, data: { docs: Item[]; } & Query ) => {
     store.dispatch(actions.setQuery(data));
     store.dispatch(actions.pushData(data.docs));
   }
 );
 
-ipcRenderer.on("license", (event: any, license: string) => {
+services.receive("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));
 });
 
-ipcRenderer.on("commandReply", (event: any, reply: string) => {
+services.receive("commandReply", (event: any, reply: string) => {
   store.dispatch(actions.updateSTDOUT(reply));
 });
 
-ipcRenderer.on("dataPreview", (event: any, doc: any) => {
+services.receive("dataPreview", (event: any, doc: any) => {
   store.dispatch(actions.setPreview(doc));
 });
 
-ipcRenderer.on("exportedItems", (event: any, response: { docs: any[] }) => {
+services.receive("exportedItems", (event: any, response: { docs: any[] }) => {
   console.log({ response })
   const items = response.docs.reduce(
     (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
@@ -229,7 +228,7 @@ ipcRenderer.on("exportedItems", (event: any, response: { docs: any[] }) => {
   a.click();
 });
 
-ipcRenderer.on("error", (event: any, error: Error) => {
+services.receive("error", (event: any, error: Error) => {
   if (!error || !error.message) {
     store.dispatch(
       actions.setError({ title: "Error", message: "Something went bad" })

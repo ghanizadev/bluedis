@@ -67,26 +67,64 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: npm
+      - run:
+          name: Run test with coverage
+          command: npm run test -- --coverage
       - persist_to_workspace:
           root: .
           paths:
             - .
+  
+  code-coverage:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - attach_workspace: 
+          at: .
       - run:
-          command: npm run test
-          name: Run tests
+          name: Download cc-test-reporter
+          command: |
+            mkdir -p tmp/
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
+            - persist_to_workspace:
+                root: tmp
+                paths:
+                  - cc-test-reporter
+      - run:
+          name: Make coverage report
+          command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.frontend.json coverage/lcov.info
+      - persist_to_workspace:
+          root: tmp
+          paths:
+            - codeclimate.frontend.json
+      - run:
+          name: Upload coverage results to Code Climate
+          command: |
+            ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -p 2 -o tmp/codeclimate.total.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.total.json
 
 workflows:
   test:
     when:
       matches:
-        pattern: "^(?!main|develop|release).*$"
+        pattern: "^(?!master|develop|release).*$"
         value: << pipeline.git.branch >>
     jobs:
       - test
 
+  coverage:
+    when:
+      equal: [ master, << pipeline.git.branch >> ]
+    jobs:
+      - test
+      - code-coverage:
+          requires:
+            - test
+
   deploy:
     when:
-      equal: [ main, << pipeline.git.branch >> ]
+      equal: [ master, << pipeline.git.branch >> ]
     jobs:
       - build
       - release:

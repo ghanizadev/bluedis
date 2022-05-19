@@ -28,7 +28,7 @@ const ErrorMessage = () => {
       {message && (
         <>
           <MessageBackground />
-          <MessageContent>
+          <MessageContent data-testid={"error-message-container"}>
             <h3>{message.title}</h3>
             <p>{message.message}</p>
             <ButtonsWrapper>
