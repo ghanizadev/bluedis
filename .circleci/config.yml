@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Update index
           command: apt update
-
+          
       - run:
           name: Build snap
           command: snapcraft
@@ -87,10 +87,10 @@ jobs:
             mkdir -p tmp/
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
             chmod +x ./tmp/cc-test-reporter
-            - persist_to_workspace:
-                root: tmp
-                paths:
-                  - cc-test-reporter
+      - persist_to_workspace:
+          root: tmp
+          paths:
+            - cc-test-reporter
       - run:
           name: Make coverage report
           command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.frontend.json coverage/lcov.info

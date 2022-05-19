@@ -12,7 +12,11 @@ if [ -n "$http_proxy" ]; then
 rm -rf build dist out node_modules
 
 # Install Git
-apt update && apt install git -y
+apt update
+apt install git -y
+
+# Install node
+curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
 
 # Install modules
 npm ci
