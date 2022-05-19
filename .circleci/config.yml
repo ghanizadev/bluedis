@@ -1,0 +1,94 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@4.7.0
+  
+defaults: &defaults
+  working_directory: ~/workspace
+  docker:
+    - image: snapcore/snapcraft:edge
+
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - run:
+          name: Update index
+          command: apt update
+
+      - run:
+          name: Build snap
+          command: snapcraft
+
+      - persist_to_workspace:
+          root: ~/workspace
+          paths: [ '*.snap' ]
+          
+  release:
+    <<: *defaults
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+      - attach_workspace:
+          at: ~/workspace
+          
+      - run:
+          name: Install prerequisites
+          command: |
+            sudo apt update
+            apt install -y openssl nodejs
+
+      - run:
+          name: Decrypt credentials
+          command: |
+            openssl aes-256-cbc -d \
+              -in .circleci/credentials.enc \
+              -out credentials \
+              -k $SNAPCRAFT_CREDENTIALS_KEY
+
+      - run:
+          name: Authenticate snapcraft
+          command: snapcraft login --with credentials
+
+      - run:
+          name: Push/release snap
+          command: snapcraft push *.snap --release edge
+  test:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+      - run:
+          command: npm run test
+          name: Run tests
+
+workflows:
+  test:
+    when:
+      matches:
+        pattern: "^(?!main|develop|release).*$"
+        value: << pipeline.git.branch >>
+    jobs:
+      - test
+
+  deploy:
+    when:
+      equal: [ main, << pipeline.git.branch >> ]
+    jobs:
+      - build
+      - release:
+          requires:
+            - build
