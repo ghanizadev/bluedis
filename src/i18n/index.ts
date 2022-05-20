@@ -1,19 +1,10 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import pt_BR from './pt_BR';
 import {store} from "../redux/store";
+import {LangType} from "./i18n.dto";
 
-const inUse: any = {};
-let timeout: any;
-
-const saveKey = (key: string, value: string) => {
-  if(!inUse[key]) inUse[key] = value;
-  
-  clearTimeout(timeout);
-  timeout = setTimeout(() => {
-    console.log(inUse);
-  }, 1000)
-} 
-
-const mapLanguage = (lang: any, defaultResponse: string, items: string[], args: any[]) => {
+const mapLanguage = (lang: LangType, defaultResponse: string, items: string[], args: any[]) => {
   const keyLike = items.map(k => k.toLowerCase().trim()).join('').replace(/[ .,/#!$?%^&*;:{}=\-_`~()]/g,"");
   const keys = Object.entries(pt_BR);
   let response = defaultResponse;

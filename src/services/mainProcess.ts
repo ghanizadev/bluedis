@@ -1,3 +1,5 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { store, actions } from "../redux/store";
 import { Item } from "../redux/Types/Item";
 import {DarkTheme, defaultAppearanceSettings, LightTheme} from "../theme";

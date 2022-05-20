@@ -1,7 +1,11 @@
+export type AppearanceFont = "Roboto" | "JetBrains Mono" | "Montserrat" | "Open Sans";
+
+export type AppearanceSchema = 'dark' | 'light';
+
 export interface Appearance {
   darkTheme?: boolean;
-  systemTheme?: 'dark' | 'light';
-  fontFamily: "Roboto" | "JetBrains Mono" | "Montserrat" | "Open Sans";
+  systemTheme?: AppearanceSchema;
+  fontFamily: AppearanceFont;
   fontSize: string;
 }
 

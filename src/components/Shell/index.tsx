@@ -76,17 +76,17 @@ const Shell: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const handleCommandsubmit = (
+  const handleCommandSubmit = (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (event.key === "Enter" && inputRef.current) {
-      const value = inputRef.current!.value;
+      const value = inputRef.current.value;
       if (!value) return;
 
-      inputRef.current!.value = "";
+      inputRef.current.value = "";
       dispatch(actions.updateSTDOUT(`> ${value}`));
 
-      if ((command as any)[value]) (command as any)[value]();
+      if (command[value]) command[value]();
       else if (
         availableCommands.filter((v) => value.toLowerCase().startsWith(v))
           .length > 0
@@ -96,11 +96,11 @@ const Shell: React.FC = () => {
         dispatch(actions.updateSTDOUT(`> Command not recognized: ${value}`));
       }
 
-      inputRef.current!.disabled = true;
+      inputRef.current.disabled = true;
     }
   };
 
-  const handleOnTerminalClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleOnTerminalClick = () => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -110,9 +110,12 @@ const Shell: React.FC = () => {
     if (!inputRef.current) return;
     if (!inputRef.current.disabled) return;
 
-    inputRef.current!.disabled = false;
-    inputRef.current!.focus();
-    const div = document.querySelector("#terminal")!;
+    inputRef.current.disabled = false;
+    inputRef.current.focus();
+    const div = document.querySelector("#terminal");
+    
+    if(!div) throw new Error('shell container not found');
+    
     div.scrollTo({ top: div.scrollTop, behavior: "smooth" });
   }, [terminal.stdout]);
 
@@ -129,7 +132,7 @@ const Shell: React.FC = () => {
               <input
                 spellCheck={false}
                 ref={inputRef}
-                onKeyDown={handleCommandsubmit}
+                onKeyDown={handleCommandSubmit}
               />
             </p>
           </Terminal>
