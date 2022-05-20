@@ -86,7 +86,7 @@ typings/
 out/
 
 # Build output
-build*/
+build/
 
 # Compiled app
 dist/
