@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-cp -rv "$SNAPCRAFT_PART_BUILD"/out/Bluedis-* "$SNAPCRAFT_PART_INSTALL"
-mv "$SNAPCRAFT_PART_INSTALL"/Bluedis-* "$SNAPCRAFT_PART_INSTALL"/bin
