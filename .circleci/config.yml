@@ -76,6 +76,8 @@ jobs:
     docker:
       - image: cimg/node:17.2.0
     steps:
+      - attach_workspace: 
+          at: .
       - run:
           name: Run test with coverage
           command: npm run test -- --coverage
