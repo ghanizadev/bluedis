@@ -77,7 +77,8 @@
     "predev:electron": "npm run build:electron",
     "start:dev": "npx gulp start-dev",
     "start:prod": "npx gulp start-prod",
-    "test": "react-scripts test --runInBand"
+    "test": "react-scripts test",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -122,6 +123,7 @@
     "eslint": "^8.15.0",
     "eslint-plugin-import": "^2.26.0",
     "gulp": "^4.0.2",
+    "husky": "^8.0.1",
     "jest": "^28.1.0",
     "jest-localstorage-mock": "^2.4.21",
     "jest-styled-components": "^7.0.8",
