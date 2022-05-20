@@ -4,30 +4,14 @@ orbs:
   node: circleci/node@4.7.0
   
 defaults: &defaults
-  working_directory: ~/workspace
+  working_directory: .
   docker:
     - image: snapcore/snapcraft:edge
 
 jobs:
-  build:
-    <<: *defaults
-    steps:
-      - checkout
-
-      - run:
-          name: Update index
-          command: apt update
-          
-      - run:
-          name: Build snap
-          command: snapcraft
-
-      - persist_to_workspace:
-          root: ~/workspace
-          paths: [ '*.snap' ]
-          
-  release:
-    <<: *defaults
+  setup:
+    docker:
+      - image: cimg/node:17.2.0
     steps:
       - checkout
       - node/install-packages:
@@ -36,15 +20,44 @@ jobs:
           root: .
           paths:
             - .
-      - attach_workspace:
-          at: ~/workspace
           
+  build-app:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - run:
+          name: Build app
+          command: npm run pack
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+    
+  build-snap:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Update index
+          command: apt update
+      - run:
+          name: Build snap
+          command: snapcraft
+      - persist_to_workspace:
+          root: .
+          paths: [ '*.snap' ]
+          
+  release:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Install prerequisites
           command: |
             sudo apt update
-            apt install -y openssl nodejs
-
+            apt install -y openssl
       - run:
           name: Decrypt credentials
           command: |
@@ -52,21 +65,17 @@ jobs:
               -in .circleci/credentials.enc \
               -out credentials \
               -k $SNAPCRAFT_CREDENTIALS_KEY
-
       - run:
           name: Authenticate snapcraft
           command: snapcraft login --with credentials
-
       - run:
           name: Push/release snap
           command: snapcraft push *.snap --release edge
+
   test:
     docker:
       - image: cimg/node:17.2.0
     steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
       - run:
           name: Run test with coverage
           command: npm run test -- --coverage
@@ -76,8 +85,8 @@ jobs:
             - .
   
   code-coverage:
-    docker:
-      - image: cimg/node:17.2.0
+    machine:
+      image: ubuntu-2004:current
     steps:
       - attach_workspace: 
           at: .
@@ -93,16 +102,15 @@ jobs:
             - cc-test-reporter
       - run:
           name: Make coverage report
-          command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.frontend.json coverage/lcov.info
+          command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.json coverage/lcov.info
       - persist_to_workspace:
           root: tmp
           paths:
-            - codeclimate.frontend.json
+            - codeclimate.json
       - run:
           name: Upload coverage results to Code Climate
           command: |
-            ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -p 2 -o tmp/codeclimate.total.json
-            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.total.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json
 
 workflows:
   test:
@@ -111,22 +119,28 @@ workflows:
         pattern: "^(?!master|develop|release).*$"
         value: << pipeline.git.branch >>
     jobs:
-      - test
-
-  coverage:
-    when:
-      equal: [ master, << pipeline.git.branch >> ]
-    jobs:
-      - test
-      - code-coverage:
+      - setup
+      - test:
           requires:
-            - test
+            - setup
 
   deploy:
     when:
       equal: [ master, << pipeline.git.branch >> ]
     jobs:
-      - build
+      - setup
+      - test:
+          requires:
+            - setup
+      - code-coverage:
+          requires:
+            - test
+      - build-app:
+          requires:
+            - test
+      - build-snap:
+          requires:
+            - build-app
       - release:
           requires:
-            - build
+            - build-snap

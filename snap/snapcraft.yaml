@@ -31,7 +31,7 @@ parts:
   bluedis:
     plugin: nil
     source: .
-    override-build: ./build.sh
+    override-build: ./build
     build-snaps:
     - node/17/stable
     build-packages:
