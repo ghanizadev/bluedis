@@ -132,6 +132,9 @@ workflows:
       - test:
           requires:
             - setup
+      - build-app:
+          requires:
+            - setup
 
   deploy:
     when:
