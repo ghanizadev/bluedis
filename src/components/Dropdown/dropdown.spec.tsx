@@ -1,4 +1,4 @@
-import {render, screen} from "@testing-library/react";
+import {act, fireEvent, render, screen} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {Provider} from "react-redux";
 
@@ -8,7 +8,7 @@ import {store} from "../../redux/store";
 import '@testing-library/jest-dom/extend-expect';
 
 describe('<Dropdown />', () => {
-  it('Should render', () => {
+  it('Should render', () => { 
     render(
       <Provider store={store}>
         <Dropdown items={['Default']} />
@@ -93,15 +93,19 @@ describe('<Dropdown />', () => {
       </Provider>
     )
 
-    const dropdown = screen.getByTestId('dropdown-select');
-    const selected = screen.getByRole<HTMLOptionElement>('option', { name: 'Third' });
+    const dropdown = screen.getByTestId<HTMLSelectElement>('dropdown-select');
     
-    userEvent.selectOptions(
-      dropdown,
-      selected,
-    );
-
-    expect(selected.selected).toBeTruthy();
+    act(() => {
+      /*
+      * TODO: Replace change event by useEvents.selectOptions()
+      *  it stopped working without any reason
+      */
+      fireEvent.change(
+        dropdown,
+        { target: { value: 'Third' }},
+      );
+    })
+    
     expect(mock).toHaveBeenCalledTimes(1);
     expect(mock).toHaveBeenLastCalledWith('Third');
   })

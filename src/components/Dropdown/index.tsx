@@ -52,7 +52,7 @@ const Dropdown: React.FC<Props> = (props) => {
     <Container>
       <Select onChange={handleChange} defaultValue={v} data-testid={props['data-testid'] ?? 'dropdown-select'}>
         {items.map((item, index) => {
-          return <Option key={index}>{item}</Option>;
+          return <Option key={index} value={item}>{item}</Option>;
         })}
       </Select>
       <Arrow>▾</Arrow>
