@@ -25,6 +25,13 @@ jobs:
     docker:
       - image: cimg/node:17.2.0
     steps:
+      - attach_workspace: 
+          at: .
+      - run:
+          name: Install prerequisites
+          command: |
+            apt update
+            apt install xfce4 fakeroot -y
       - run:
           name: Build app
           command: npm run pack
