@@ -1,4 +1,6 @@
-export default {
+import {LangType} from "./i18n.dto";
+
+const translation: LangType = {
   "absolutettl": "TTL absoluta",
   "actual": "Atual",
   "addanewkey": "Adicionar nova chave",
@@ -77,4 +79,6 @@ export default {
   "usetls": "Usar TLS",
   "value": "Valor",
   "wipedata": "Limpar dados",
-} as { [key: string]: ((...args: any[]) => string) | string }
+};
+
+export default translation;

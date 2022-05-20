@@ -34,12 +34,14 @@ const EditTTL: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleConfirm = () => {
-    services.setTTL(item!.key, ttl);
+    if(!item) return;
+    services.setTTL(item.key, ttl);
     dispatch(actions.setEditTTL(undefined));
   };
 
   const handleRemove = () => {
-    services.removeTTL(item!.key);
+    if(!item) return;
+    services.removeTTL(item.key);
     dispatch(actions.setEditTTL(undefined));
   };
 

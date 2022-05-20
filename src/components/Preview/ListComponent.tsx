@@ -22,7 +22,7 @@ import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
 import {t} from "../../i18n";
 
-let timeout: any;
+let timeout: NodeJS.Timeout;
 
 type Props = {
   item: Item;

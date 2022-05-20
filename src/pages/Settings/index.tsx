@@ -13,8 +13,9 @@ import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
 import {DarkTheme, LightTheme} from "../../theme";
-import {Language, t} from "../../i18n";
+import { t } from "../../i18n";
 import {FONTS, LANGUAGES} from "./settings.constants";
+import {AppearanceFont} from "../../redux/Types/Appearance";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -58,7 +59,7 @@ const Settings = () => {
     dispatch(
       actions.changeAppearance({
         ...settings.appearance,
-        fontFamily: value as any,
+        fontFamily: value as AppearanceFont,
       })
     );
     saveChanges();

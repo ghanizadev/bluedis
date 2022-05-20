@@ -7,7 +7,6 @@ import {Item} from "./Types/Item";
 import {Page} from "./Types/Page";
 import {State} from "./Types/State";
 import {Query} from "./Types/Query";
-import {Language} from "../i18n";
 import {Region} from "./Types/Region";
 
 const initialState: State = {

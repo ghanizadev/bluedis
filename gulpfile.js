@@ -59,7 +59,7 @@ const checkDevServerStatus = async () => {
 }
 
 const compileReact = async() => {
-  return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} BUILD_PATH=./build react-scripts build`)
+  return execAsync(`npx cross-env NODE_ENV=${process.env.BUILD_ENV} CI=true BUILD_PATH=./build react-scripts build`)
 }
 
 const compileElectron = async () => {
