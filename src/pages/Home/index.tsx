@@ -1,6 +1,5 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import "../../services/mainProcess";
 import Table from "../../components/Table";
 import styled from "styled-components";
 import Search from "../../components/Search";

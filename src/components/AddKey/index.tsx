@@ -7,6 +7,7 @@ import Dropdown from "../Dropdown";
 import Input from "../Input";
 import Toggle from "../Toggle";
 import {t} from "../../i18n";
+import {KeyType} from "../../shared/constants/key-type.dto";
 
 const Row = styled.div`
   display: flex;
@@ -14,9 +15,7 @@ const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-
   margin-top: 15px;
-  width: 100%;
 
   & input {
     margin: 0 !important;
@@ -30,7 +29,7 @@ const Key = styled(Input)`
 type Props = {
   onCancel: () => void;
   onConfirm: (
-    type: "set" | "zset" | "hash" | "string" | "list",
+    type: KeyType,
     key: string,
     ttl: number | string
   ) => void;
@@ -38,7 +37,7 @@ type Props = {
 
 const AddKey: React.FC<Props> = (props) => {
   const { onCancel, onConfirm } = props;
-  const [type, setType] = React.useState("set");
+  const [type, setType] = React.useState<KeyType>("set");
   const [key, setKey] = React.useState("");
   const [ttl, setTTL] = React.useState<string | number>(0);
   const [useTTL, setUseTTL] = React.useState(false);
@@ -46,7 +45,7 @@ const AddKey: React.FC<Props> = (props) => {
 
   const handleConfirm = () => {
     if (!type || !key) return;
-    onConfirm(type as any, key, ttl);
+    onConfirm(type, key, ttl);
   };
 
   const handleCancel = () => {
@@ -54,7 +53,7 @@ const AddKey: React.FC<Props> = (props) => {
   };
 
   const handleTypeChange = (type: string) => {
-    setType(type);
+    setType(type as KeyType);
   };
 
   const handleKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 
 import { ReactComponent as CloseIcon } from "../../assets/close.svg";
+import {State} from "../../redux/Types/State";
 
 const Close = styled.button`
   background-color: transparent;
@@ -34,7 +35,7 @@ type Props = {
 
 const Preview: React.FC<Props> = (props) => {
   const { onCloseRequest } = props;
-  const preview = useSelector((state: any) => state.preview);
+  const preview = useSelector((state: State) => state.preview);
 
   const handleCloseRequest = () => {
     onCloseRequest && onCloseRequest();

@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { State } from "../../redux/Types/State";
 import { Connection } from "../../redux/Types/Connection";
 
-const Frame: FC<any> = (props) => {
+const Frame: FC<{children?: React.ReactNode | React.ReactNode[]}> = (props) => {
   const connected = useSelector<State, boolean>((state) => state.connected);
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection

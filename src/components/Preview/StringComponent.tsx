@@ -21,8 +21,8 @@ const Container = styled.textarea`
   flex: 1;
 `;
 
-let timeout: any;
-let saveTimeout: any;
+let timeout: NodeJS.Timeout;
+let saveTimeout: NodeJS.Timeout;
 
 type Props = {
   item: Item;
