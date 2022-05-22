@@ -18,6 +18,10 @@ export const maximize = () => {
   services.send("maximize");
 };
 
+export const fullscreen = () => {
+  services.send("fullscreen");
+};
+
 export const deleteKey = (key: string[]) => {
   services.send("deleteKey", key);
 };

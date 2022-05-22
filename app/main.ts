@@ -2,10 +2,14 @@ import { app, BrowserWindow, globalShortcut, ipcMain, screen, nativeImage } from
 import path from "path";
 import dotenv from "dotenv";
 
+import { updater } from "./updater";
+
 import "./listeners";
 
 dotenv.config({ path: '../' });
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+updater();
 
 if (require("electron-squirrel-startup")) {
     app.quit();
@@ -83,6 +87,10 @@ ipcMain.on("maximize", () => {
             height: HEIGHT,
         });
     }
+});
+
+ipcMain.on("fullscreen", () => {
+  mainWindow.setFullScreen(!mainWindow.isFullScreen());
 });
 
 app.on("window-all-closed", () => {

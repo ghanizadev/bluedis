@@ -14,6 +14,8 @@ import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
 import { useSelector } from "react-redux";
 import { State } from "../../redux/Types/State";
 import { Connection } from "../../redux/Types/Connection";
+import {OSXBar} from "./osx-bar";
+import {WindowsBar} from "./windows-bar";
 
 const Frame: FC<{children?: React.ReactNode | React.ReactNode[]}> = (props) => {
   const connected = useSelector<State, boolean>((state) => state.connected);
@@ -25,18 +27,6 @@ const Frame: FC<{children?: React.ReactNode | React.ReactNode[]}> = (props) => {
   );
   const [host, setHost] = React.useState("");
   const [name, setName] = React.useState("");
-
-  const handleClose = () => {
-    close();
-  };
-
-  const handleMinimize = () => {
-    minimize();
-  };
-
-  const handleMaximize = () => {
-    maximize();
-  };
   
   const formatName = (name: string) => {
     if (name.length > 30) {
@@ -79,31 +69,8 @@ const Frame: FC<{children?: React.ReactNode | React.ReactNode[]}> = (props) => {
 
   return (
     <Background data-testid="frame">
-      <Bar>
-        <div style={{ display: "flex" }}>
-          <img
-            src={process.env.PUBLIC_URL + "/icon.png"}
-            alt=""
-            style={{ objectFit: "contain", width: 18, height: 18 }}
-          />
-          <Title data-testid={"frame-titlebar"}>
-            Bluedis
-            {host}
-            {name}
-          </Title>
-        </div>
-        <ButtonWrapper>
-          <Resize data-testid="frame-minimize" onClick={handleMinimize}>
-            <MinimizeIcon width={16} height={16} />
-          </Resize>
-          <Resize data-testid="frame-maximize" onClick={handleMaximize}>
-            <MaximizeIcon width={16} height={16} />
-          </Resize>
-          <Close data-testid="frame-close" onClick={handleClose}>
-            <CloseIcon width={16} height={16} />
-          </Close>
-        </ButtonWrapper>
-      </Bar>
+      {window.electron.platform === 'darwin' && <OSXBar title={`Bluedis ${host}${name}`} />}
+      {window.electron.platform === 'windows' && <WindowsBar title={`Bluedis ${host}${name}`} />}
       <WorkingArea>{props.children}</WorkingArea>
     </Background>
   );
