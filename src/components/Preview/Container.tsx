@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Container = styled.section<{ open: boolean; }> `
+export const Container = styled.section<{ open: boolean }>`
   width: ${(props) => (props.open ? "350px" : "0")};
   opacity: ${(props) => (props.open ? 1 : 0)};
   padding: ${(props) => (props.open ? "8px" : 0)};

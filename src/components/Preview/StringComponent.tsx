@@ -1,18 +1,17 @@
 import React from "react";
 import styled from "styled-components";
+import { useDispatch } from "react-redux";
 
 import { changeString, deleteKey } from "../../services/mainProcess";
 import { Item } from "../../redux/Types/Item";
-
 import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as SaveIcon } from "../../assets/save.svg";
 import { PreviewActionButton } from "../common/PreviewActionButton";
 import { PreviewActions } from "../common/PreviewActions";
-import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
 
 const Container = styled.textarea`
   resize: none;
@@ -90,12 +89,14 @@ const StringComponent: React.FC<Props> = (props) => {
             {t`Key saved`}!
           </span>
         )}
-      <div>
-        <span>
-          {ttl !== -1 &&
-            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
-        </span>
-      </div>
+        <div>
+          <span>
+            {ttl !== -1 &&
+              t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+                timeZoneName: "short",
+              })}`}
+          </span>
+        </div>
         <PreviewActions>
           <PreviewActionButton
             title={t`Save key`}
@@ -112,12 +113,12 @@ const StringComponent: React.FC<Props> = (props) => {
             <CopyIcon />
           </PreviewActionButton>
           <PreviewActionButton
-          data-testid="item-ttl"
-          title={t`Edit TTL`}
-          onClick={handleTTLOpen}
-        >
-          <TTLIcon />
-        </PreviewActionButton>
+            data-testid="item-ttl"
+            title={t`Edit TTL`}
+            onClick={handleTTLOpen}
+          >
+            <TTLIcon />
+          </PreviewActionButton>
           <PreviewActionButton
             data-testid="item-remove"
             title={t`Remove key`}

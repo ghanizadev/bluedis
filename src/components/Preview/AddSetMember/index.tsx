@@ -1,4 +1,5 @@
 import React from "react";
+
 import Button from "../../Button";
 import { MessageBackground } from "../../common/MessageBackground";
 import { MessageContent } from "../../common/MessageContent";
@@ -6,10 +7,9 @@ import { MessageButtonWrapper } from "../../common/MessageButtonWrapper";
 import { TextArea } from "../../TextArea";
 import { PreviewActionButton } from "../../common/PreviewActionButton";
 import { PreviewActions } from "../../common/PreviewActions";
-
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
-import {t} from "../../../i18n";
+import { t } from "../../../i18n";
 
 type Props = {
   onSubmit: (oldValue: string, newValue: string) => void;

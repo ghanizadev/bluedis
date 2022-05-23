@@ -1,7 +1,6 @@
 import React from "react";
-import { SquareButton } from "./SquareButton";
-import { Separator } from "./Separator";
 import { useDispatch, useSelector } from "react-redux";
+
 import { State } from "../../redux/Types/State";
 import {
   deleteKey,
@@ -10,8 +9,6 @@ import {
   saveFavorites,
 } from "../../services/mainProcess";
 import { actions, store } from "../../redux/store";
-import PickName from "./PickName";
-
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { ReactComponent as RefreshIcon } from "../../assets/refresh.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
@@ -20,9 +17,13 @@ import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
 import { ReactComponent as FavoriteIcon } from "../../assets/star.svg";
 import { ReactComponent as TerminalIcon } from "../../assets/terminal.svg";
 import { Connection } from "../../redux/Types/Connection";
+import { t } from "../../i18n";
+
 import { Container } from "./Container";
 import { LastRefresh } from "./LastRefresh";
-import {t} from "../../i18n";
+import PickName from "./PickName";
+import { Separator } from "./Separator";
+import { SquareButton } from "./SquareButton";
 
 type Props = {
   onRefresh: () => void;
@@ -58,10 +59,11 @@ const Toolbar: React.FC<Props> = (props) => {
 
   const handleDeleteSelected = () => {
     const title = t`Attention`;
-    const message = selected.length === 1
-      ? t`Do you really want to delete THIS KEY?`
-      : t`Do you really want to delete THESE ${selected.length} KEYS?`;
-    
+    const message =
+      selected.length === 1
+        ? t`Do you really want to delete THIS KEY?`
+        : t`Do you really want to delete THESE ${selected.length} KEYS?`;
+
     dispatch(
       actions.setConfirmation({
         message,
@@ -152,14 +154,14 @@ const Toolbar: React.FC<Props> = (props) => {
         >
           <DisconnectIcon />
         </SquareButton>
-        {!favorites.find(
-          (connection) => {
-              return currentConnection?.host === connection.host
-                && currentConnection?.port === connection.port
-                && currentConnection?.password === connection.password
-                && currentConnection?.tls === connection.tls
-          }
-        ) && (
+        {!favorites.find((connection) => {
+          return (
+            currentConnection?.host === connection.host &&
+            currentConnection?.port === connection.port &&
+            currentConnection?.password === connection.password &&
+            currentConnection?.tls === connection.tls
+          );
+        }) && (
           <SquareButton
             data-testid="data-favorite"
             title={t`Favorite this connection`}

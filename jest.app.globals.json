@@ -1,0 +1,7 @@
+{
+  "window": {
+    "electron": {
+      "platform": "win32"
+    }
+  }
+}

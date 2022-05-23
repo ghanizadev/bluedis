@@ -2,16 +2,11 @@ version: 2.1
 
 orbs:
   node: circleci/node@4.7.0
-  
-defaults: &defaults
-  working_directory: .
-  docker:
-    - image: snapcore/snapcraft:edge
 
 jobs:
   setup:
     docker:
-      - image: cimg/node:17.2.0
+      - image: cimg/node:14.19.0
     steps:
       - checkout
       - node/install-packages:
@@ -23,7 +18,7 @@ jobs:
           
   build-app:
     docker:
-      - image: cimg/node:17.2.0
+      - image: cimg/node:14.19.0
     steps:
       - attach_workspace: 
           at: .
@@ -39,50 +34,10 @@ jobs:
           root: .
           paths:
             - .
-    
-  build-snap:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Update index
-          command: apt update
-      - run:
-          name: Build snap
-          command: snapcraft
-          no_output_timeout: 45m
-      - persist_to_workspace:
-          root: .
-          paths: [ '*.snap' ]
-          
-  release:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: Install prerequisites
-          command: |
-            sudo apt update
-            apt install -y openssl
-      - run:
-          name: Decrypt credentials
-          command: |
-            openssl aes-256-cbc -d \
-              -in .circleci/credentials.enc \
-              -out credentials \
-              -k $SNAPCRAFT_CREDENTIALS_KEY
-      - run:
-          name: Authenticate snapcraft
-          command: snapcraft login --with credentials
-      - run:
-          name: Push/release snap
-          command: snapcraft push *.snap --release edge
 
   test:
     docker:
-      - image: cimg/node:17.2.0
+      - image: cimg/node:14.19.0
     steps:
       - attach_workspace: 
           at: .
@@ -106,17 +61,9 @@ jobs:
             mkdir -p tmp/
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
             chmod +x ./tmp/cc-test-reporter
-      - persist_to_workspace:
-          root: tmp
-          paths:
-            - cc-test-reporter
       - run:
           name: Make coverage report
           command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.json coverage/lcov.info
-      - persist_to_workspace:
-          root: tmp
-          paths:
-            - codeclimate.json
       - run:
           name: Upload coverage results to Code Climate
           command: |
@@ -151,9 +98,3 @@ workflows:
       - build-app:
           requires:
             - test
-      - build-snap:
-          requires:
-            - build-app
-      - release:
-          requires:
-            - build-snap

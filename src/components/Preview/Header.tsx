@@ -6,7 +6,7 @@ export const Header = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-wrap: nowrap;
-  margin: 15px 0; 
+  margin: 15px 0;
 
   & h1 {
     overflow: hidden;

@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+
 import Button from "../Button";
 import Input from "../Input";
 import { t } from "../../i18n";
@@ -65,10 +66,10 @@ const PickName: React.FC<Props> = (props) => {
 
   const handleConfirm = () => {
     inputRef.current && onConfirm(inputRef.current.value);
-  }
+  };
   const handleCancel = () => {
     onCancel();
-  }
+  };
 
   return (
     <>

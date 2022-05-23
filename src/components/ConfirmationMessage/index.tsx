@@ -1,13 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+
 import Button from "../Button";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { MessageContent } from "../common/MessageContent";
 import { MessageBackground } from "../common/MessageBackground";
 import { Confirmation } from "../../redux/Types/Confirmation";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
 
 const ButtonsWrapper = styled.div`
   display: flex;
@@ -17,7 +18,9 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ConfirmationMessage = () => {
-  const confirm = useSelector<State, Confirmation | undefined>((state) => state.confirmation);
+  const confirm = useSelector<State, Confirmation | undefined>(
+    (state) => state.confirmation
+  );
   const dispatch = useDispatch();
 
   const handleConfirm = () => {
@@ -43,12 +46,12 @@ const ConfirmationMessage = () => {
               <Button
                 onClick={handleCancel}
                 label={t`Cancel`}
-                data-testid={'confirmation-message-cancel'}
+                data-testid={"confirmation-message-cancel"}
               />
               <Button
                 onClick={handleConfirm}
                 label={t`Confirm`}
-                data-testid={'confirmation-message-confirm'}
+                data-testid={"confirmation-message-confirm"}
               />
             </ButtonsWrapper>
           </MessageContent>

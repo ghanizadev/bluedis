@@ -9,7 +9,7 @@ type Props = {
   onChange?: () => void;
   defaultChecked?: boolean;
   checked?: boolean;
-  'data-testid'?: string;
+  "data-testid"?: string;
 };
 
 const Toggle: React.FC<Props> = (props) => {
@@ -23,7 +23,7 @@ const Toggle: React.FC<Props> = (props) => {
           checked={checked}
           defaultChecked={defaultChecked}
           onChange={onChange}
-          data-testid={props["data-testid"] ?? 'toggle-input'}
+          data-testid={props["data-testid"] ?? "toggle-input"}
         />
         <span className="slider round"></span>
       </label>

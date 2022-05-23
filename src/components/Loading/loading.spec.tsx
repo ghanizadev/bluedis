@@ -1,35 +1,36 @@
-import {act, render, screen} from "@testing-library/react";
-import {Provider} from "react-redux";
+import { act, render, screen } from "@testing-library/react";
+import { Provider } from "react-redux";
+
+import { actions, store } from "../../redux/store";
 
 import Loading from "./index";
-import {actions, store} from "../../redux/store";
 
-import '@testing-library/jest-dom/extend-expect';
+import "@testing-library/jest-dom/extend-expect";
 
-describe('<Loading />', () => {
-  it('Should not render', () => {
+describe("<Loading />", () => {
+  it("Should not render", () => {
     const { container } = render(
       <Provider store={store}>
         <Loading />
       </Provider>
-    )
-    
-    expect(container).toBeEmptyDOMElement();
-  })
+    );
 
-  it('Should render', () => {
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("Should render", () => {
     render(
       <Provider store={store}>
         <Loading />
       </Provider>
-    )
-    
+    );
+
     act(() => {
       store.dispatch(actions.setLoading(true));
-    })
+    });
 
-    const input = screen.getByTestId('loading');
+    const input = screen.getByTestId("loading");
 
     expect(input).toBeInTheDocument();
-  })
-})
+  });
+});

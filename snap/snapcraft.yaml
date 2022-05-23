@@ -33,7 +33,7 @@ parts:
     source: .
     override-build: ./build
     build-snaps:
-    - node/17/stable
+    - node/14/stable
     build-packages:
     - unzip
     stage-packages:

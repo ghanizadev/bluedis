@@ -1,5 +1,6 @@
 import Redis from "ioredis";
 import { v4 } from "uuid";
+
 import availableCommands from "./availableCommands.json";
 
 type DBResponse =
@@ -16,13 +17,16 @@ class DatabaseManager {
     password?: string,
     tls = false
   ): void {
-    this._instance = new Redis(`redis${tls ? 's' : ''}://:${password}@${host}:${port}`, {
-      retryStrategy: (times) => {
-        if (times > 3) throw new Error("timeout");
-      },
-      maxRetriesPerRequest: 3,
-      keepAlive: 5
-    });
+    this._instance = new Redis(
+      `redis${tls ? "s" : ""}://:${password}@${host}:${port}`,
+      {
+        retryStrategy: (times) => {
+          if (times > 3) throw new Error("timeout");
+        },
+        maxRetriesPerRequest: 3,
+        keepAlive: 5,
+      }
+    );
   }
 
   public disconnect(): void {
@@ -40,7 +44,7 @@ class DatabaseManager {
 
         this._instance
           .call(
-              c,
+            c,
             ...command
               .slice(c.length)
               .trim()
@@ -53,7 +57,6 @@ class DatabaseManager {
           .catch((e) => {
             return rej(e);
           });
-
 
         return this._instance;
       } catch (e) {
@@ -134,7 +137,10 @@ class DatabaseManager {
     items: { score: string; value: string }[],
     ttl: number | string
   ): Promise<void> {
-    const args: string[] = items.reduce((prev, curr) => [...prev, curr.score, curr.value], [] as string[])
+    const args: string[] = items.reduce(
+      (prev, curr) => [...prev, curr.score, curr.value],
+      [] as string[]
+    );
     await this._instance.zadd(key, ...args);
     await this.addTTL(key, ttl);
   }
@@ -343,19 +349,17 @@ class DatabaseManager {
       const type = await this._instance.type(item);
 
       const value = await (async (): Promise<DBResponse> => {
-        if (type === "string") 
-          return this._instance.get(item);
-          
-        if (type === "hash") 
-          return this._instance.hgetall(item);
-        
-        if (type === "set")
-          return this._instance.smembers(item);
-          
-        if (type === "list") 
-          return this._instance.lrange(item, 0, -1);
-        
-        if (type === "zset") return this._instance.zrange(item, 0, -1, "WITHSCORES")
+        if (type === "string") return this._instance.get(item);
+
+        if (type === "hash") return this._instance.hgetall(item);
+
+        if (type === "set") return this._instance.smembers(item);
+
+        if (type === "list") return this._instance.lrange(item, 0, -1);
+
+        if (type === "zset")
+          return this._instance
+            .zrange(item, 0, -1, "WITHSCORES")
             .then((reply) => {
               const result: { value: string; score: string }[] = [];
 
@@ -367,16 +371,15 @@ class DatabaseManager {
                   score: reply[index + 1],
                 });
               });
-              
+
               return result;
             });
       })();
 
-      const ttl = await this._instance.pttl(item)
-        .then((ttl) => {
-          if (ttl === -1) return -1;
-          return new Date(Date.now() + ttl).getTime()
-        });
+      const ttl = await this._instance.pttl(item).then((ttl) => {
+        if (ttl === -1) return -1;
+        return new Date(Date.now() + ttl).getTime();
+      });
 
       response.value = value;
       response.type = type;
@@ -392,17 +395,32 @@ class DatabaseManager {
     return this._instance.dbsize();
   }
 
-  public async find(match: string, cursor = 0, limit = Number.MAX_SAFE_INTEGER,
-  ): Promise<{ docs: any[]; cursor: number; count: number, input: string, done: boolean }> {
+  public async find(
+    match: string,
+    cursor = 0,
+    limit = Number.MAX_SAFE_INTEGER
+  ): Promise<{
+    docs: any[];
+    cursor: number;
+    count: number;
+    input: string;
+    done: boolean;
+  }> {
     let newCursor = cursor > 0 ? cursor : -1;
     let resultItems: any[] = [];
 
-    while(newCursor !== 0 && resultItems.length <= limit) {
-      if(newCursor === -1) newCursor = 0;
-      
-      const [replyCursor, items] = await this._instance.scan(newCursor, "MATCH", match, 'COUNT', 10);
+    while (newCursor !== 0 && resultItems.length <= limit) {
+      if (newCursor === -1) newCursor = 0;
+
+      const [replyCursor, items] = await this._instance.scan(
+        newCursor,
+        "MATCH",
+        match,
+        "COUNT",
+        10
+      );
       newCursor = +replyCursor;
-      resultItems = [...resultItems, ...items]
+      resultItems = [...resultItems, ...items];
     }
 
     const response = await this.hydrateShallow(resultItems);
@@ -413,18 +431,18 @@ class DatabaseManager {
       input: match,
       count: resultItems.length,
       done: newCursor === 0,
-    }
+    };
   }
 
   public async findAll(
     cursor = 0,
-    limit = Number.MAX_SAFE_INTEGER,
-  ): Promise<{ docs: any[]; cursor: number; count: number, input: string }> {
-    return this.find('*', cursor, limit)
+    limit = Number.MAX_SAFE_INTEGER
+  ): Promise<{ docs: any[]; cursor: number; count: number; input: string }> {
+    return this.find("*", cursor, limit);
   }
 
   public async findByKeys(keys: string[]): Promise<any[]> {
-    console.log(keys.length)
+    console.log(keys.length);
     return this.hydrateItems(keys);
   }
 }

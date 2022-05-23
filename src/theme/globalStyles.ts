@@ -1,7 +1,10 @@
 import { createGlobalStyle } from "styled-components";
+
 import { AppearenceSettings, ColorSchema } from ".";
 
-export const GlobalStyles = createGlobalStyle<{ theme: AppearenceSettings & ColorSchema }>`
+export const GlobalStyles = createGlobalStyle<{
+  theme: AppearenceSettings & ColorSchema;
+}>`
   html, body, #root {
     font-size: ${(props) => props.theme.fontSize};
     font-family: ${(props) => props.theme.fontFamily};
@@ -41,7 +44,7 @@ export const GlobalStyles = createGlobalStyle<{ theme: AppearenceSettings & Colo
 }
 
 a {
-  color: ${props => props.theme.foreground};
+  color: ${(props) => props.theme.foreground};
 }
 
 .switch input {
@@ -75,11 +78,11 @@ a {
 }
 
 input:checked + .slider {
-  background-color: ${ props => props.theme.foreground};
+  background-color: ${(props) => props.theme.foreground};
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px ${ props => props.theme.foreground};
+  box-shadow: 0 0 1px ${(props) => props.theme.foreground};
 }
 
 input:checked + .slider:before {

@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+
 import { actions } from "../../redux/store";
 import { Item } from "../../redux/Types/Item";
 import { State } from "../../redux/Types/State";
@@ -34,13 +35,13 @@ const EditTTL: React.FC = () => {
   const dispatch = useDispatch();
 
   const handleConfirm = () => {
-    if(!item) return;
+    if (!item) return;
     services.setTTL(item.key, ttl);
     dispatch(actions.setEditTTL(undefined));
   };
 
   const handleRemove = () => {
-    if(!item) return;
+    if (!item) return;
     services.removeTTL(item.key);
     dispatch(actions.setEditTTL(undefined));
   };
@@ -66,19 +67,21 @@ const EditTTL: React.FC = () => {
           })
     );
   }, [item]);
-  
+
   return (
     <>
       {item && (
         <>
           <MessageBackground />
-          <MessageContent data-testid={'edit-ttl-container'}>
+          <MessageContent data-testid={"edit-ttl-container"}>
             <h3>{t`Set TTL`}</h3>
-            <small data-testid={'edit-ttl-label'}>{t`Actual`}: {displayTTL}</small>
+            <small data-testid={"edit-ttl-label"}>
+              {t`Actual`}: {displayTTL}
+            </small>
             <Row>
               <span>{t`Absolute TTL`}: </span>
               <Toggle
-                data-testid={'edit-ttl-toggle'}
+                data-testid={"edit-ttl-toggle"}
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
                 }}
@@ -91,7 +94,7 @@ const EditTTL: React.FC = () => {
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
                 style={{ width: ttlAbsolute ? "unset" : "80px" }}
-                data-testid={'edit-ttl-input'}
+                data-testid={"edit-ttl-input"}
                 onChange={handleTTLChange}
               />
             </Row>
@@ -100,17 +103,17 @@ const EditTTL: React.FC = () => {
                 disabled={item?.ttl === -1}
                 label={t`Remove`}
                 onClick={handleRemove}
-                data-testid={'edit-ttl-remove'}
+                data-testid={"edit-ttl-remove"}
               />
               <Button
                 label={t`Cancel`}
                 onClick={handleCancel}
-                data-testid={'edit-ttl-cancel'}
+                data-testid={"edit-ttl-cancel"}
               />
               <Button
                 label={t`Confirm`}
                 onClick={handleConfirm}
-                data-testid={'edit-ttl-confirm'}
+                data-testid={"edit-ttl-confirm"}
               />
             </Row>
           </MessageContent>
