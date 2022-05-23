@@ -15,6 +15,10 @@
     "data",
     "visualization"
   ],
+  "engines": {
+    "node": "14.x",
+    "npm": "7.x"
+  },
   "private": true,
   "main": "dist/main.js",
   "homepage": "./",
@@ -31,17 +35,6 @@
         "darwinDarkModeSupport": true
       },
       "makers": [
-        {
-          "name": "@electron-forge/maker-snap",
-          "config": {
-            "name": "bluedis",
-            "features": {
-              "webgl": true
-            },
-            "description": "A modern Redis client",
-            "summary": "A modern Redis client"
-          }
-        },
         {
           "name": "@electron-forge/maker-squirrel",
           "platforms": [
