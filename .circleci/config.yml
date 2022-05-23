@@ -11,7 +11,7 @@ defaults: &defaults
 jobs:
   setup:
     docker:
-      - image: cimg/node:17.2.0
+      - image: cimg/node:14.19.0
     steps:
       - checkout
       - node/install-packages:
@@ -23,7 +23,7 @@ jobs:
           
   build-app:
     docker:
-      - image: cimg/node:17.2.0
+      - image: cimg/node:14.19.0
     steps:
       - attach_workspace: 
           at: .
@@ -82,7 +82,7 @@ jobs:
 
   test:
     docker:
-      - image: cimg/node:17.2.0
+      - image: cimg/node:14.19.0
     steps:
       - attach_workspace: 
           at: .
