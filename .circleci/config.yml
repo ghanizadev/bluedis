@@ -98,9 +98,3 @@ workflows:
       - build-app:
           requires:
             - test
-      - build-snap:
-          requires:
-            - build-app
-      - release:
-          requires:
-            - build-snap
