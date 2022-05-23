@@ -1,4 +1,4 @@
-import React, {FC} from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 
 const Container = styled.section`
@@ -6,11 +6,7 @@ const Container = styled.section`
 `;
 
 const View: FC<any> = (props) => {
-  return(
-    <Container>
-      {props.children}
-    </Container>
-  )
-}
+  return <Container>{props.children}</Container>;
+};
 
 export default View;

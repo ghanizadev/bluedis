@@ -13,7 +13,7 @@ const Ellipsis = styled.div`
     width: 13px;
     height: 13px;
     border-radius: 50%;
-    background: ${props => props.theme.foreground};
+    background: ${(props) => props.theme.foreground};
     animation-timing-function: cubic-bezier(0, 1, 1, 0);
   }
 

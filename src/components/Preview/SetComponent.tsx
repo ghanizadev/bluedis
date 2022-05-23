@@ -1,12 +1,12 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+
 import {
   addSetMember,
   deleteKey,
   removeSetMember,
 } from "../../services/mainProcess";
 import { Item } from "../../redux/Types/Item";
-import AddSetMember from "./AddSetMember";
-
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
@@ -17,9 +17,10 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
+
+import AddSetMember from "./AddSetMember";
 
 let timeout: NodeJS.Timeout;
 
@@ -35,7 +36,7 @@ const SetComponent: React.FC<Props> = (props) => {
   const [deleting, setDeleting] = React.useState(false);
 
   const dispatch = useDispatch();
-  
+
   const handleAddOpen = () => {
     setItemValue({ isNew: true, value: "New member here..." });
   };
@@ -107,7 +108,9 @@ const SetComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+              timeZoneName: "short",
+            })}`}
         </span>
       </div>
       <PreviewActions>

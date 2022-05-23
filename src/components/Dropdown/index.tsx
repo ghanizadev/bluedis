@@ -34,25 +34,35 @@ const Arrow = styled.span`
 
 type Props = {
   items: string[];
-  onChange ?: (item: string) => void;
+  onChange?: (item: string) => void;
   defaultValue?: string;
   defaultIndex?: number;
-  'data-testid'?: string;
+  "data-testid"?: string;
 };
 
 const Dropdown: React.FC<Props> = (props) => {
   const { items, onChange, defaultValue, defaultIndex } = props;
-  const [v] = useState(() => defaultValue ? defaultValue : items[defaultIndex ?? 0])
-  
+  const [v] = useState(() =>
+    defaultValue ? defaultValue : items[defaultIndex ?? 0]
+  );
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange && onChange(e.target.value);
-  }
-  
+  };
+
   return (
     <Container>
-      <Select onChange={handleChange} defaultValue={v} data-testid={props['data-testid'] ?? 'dropdown-select'}>
+      <Select
+        onChange={handleChange}
+        defaultValue={v}
+        data-testid={props["data-testid"] ?? "dropdown-select"}
+      >
         {items.map((item, index) => {
-          return <Option key={index} value={item}>{item}</Option>;
+          return (
+            <Option key={index} value={item}>
+              {item}
+            </Option>
+          );
         })}
       </Select>
       <Arrow>▾</Arrow>

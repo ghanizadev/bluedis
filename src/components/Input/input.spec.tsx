@@ -1,21 +1,22 @@
-import {render, screen} from "@testing-library/react";
-import {Provider} from "react-redux";
+import { render, screen } from "@testing-library/react";
+import { Provider } from "react-redux";
+
+import { store } from "../../redux/store";
 
 import Input from "./index";
-import {store} from "../../redux/store";
 
-import '@testing-library/jest-dom/extend-expect';
+import "@testing-library/jest-dom/extend-expect";
 
-describe('<Input />', () => {
-  it('Should render', () => {
+describe("<Input />", () => {
+  it("Should render", () => {
     render(
       <Provider store={store}>
         <Input />
       </Provider>
-    )
-    
-    const input = screen.getByRole('textbox');
-    
+    );
+
+    const input = screen.getByRole("textbox");
+
     expect(input).toBeInTheDocument();
-  })
-})
+  });
+});

@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+
 import { t } from "../../i18n";
 import { State } from "../../redux/Types/State";
 import { openLink } from "../../services/mainProcess";

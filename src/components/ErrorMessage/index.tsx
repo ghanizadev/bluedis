@@ -1,13 +1,14 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+
 import Button from "../Button";
 import { actions } from "../../redux/store";
 import { Error } from "../../redux/Types/Error";
 import { State } from "../../redux/Types/State";
 import { MessageContent } from "../common/MessageContent";
 import { MessageBackground } from "../common/MessageBackground";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
 
 const ButtonsWrapper = styled.div`
   display: flex;

@@ -1,9 +1,10 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
-import { store, actions } from "../redux/store";
+import { actions, store } from "../redux/store";
 import { Item } from "../redux/Types/Item";
-import {DarkTheme, defaultAppearanceSettings, LightTheme} from "../theme";
-import {Query} from "../redux/Types/Query";
+import { DarkTheme, LightTheme, defaultAppearanceSettings } from "../theme";
+import { Query } from "../redux/Types/Query";
+
 import services from "./services";
 
 export const close = () => {
@@ -16,6 +17,10 @@ export const minimize = () => {
 
 export const maximize = () => {
   services.send("maximize");
+};
+
+export const fullscreen = () => {
+  services.send("fullscreen");
 };
 
 export const deleteKey = (key: string[]) => {
@@ -154,19 +159,23 @@ export const disconnect = () => {
 };
 
 services.receive("preferences", (event: any, preferences: any) => {
-  const darkTheme = typeof preferences.appearance.darkTheme !== 'undefined'
-    ? preferences.appearance.darkTheme
-    : preferences.appearance.systemTheme === 'dark';
-  
-  preferences && store.dispatch(actions.updatePreferences({
-    ...preferences,
-    appearance: {
-      ...defaultAppearanceSettings,
-      ...preferences.appearance,
-      ...(darkTheme ? DarkTheme : LightTheme),
-      darkTheme,
-    }
-  }));
+  const darkTheme =
+    typeof preferences.appearance.darkTheme !== "undefined"
+      ? preferences.appearance.darkTheme
+      : preferences.appearance.systemTheme === "dark";
+
+  preferences &&
+    store.dispatch(
+      actions.updatePreferences({
+        ...preferences,
+        appearance: {
+          ...defaultAppearanceSettings,
+          ...preferences.appearance,
+          ...(darkTheme ? DarkTheme : LightTheme),
+          darkTheme,
+        },
+      })
+    );
 });
 
 services.receive("setCountDB", (event: any, count: number) => {
@@ -185,20 +194,18 @@ services.receive("keyRemoved", (event: any, key: string[]) => {
   store.dispatch(actions.removeDocument(key));
 });
 
-services.receive("data", (event: any, data: { docs: Item[]; } & Query) => {
-    store.dispatch(actions.setQuery(data));
-    store.dispatch(actions.setData(data.docs));
-    store.dispatch(actions.setConnected(true));
-    store.dispatch(actions.setPreview(undefined));
-    store.dispatch(actions.setLoading(false));
-  }
-);
+services.receive("data", (event: any, data: { docs: Item[] } & Query) => {
+  store.dispatch(actions.setQuery(data));
+  store.dispatch(actions.setData(data.docs));
+  store.dispatch(actions.setConnected(true));
+  store.dispatch(actions.setPreview(undefined));
+  store.dispatch(actions.setLoading(false));
+});
 
-services.receive("loadedData", (event: any, data: { docs: Item[]; } & Query ) => {
-    store.dispatch(actions.setQuery(data));
-    store.dispatch(actions.pushData(data.docs));
-  }
-);
+services.receive("loadedData", (event: any, data: { docs: Item[] } & Query) => {
+  store.dispatch(actions.setQuery(data));
+  store.dispatch(actions.pushData(data.docs));
+});
 
 services.receive("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));
@@ -213,7 +220,7 @@ services.receive("dataPreview", (event: any, doc: any) => {
 });
 
 services.receive("exportedItems", (event: any, response: { docs: any[] }) => {
-  console.log({ response })
+  console.log({ response });
   const items = response.docs.reduce(
     (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
     {}

@@ -1,13 +1,14 @@
 import React from "react";
 import styled from "styled-components";
+
 import Button from "../Button";
 import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import Dropdown from "../Dropdown";
 import Input from "../Input";
 import Toggle from "../Toggle";
-import {t} from "../../i18n";
-import {KeyType} from "../../shared/constants/key-type.dto";
+import { t } from "../../i18n";
+import { KeyType } from "../../shared/constants/key-type.dto";
 
 const Row = styled.div`
   display: flex;
@@ -28,11 +29,7 @@ const Key = styled(Input)`
 
 type Props = {
   onCancel: () => void;
-  onConfirm: (
-    type: KeyType,
-    key: string,
-    ttl: number | string
-  ) => void;
+  onConfirm: (type: KeyType, key: string, ttl: number | string) => void;
 };
 
 const AddKey: React.FC<Props> = (props) => {
@@ -80,7 +77,7 @@ const AddKey: React.FC<Props> = (props) => {
           <Dropdown
             onChange={handleTypeChange}
             items={["set", "zset", "hash", "string", "list"]}
-            data-testid={'add-key-select'}
+            data-testid={"add-key-select"}
           />
         </Row>
         <Row>
@@ -89,7 +86,7 @@ const AddKey: React.FC<Props> = (props) => {
             onChange={() => {
               setUseTTL(!useTTL);
             }}
-            data-testid={'add-key-toggle'}
+            data-testid={"add-key-toggle"}
           />
         </Row>
         {useTTL && (
@@ -110,14 +107,22 @@ const AddKey: React.FC<Props> = (props) => {
                 type={ttlAbsolute ? "datetime-local" : "number"}
                 style={{ width: ttlAbsolute ? "unset" : "80px" }}
                 onChange={handleTTLChange}
-                data-testid={'add-key-ttl'}
+                data-testid={"add-key-ttl"}
               />
             </Row>
           </>
         )}
         <Row style={{ justifyContent: "flex-end" }}>
-          <Button label={t`Cancel`} onClick={handleCancel} data-testid={"add-key-cancel"} />
-          <Button label={t`Confirm`} onClick={handleConfirm} data-testid={"add-key-confirm"} />
+          <Button
+            label={t`Cancel`}
+            onClick={handleCancel}
+            data-testid={"add-key-cancel"}
+          />
+          <Button
+            label={t`Confirm`}
+            onClick={handleConfirm}
+            data-testid={"add-key-confirm"}
+          />
         </Row>
       </MessageContent>
     </>

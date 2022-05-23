@@ -1,8 +1,10 @@
-import React from 'react';
-import Spinner from './Spinner';
+import React from "react";
 import styled from "styled-components";
-import { useSelector } from 'react-redux';
-import { State } from '../../redux/Types/State';
+import { useSelector } from "react-redux";
+
+import { State } from "../../redux/Types/State";
+
+import Spinner from "./Spinner";
 
 const Container = styled.div`
   position: absolute;
@@ -17,17 +19,17 @@ const Container = styled.div`
 `;
 
 const Loading: React.FC = () => {
-  const isLoading = useSelector<State, boolean>(state => state.isLoading);
+  const isLoading = useSelector<State, boolean>((state) => state.isLoading);
 
   return (
     <>
-      {isLoading &&
-        <Container data-testid={'loading'}>
-          <Spinner/>
+      {isLoading && (
+        <Container data-testid={"loading"}>
+          <Spinner />
         </Container>
-      }
+      )}
     </>
   );
-}
+};
 
 export default Loading;

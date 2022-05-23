@@ -1,6 +1,8 @@
-import { ipcMain, app, nativeTheme } from "electron";
-import DatabaseManager from "../database";
+import { app, ipcMain, nativeTheme } from "electron";
+
 import Store from "electron-store";
+
+import DatabaseManager from "../database";
 
 const store = new Store();
 const database = new DatabaseManager();
@@ -34,12 +36,11 @@ ipcMain.on("close", () => {
 ipcMain.on("connect", async (event, options) => {
   try {
     const { host, port, password, tls } = options;
-  
+
     database.connect(host, port, password, tls);
     const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
     event.sender.send("data", docs);
-
-  }catch(e) {
+  } catch (e) {
     return event.sender.send("error", e);
   }
 });
@@ -181,7 +182,11 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
 
 ipcMain.on("wipeData", async (event: any) => {
   store.clear();
-  event.sender.send("preferences", { appearance: { systemTheme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' } });
+  event.sender.send("preferences", {
+    appearance: {
+      systemTheme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
+    },
+  });
   event.sender.send("favorites", []);
 });
 
@@ -191,15 +196,22 @@ ipcMain.on("initial", async (event) => {
 
   event.sender.send("license", license);
 
-  let pref: any = { appearance: { systemTheme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' } };
-  
+  let pref: any = {
+    appearance: {
+      systemTheme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
+    },
+  };
+
   if (preferences) {
     const saved = JSON.parse(preferences as string);
-    pref = { ...saved, appearance: { ...saved.appearance, ...pref.appearance } };
+    pref = {
+      ...saved,
+      appearance: { ...saved.appearance, ...pref.appearance },
+    };
   }
-  
+
   event.sender.send("preferences", pref);
-  
+
   if (favorites)
     event.sender.send("favorites", JSON.parse(favorites as string));
 });

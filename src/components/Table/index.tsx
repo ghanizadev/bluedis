@@ -1,18 +1,19 @@
-import React, {useCallback} from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
-import { Item } from "../../redux/Types/Item";
-
-import { Container } from "./Container";
-import { Header } from "./Header";
-import { Data } from "./Data";
-import { Type } from "./Type";
-import Checkbox from "../Checkbox";
 import { useDispatch, useSelector } from "react-redux";
+
+import Checkbox from "../Checkbox";
+import { Item } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { loadMore } from "../../services/mainProcess";
-import {Query} from "../../redux/Types/Query";
-import {t} from "../../i18n";
+import { Query } from "../../redux/Types/Query";
+import { t } from "../../i18n";
+
+import { Type } from "./Type";
+import { Data } from "./Data";
+import { Header } from "./Header";
+import { Container } from "./Container";
 
 const Row = styled.tr`
   height: 32px;
@@ -23,7 +24,7 @@ const TableContainer = styled.table`
   margin: 0 8px;
   border-spacing: 0;
   border-collapse: collapse;
-  
+
   & th {
     position: sticky;
     top: 0;
@@ -58,7 +59,7 @@ type Props = {
 const Table: React.FC<Props> = (props) => {
   const { data, onItemEdit } = props;
   const dispatch = useDispatch();
-  
+
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
@@ -87,7 +88,10 @@ const Table: React.FC<Props> = (props) => {
           <Row data-testid="home-table-header">
             <Header style={{ width: "40px" }}>
               <Checkbox
-                checked={data.length !== 0 && data.every((item) => selected.includes(item.key))}
+                checked={
+                  data.length !== 0 &&
+                  data.every((item) => selected.includes(item.key))
+                }
                 onChangeValue={() => handleSelect("", { all: true })}
               />
             </Header>
@@ -103,13 +107,15 @@ const Table: React.FC<Props> = (props) => {
                     width: "5%",
                   }}
                 >
-                  <div style={{
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: "center",
-                    justifyContent: 'center'
-                  }}>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Checkbox
                       checked={selected.includes(item.key)}
                       onChangeValue={() => handleSelect(item.key)}

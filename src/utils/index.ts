@@ -1,7 +1,11 @@
-export function dragElement(elmnt:  HTMLElement) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+export function dragElement(elmnt: HTMLElement) {
+  let pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
 
   const element = document.getElementById(elmnt.id + "header");
+
   if (element) {
     element.onmousedown = dragMouseDown;
   } else {
@@ -24,8 +28,8 @@ export function dragElement(elmnt:  HTMLElement) {
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
   }
 
   function closeDragElement() {

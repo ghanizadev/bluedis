@@ -1,5 +1,6 @@
 import React from "react";
-import AddListMember from "./AddListMember";
+import { useDispatch } from "react-redux";
+
 import { Item } from "../../redux/Types/Item";
 import { PreviewActionButton } from "../common/PreviewActionButton";
 import { PreviewActions } from "../common/PreviewActions";
@@ -13,14 +14,14 @@ import {
   deleteKey,
   removeListMember,
 } from "../../services/mainProcess";
-
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
-import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
+
+import AddListMember from "./AddListMember";
 
 let timeout: NodeJS.Timeout;
 

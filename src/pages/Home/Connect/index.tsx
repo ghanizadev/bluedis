@@ -1,14 +1,16 @@
 import React from "react";
 import styled from "styled-components";
 import { nanoid } from "nanoid";
-import { connect, saveFavorites } from "../../../services/mainProcess";
 import { useDispatch, useSelector } from "react-redux";
+
+import { connect, saveFavorites } from "../../../services/mainProcess";
 import { actions, store } from "../../../redux/store";
 import { State } from "../../../redux/Types/State";
 import { Connection } from "../../../redux/Types/Connection";
-import Favorite from "./Favorite";
 import SocialMedia from "../../../components/SocialMedia";
 import { t } from "../../../i18n";
+
+import Favorite from "./Favorite";
 
 const Container = styled.div`
   flex: 1;
@@ -134,8 +136,7 @@ const Connect = () => {
               <input type="password" onChange={handlePasswordChange} />
             </label>
             <label>
-              <input type="checkbox" onChange={handleTLSChange} />
-              {" "}{t`Use TLS`}
+              <input type="checkbox" onChange={handleTLSChange} /> {t`Use TLS`}
             </label>
             <LoginButton onClick={handleConnect}>{t`Connect`}</LoginButton>
           </Form>

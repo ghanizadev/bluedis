@@ -5,4 +5,5 @@ contextBridge.exposeInMainWorld('electron', {
   send: (event, ...args) => ipcRenderer.send(event, ...args),
   invoke: (event, ...args) => ipcRenderer.invoke(event, ...args),
   shell,
+  platform: process.platform,
 });

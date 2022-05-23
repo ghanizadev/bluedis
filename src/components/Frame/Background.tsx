@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const Background = styled.section`
-  background-color: ${props => props.theme.background};
+  background-color: ${(props) => props.theme.background};
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -12,5 +12,5 @@ export const Background = styled.section`
   flex-direction: column;
   box-sizing: border-box;
 
-  color: ${props => props.theme.text};
+  color: ${(props) => props.theme.text};
 `;
