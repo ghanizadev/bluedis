@@ -89,16 +89,17 @@
     "build:electron": "tsc --project tsconfig.app.json",
     "dev:electron": "cross-env NODE_ENV=development electron-forge start",
     "dev:react": "cross-env NODE_ENV=development BROWSER=none react-scripts start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "make": "electron-forge make",
     "pack": "npx gulp pack",
+    "package": "electron-forge package",
     "predev:electron": "npm run build:electron",
-    "start:dev": "npx gulp start-dev",
-    "start:prod": "npx gulp start-prod",
-    "test": "react-scripts test",
-    "lint": "eslint",
     "prepare": "husky install",
     "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "start:dev": "npx gulp start-dev",
+    "start:prod": "npx gulp start-prod",
+    "test": "react-scripts test --watchAll=false --runInBand"
   },
   "eslintConfig": {
     "extends": [
