@@ -1,4 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import styled from "styled-components";
+
+import { ReactComponent as CloseIcon } from "../../assets/close.svg";
+import { State } from "../../redux/Types/State";
+
 import HashComponent from "./HashComponent";
 import ListComponent from "./ListComponent";
 import SetComponent from "./SetComponent";
@@ -6,11 +12,6 @@ import StringComponent from "./StringComponent";
 import ZSetComponent from "./ZSetComponent";
 import { Container } from "./Container";
 import { Header } from "./Header";
-import { useSelector } from "react-redux";
-import styled from "styled-components";
-
-import { ReactComponent as CloseIcon } from "../../assets/close.svg";
-import {State} from "../../redux/Types/State";
 
 const Close = styled.button`
   background-color: transparent;

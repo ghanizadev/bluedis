@@ -1,9 +1,16 @@
-import {Title} from "./Title";
-import {ButtonWrapper} from "./ButtonWrapper";
-import React, {FC} from "react";
-import {close, fullscreen, maximize, minimize} from "../../services/mainProcess";
-import {MacButton} from "./mac-button";
+import React, { FC } from "react";
 import styled from "styled-components";
+
+import {
+  close,
+  fullscreen,
+  maximize,
+  minimize,
+} from "../../services/mainProcess";
+
+import { Title } from "./Title";
+import { ButtonWrapper } from "./ButtonWrapper";
+import { MacButton } from "./mac-button";
 
 export const Bar = styled.div`
   position: relative;
@@ -26,7 +33,7 @@ const TitleWrapper = styled.div`
   align-items: center;
 `;
 
-export const OSXBar: FC<{title?: string}> = ({ title }) => {
+export const OSXBar: FC<{ title?: string }> = ({ title }) => {
   const handleClose = () => {
     close();
   };
@@ -40,20 +47,31 @@ export const OSXBar: FC<{title?: string}> = ({ title }) => {
   };
 
   const handleMaximize = (e: React.MouseEvent) => {
-    if(e.detail === 2)
-      maximize();
+    if (e.detail === 2) maximize();
   };
-  
+
   return (
     <Bar>
       <ButtonWrapper>
-        <MacButton color={"hsl(0,100%,66%)"} data-testid="frame-close" onClick={handleClose}></MacButton>
-        <MacButton color={"hsl(45,100%,50%)"} data-testid="frame-minimize" onClick={handleMinimize}></MacButton>
-        <MacButton color={"hsl(127,98%,40%)"} data-testid="frame-maximize" onClick={handleFullscreen}></MacButton>
+        <MacButton
+          color={"hsl(0,100%,66%)"}
+          data-testid="frame-close"
+          onClick={handleClose}
+        ></MacButton>
+        <MacButton
+          color={"hsl(45,100%,50%)"}
+          data-testid="frame-minimize"
+          onClick={handleMinimize}
+        ></MacButton>
+        <MacButton
+          color={"hsl(127,98%,40%)"}
+          data-testid="frame-maximize"
+          onClick={handleFullscreen}
+        ></MacButton>
       </ButtonWrapper>
       <TitleWrapper onClick={handleMaximize}>
         <Title data-testid={"frame-titlebar"}>{title}</Title>
       </TitleWrapper>
     </Bar>
-  )
-}
+  );
+};

@@ -1,7 +1,6 @@
-
 const mocks = {
-  ipcRenderer: { on: jest.fn(), send: jest.fn() } 
-}
+  ipcRenderer: { on: jest.fn(), send: jest.fn() },
+};
 
 Object.defineProperty(window, "require", {
   writable: true,
@@ -14,25 +13,24 @@ const writeText = jest.fn().mockResolvedValue(null);
 
 const createObjectURL = jest.fn((data: Blob) => {
   return Blob.toString();
-}
-);
+});
 
 Object.defineProperty(window, "URL", {
   writable: true,
   value: {
-    createObjectURL
-  }
-})
+    createObjectURL,
+  },
+});
 
 Object.defineProperty(global.navigator, "clipboard", {
   writable: true,
-  value: {writeText}
-})
+  value: { writeText },
+});
 
 const functions = {
   ...mocks,
   writeText,
-  createObjectURL
-}
+  createObjectURL,
+};
 
 export default functions;

@@ -1,10 +1,12 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { command } from "./comands";
 import { executeCommand } from "../../services/mainProcess";
+
+import { command } from "./comands";
 import availableCommands from "./availableCommands.json";
 
 export const Background = styled.div`
@@ -81,6 +83,7 @@ const Shell: React.FC = () => {
   ) => {
     if (event.key === "Enter" && inputRef.current) {
       const value = inputRef.current.value;
+
       if (!value) return;
 
       inputRef.current.value = "";
@@ -113,9 +116,9 @@ const Shell: React.FC = () => {
     inputRef.current.disabled = false;
     inputRef.current.focus();
     const div = document.querySelector("#terminal");
-    
-    if(!div) throw new Error('shell container not found');
-    
+
+    if (!div) throw new Error("shell container not found");
+
     div.scrollTo({ top: div.scrollTop, behavior: "smooth" });
   }, [terminal.stdout]);
 

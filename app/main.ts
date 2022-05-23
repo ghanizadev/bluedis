@@ -1,92 +1,101 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, screen, nativeImage } from "electron";
+import {
+  BrowserWindow,
+  app,
+  globalShortcut,
+  ipcMain,
+  nativeImage,
+  screen,
+} from "electron";
 import path from "path";
+
 import dotenv from "dotenv";
 
 import { updater } from "./updater";
 
 import "./listeners";
 
-dotenv.config({ path: '../' });
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+dotenv.config({ path: "../" });
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 updater();
 
 if (require("electron-squirrel-startup")) {
-    app.quit();
+  app.quit();
 }
 
 let mainWindow: BrowserWindow;
 
-const icon = (function() {
-  const ext = process.platform === 'darwin'
-    ? "icns"
-    : process.platform === 'linux'
-    ? "png"
-    : "ico"
-  
-  const iconPath = path.resolve(app.getAppPath(), 'assets', 'icon.' + ext);
+const icon = (function () {
+  const ext =
+    process.platform === "darwin"
+      ? "icns"
+      : process.platform === "linux"
+      ? "png"
+      : "ico";
+
+  const iconPath = path.resolve(app.getAppPath(), "assets", "icon." + ext);
   return nativeImage.createFromPath(iconPath);
 })();
 
-process.platform === 'darwin' && app.dock.setIcon(icon);
+process.platform === "darwin" && app.dock.setIcon(icon);
 
 const HEIGHT = 800;
 const WIDTH = 1200;
 
 const createWindow = async (): Promise<void> => {
-    mainWindow = new BrowserWindow({
-        height: HEIGHT,
-        width: WIDTH,
-        minHeight: HEIGHT,
-        minWidth: WIDTH,
-        frame: false,
-        transparent: true,
-        icon,
-        webPreferences: {
-          preload: path.resolve(__dirname, 'preload.js'),
-          nodeIntegration: true,
-          contextIsolation: true,
-        },
-    });
+  mainWindow = new BrowserWindow({
+    height: HEIGHT,
+    width: WIDTH,
+    minHeight: HEIGHT,
+    minWidth: WIDTH,
+    frame: false,
+    transparent: true,
+    icon,
+    webPreferences: {
+      preload: path.resolve(__dirname, "preload.js"),
+      nodeIntegration: true,
+      contextIsolation: true,
+    },
+  });
 
   globalShortcut.register("F5", () => {
-        process.env.NODE_ENV === "development" && mainWindow.reload();
-    });
+    process.env.NODE_ENV === "development" && mainWindow.reload();
+  });
 
-    globalShortcut.register("F6", () => {
-        process.env.NODE_ENV === "development" &&
-        mainWindow.webContents.toggleDevTools();
-    });
+  globalShortcut.register("F6", () => {
+    process.env.NODE_ENV === "development" &&
+      mainWindow.webContents.toggleDevTools();
+  });
 
-    if (process.env.NODE_ENV === "development") {
-        mainWindow.loadURL("http://localhost:3000");
-    } else {
-        mainWindow.loadFile(path.resolve(__dirname, "app", "index.html"));
-    }
+  if (process.env.NODE_ENV === "development") {
+    mainWindow.loadURL("http://localhost:3000");
+  } else {
+    mainWindow.loadFile(path.resolve(__dirname, "app", "index.html"));
+  }
 
-    process.on("uncaughtException", (error) => {
-        mainWindow.webContents.send("error", error);
-    });
+  process.on("uncaughtException", (error) => {
+    mainWindow.webContents.send("error", error);
+  });
 };
 
 app.on("ready", createWindow);
 
 ipcMain.on("minimize", () => {
-    mainWindow.minimize();
+  mainWindow.minimize();
 });
 
 ipcMain.on("maximize", () => {
-    if (!mainWindow.isMaximized()) mainWindow.maximize();
-    else {
-        const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  if (!mainWindow.isMaximized()) mainWindow.maximize();
+  else {
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-        mainWindow.setBounds({
-            x: width / 2 - (WIDTH / 2),
-            y: height / 2 - (HEIGHT / 2),
-            width: WIDTH,
-            height: HEIGHT,
-        });
-    }
+    mainWindow.setBounds({
+      x: width / 2 - WIDTH / 2,
+      y: height / 2 - HEIGHT / 2,
+      width: WIDTH,
+      height: HEIGHT,
+    });
+  }
 });
 
 ipcMain.on("fullscreen", () => {
@@ -94,17 +103,17 @@ ipcMain.on("fullscreen", () => {
 });
 
 app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 app.on("will-quit", () => {
-    globalShortcut.unregisterAll();
+  globalShortcut.unregisterAll();
 });
 
 app.on("activate", async () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        await createWindow();
-    }
+  if (BrowserWindow.getAllWindows().length === 0) {
+    await createWindow();
+  }
 });

@@ -1,11 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+
 import Button from "../Button";
 import Dropdown from "../Dropdown";
 import Input from "../Input";
-
 import { find, selectDatabase } from "../../services/mainProcess";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -46,6 +46,7 @@ const Search = () => {
 
   const handleDatabaseChange = (item: string) => {
     const value = databases.find((db) => db.name === item)?.value;
+
     if (typeof value === "number") selectDatabase(value);
   };
 

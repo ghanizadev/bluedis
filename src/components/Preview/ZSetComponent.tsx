@@ -1,5 +1,6 @@
 import React from "react";
-import AddOrderedItem from "./AddOrderedItem";
+import { useDispatch } from "react-redux";
+
 import { Item } from "../../redux/Types/Item";
 import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewActions } from "../common/PreviewActions";
@@ -12,14 +13,14 @@ import {
   deleteKey,
   removeZSetMember,
 } from "../../services/mainProcess";
-
 import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
+
+import AddOrderedItem from "./AddOrderedItem";
 
 let timeout: NodeJS.Timeout;
 
@@ -38,7 +39,7 @@ const ZSetComponent: React.FC<Props> = (props) => {
   const [deleting, setDeleting] = React.useState(false);
 
   const dispatch = useDispatch();
-  
+
   const handleAddOpen = () => {
     setItemValue({ isNew: true, score: "0", value: t`New value here...` });
   };
@@ -121,7 +122,9 @@ const ZSetComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+              timeZoneName: "short",
+            })}`}
         </span>
       </div>
       <PreviewActions>

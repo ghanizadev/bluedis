@@ -6,4 +6,4 @@ export default {
   receive,
   send,
   shell,
-}
+};

@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
+
 import Frame from "./components/Frame";
 import Home from "./pages/Home";
 import { State } from "./redux/Types/State";
@@ -14,41 +15,43 @@ import ErrorMessage from "./components/ErrorMessage";
 import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";
 import Loading from "./components/Loading";
-import {Appearance} from "./redux/Types/Appearance";
-import {t} from "./i18n";
+import { Appearance } from "./redux/Types/Appearance";
+import { t } from "./i18n";
 
 const App = () => {
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
-  const appearance = useSelector<State, Appearance>((state) => state.settings.appearance);
+  const appearance = useSelector<State, Appearance>(
+    (state) => state.settings.appearance
+  );
 
   React.useEffect(() => {
     getPreferences();
-    console.log(t`something that ${9 + 2} needs to be translated ${9 + 2}`)
+    console.log(t`something that ${9 + 2} needs to be translated ${9 + 2}`);
   }, []);
 
   return (
-      <ThemeProvider theme={appearance}>
-        <Frame>
-          <div
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: "row",
-            }}
-          >
-            <Sidebar />
-            {currentPage === "home" && <Home />}
-            {currentPage === "settings" && <Settings />}
-            {currentPage === "help" && <Help />}
-          </div>
-        </Frame>
-        <GlobalStyles />
-        <EditTTL />
-        <ErrorMessage />
-        <ConfirmationMessage />
-        <Loading />
-      </ThemeProvider>
+    <ThemeProvider theme={appearance}>
+      <Frame>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          <Sidebar />
+          {currentPage === "home" && <Home />}
+          {currentPage === "settings" && <Settings />}
+          {currentPage === "help" && <Help />}
+        </div>
+      </Frame>
+      <GlobalStyles />
+      <EditTTL />
+      <ErrorMessage />
+      <ConfirmationMessage />
+      <Loading />
+    </ThemeProvider>
   );
 };
 

@@ -1,4 +1,5 @@
-import React, {FC, useEffect} from "react";
+import React, { FC, useEffect } from "react";
+
 import { Input } from "./Input";
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
   onChangeValue?: (value: boolean) => void;
   defaultChecked?: boolean;
   checked?: boolean;
-  'data-testid'?: string;
+  "data-testid"?: string;
 };
 
 const Checkbox: FC<Props> = (props) => {
@@ -25,9 +26,9 @@ const Checkbox: FC<Props> = (props) => {
   }, [props.checked]);
 
   return (
-    <label data-testid={'checkbox-label'}>
+    <label data-testid={"checkbox-label"}>
       <Input
-        data-testid={props['data-testid'] ?? 'checkbox-input'}
+        data-testid={props["data-testid"] ?? "checkbox-input"}
         checked={checked}
         onClick={handleChecked}
       >

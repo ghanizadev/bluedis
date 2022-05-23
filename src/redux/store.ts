@@ -1,13 +1,19 @@
-import {configureStore, createSlice, getDefaultMiddleware, PayloadAction,} from "@reduxjs/toolkit";
-import {Appearance} from "./Types/Appearance";
-import {Confirmation} from "./Types/Confirmation";
-import {Connection} from "./Types/Connection";
-import {Error} from "./Types/Error";
-import {Item} from "./Types/Item";
-import {Page} from "./Types/Page";
-import {State} from "./Types/State";
-import {Query} from "./Types/Query";
-import {Region} from "./Types/Region";
+import {
+  PayloadAction,
+  configureStore,
+  createSlice,
+  getDefaultMiddleware,
+} from "@reduxjs/toolkit";
+
+import { Appearance } from "./Types/Appearance";
+import { Confirmation } from "./Types/Confirmation";
+import { Connection } from "./Types/Connection";
+import { Error } from "./Types/Error";
+import { Item } from "./Types/Item";
+import { Page } from "./Types/Page";
+import { State } from "./Types/State";
+import { Query } from "./Types/Query";
+import { Region } from "./Types/Region";
 
 const initialState: State = {
   currentTotalDocs: 0,
@@ -38,7 +44,7 @@ const initialState: State = {
   connected: false,
   favorites: [],
   lastRefresh: new Date(),
-  query: { input: '*', cursor: 0, count: 0, done: false },
+  query: { input: "*", cursor: 0, count: 0, done: false },
 };
 
 const slice = createSlice({

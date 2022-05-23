@@ -6,7 +6,7 @@ export const Container = styled.button`
   padding: 5px 8px;
   margin: 0 5px;
 
-  background-color: ${props => props.theme.foreground};
+  background-color: ${(props) => props.theme.foreground};
 
   &:hover {
     filter: brightness(0.95);

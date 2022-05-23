@@ -1,15 +1,17 @@
-import {Title} from "./Title";
-import {ButtonWrapper} from "./ButtonWrapper";
-import {Resize} from "./Resize";
-import {ReactComponent as MinimizeIcon} from "../../assets/minus.svg";
-import {ReactComponent as MaximizeIcon} from "../../assets/square.svg";
-import {Close} from "./Close";
-import {ReactComponent as CloseIcon} from "../../assets/close.svg";
-import {Bar} from "./Bar";
-import React, {FC} from "react";
-import {close, maximize, minimize} from "../../services/mainProcess";
+import React, { FC } from "react";
 
-export const WindowsBar: FC<{title?: string}> = ({ title }) => {
+import { ReactComponent as MinimizeIcon } from "../../assets/minus.svg";
+import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
+import { ReactComponent as CloseIcon } from "../../assets/close.svg";
+import { close, maximize, minimize } from "../../services/mainProcess";
+
+import { Title } from "./Title";
+import { ButtonWrapper } from "./ButtonWrapper";
+import { Resize } from "./Resize";
+import { Close } from "./Close";
+import { Bar } from "./Bar";
+
+export const WindowsBar: FC<{ title?: string }> = ({ title }) => {
   const handleClose = () => {
     close();
   };
@@ -22,17 +24,9 @@ export const WindowsBar: FC<{title?: string}> = ({ title }) => {
     maximize();
   };
 
-  const handleDoubleClickMaximize = (e: React.MouseEvent) => {
-    if(e.detail === 2)
-      maximize();
-  };
-  
   return (
     <Bar>
-      <div
-        onClick={handleDoubleClickMaximize}
-        style={{ display: "flex", flex: 1 }}
-      >
+      <div style={{ display: "flex", flex: 1 }}>
         <img
           src={process.env.PUBLIC_URL + "/icon.png"}
           alt=""
@@ -52,5 +46,5 @@ export const WindowsBar: FC<{title?: string}> = ({ title }) => {
         </Close>
       </ButtonWrapper>
     </Bar>
-  )
-}
+  );
+};

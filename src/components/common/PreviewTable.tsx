@@ -1,4 +1,4 @@
-import styled from  "styled-components";
+import styled from "styled-components";
 
 export const PreviewTable = styled.table`
   padding: 8px;

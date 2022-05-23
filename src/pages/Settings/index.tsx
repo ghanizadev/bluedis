@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import Dropdown from "../../components/Dropdown";
 import Input from "../../components/Input";
 import Toggle from "../../components/Toggle";
@@ -8,14 +9,15 @@ import { Settings as ISettings } from "../../redux/Types/Settings";
 import { actions, store } from "../../redux/store";
 import { savePreferences, wipeData } from "../../services/mainProcess";
 import Button from "../../components/Button";
+import { DarkTheme, LightTheme } from "../../theme";
+import { t } from "../../i18n";
+import { AppearanceFont } from "../../redux/Types/Appearance";
+
 import { Container } from "./Container";
 import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
-import {DarkTheme, LightTheme} from "../../theme";
-import { t } from "../../i18n";
-import {FONTS, LANGUAGES} from "./settings.constants";
-import {AppearanceFont} from "../../redux/Types/Appearance";
+import { FONTS, LANGUAGES } from "./settings.constants";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -26,11 +28,11 @@ const Settings = () => {
   const saveChanges = () => {
     const settings = store.getState().settings;
     savePreferences(settings);
-  }
+  };
 
   const handleDarkModeChange = () => {
     const darkTheme = !settings.appearance.darkTheme;
-    
+
     dispatch(
       actions.changeAppearance({
         ...settings.appearance,
@@ -43,9 +45,10 @@ const Settings = () => {
   };
 
   const handleLanguageChange = (value: string) => {
-    const language = LANGUAGES.find(l => l.label === value)?.value;
-    if(language === undefined) return;
-    
+    const language = LANGUAGES.find((l) => l.label === value)?.value;
+
+    if (language === undefined) return;
+
     dispatch(
       actions.changeRegion({
         ...settings.region,
@@ -54,7 +57,7 @@ const Settings = () => {
     );
     saveChanges();
   };
-  
+
   const handleFontFamilyChange = (value: string) => {
     dispatch(
       actions.changeAppearance({
@@ -66,7 +69,7 @@ const Settings = () => {
   };
 
   const changeFont = () => {
-    if(!fontSizeRef.current) return;
+    if (!fontSizeRef.current) return;
 
     const value = fontSizeRef.current.value.match(/\d+/)?.join("");
 
@@ -77,25 +80,29 @@ const Settings = () => {
       })
     );
     saveChanges();
-  }
+  };
 
   const handleFontSizeChange = () => {
     changeFont();
   };
 
-  const handleFontSizeChangeOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.key === "Enter") changeFont();
+  const handleFontSizeChangeOnEnter = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") changeFont();
   };
 
   const handleWipeData = () => {
-    dispatch(actions.setConfirmation({
-      title: t`Confirmation`,
-      message: t`Do you really want to wipe all stored data? This includes all your preferences and favorites`,
-      onConfirm: () => {
-        wipeData();
-      }
-    }))
-  }
+    dispatch(
+      actions.setConfirmation({
+        title: t`Confirmation`,
+        message: t`Do you really want to wipe all stored data? This includes all your preferences and favorites`,
+        onConfirm: () => {
+          wipeData();
+        },
+      })
+    );
+  };
 
   return (
     <Container>
@@ -108,7 +115,7 @@ const Settings = () => {
             <Dropdown
               defaultIndex={settings.region.language}
               onChange={handleLanguageChange}
-              items={LANGUAGES.map(({label})=> label)}
+              items={LANGUAGES.map(({ label }) => label)}
             />
           </span>
         </Row>
@@ -125,7 +132,11 @@ const Settings = () => {
         <Row>
           <span>{t`Font`}</span>
           <span>
-            <Dropdown defaultValue={settings.appearance.fontFamily} onChange={handleFontFamilyChange} items={FONTS} />
+            <Dropdown
+              defaultValue={settings.appearance.fontFamily}
+              onChange={handleFontFamilyChange}
+              items={FONTS}
+            />
           </span>
         </Row>
         <Row>
@@ -148,12 +159,10 @@ const Settings = () => {
             <Button label={t`Wipe data`} onClick={handleWipeData} />
           </span>
         </Row>
-        {
-        /**
+        {/**
          * Set DB: quantity and name
          * fetch data => load step = 10
-         */
-         }
+         */}
       </Content>
     </Container>
   );

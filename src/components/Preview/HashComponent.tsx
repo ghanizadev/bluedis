@@ -1,5 +1,6 @@
 import React from "react";
-import AddHashItem from "./AddHashItem";
+import { useDispatch } from "react-redux";
+
 import { PreviewActionButton } from "../common/PreviewActionButton";
 import { PreviewActions } from "../common/PreviewActions";
 import { PreviewContainer } from "../common/PreviewContainer";
@@ -9,17 +10,17 @@ import { PreviewTableRow } from "../common/PreviewTableRow";
 import { Item } from "../../redux/Types/Item";
 import {
   addHashMember,
-  removeHashMember,
   deleteKey,
+  removeHashMember,
 } from "../../services/mainProcess";
-
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
 import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
 import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
-import { useDispatch } from "react-redux";
 import { actions } from "../../redux/store";
-import {t} from "../../i18n";
+import { t } from "../../i18n";
+
+import AddHashItem from "./AddHashItem";
 
 let timeout: NodeJS.Timeout;
 
@@ -108,7 +109,9 @@ const HashComponent: React.FC<Props> = (props) => {
       <div>
         <span>
           {ttl !== -1 &&
-            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, { timeZoneName: "short" })}`}
+            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+              timeZoneName: "short",
+            })}`}
         </span>
       </div>
       <PreviewActions>

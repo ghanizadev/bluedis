@@ -1,17 +1,24 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Table from "../../components/Table";
 import styled from "styled-components";
+
+import Table from "../../components/Table";
 import Search from "../../components/Search";
 import { Item } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-import {updateData, addKey, updatePreview, getDBCount} from "../../services/mainProcess";
+import {
+  addKey,
+  getDBCount,
+  updateData,
+  updatePreview,
+} from "../../services/mainProcess";
 import AddKey from "../../components/AddKey";
-import Connect from "./Connect";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
+
+import Connect from "./Connect";
 
 const Content = styled.div`
   width: 100%;
@@ -28,7 +35,9 @@ const Wrapper = styled.div`
 
 const Home = () => {
   const data = useSelector<State, Item[]>((state) => state.data);
-  const preview = useSelector<State, Item | undefined>((state) => state.preview);
+  const preview = useSelector<State, Item | undefined>(
+    (state) => state.preview
+  );
   const connected = useSelector<State, boolean>((state) => state.connected);
 
   const [addItem, setAddItem] = React.useState(false);
@@ -71,7 +80,7 @@ const Home = () => {
 
   React.useEffect(() => {
     connected && getDBCount();
-  }, [data, connected])
+  }, [data, connected]);
 
   return (
     <>

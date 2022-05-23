@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 export const TypeInfo = styled.div`
-  background-color: ${props => props.theme.text};
-  color: ${props => props.theme.background};
+  background-color: ${(props) => props.theme.text};
+  color: ${(props) => props.theme.background};
   width: 60px;
   text-align: center;
   font-weight: bold;

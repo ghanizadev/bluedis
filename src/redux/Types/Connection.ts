@@ -1,5 +1,5 @@
 export interface Connection {
-  name?: string,
+  name?: string;
   id: string;
   host: string;
   port: string;

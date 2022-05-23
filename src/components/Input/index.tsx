@@ -6,8 +6,8 @@ const Input = styled.input`
   margin: 0 5px;
   border: none;
   background-color: transparent !important;
-  border-bottom: 2px solid ${({theme}) => theme.foreground};
-  color: ${({theme}) => theme.text};
+  border-bottom: 2px solid ${({ theme }) => theme.foreground};
+  color: ${({ theme }) => theme.text};
 `;
 
 export default Input;

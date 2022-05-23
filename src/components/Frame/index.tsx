@@ -1,23 +1,17 @@
 import React, { FC, useEffect } from "react";
-import { Background } from "./Background";
-import { Bar } from "./Bar";
-import { Close } from "./Close";
-import { Resize } from "./Resize";
-import { WorkingArea } from "./WorkingArea";
-import { Title } from "./Title";
-import { close, maximize, minimize } from "../../services/mainProcess";
-import { ButtonWrapper } from "./ButtonWrapper";
-
-import { ReactComponent as CloseIcon } from "../../assets/close.svg";
-import { ReactComponent as MinimizeIcon } from "../../assets/minus.svg";
-import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
 import { useSelector } from "react-redux";
+
 import { State } from "../../redux/Types/State";
 import { Connection } from "../../redux/Types/Connection";
-import {OSXBar} from "./osx-bar";
-import {WindowsBar} from "./windows-bar";
 
-const Frame: FC<{children?: React.ReactNode | React.ReactNode[]}> = (props) => {
+import { WorkingArea } from "./WorkingArea";
+import { Background } from "./Background";
+import { OSXBar } from "./osx-bar";
+import { WindowsBar } from "./windows-bar";
+
+const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
+  props
+) => {
   const connected = useSelector<State, boolean>((state) => state.connected);
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection
@@ -27,50 +21,61 @@ const Frame: FC<{children?: React.ReactNode | React.ReactNode[]}> = (props) => {
   );
   const [host, setHost] = React.useState("");
   const [name, setName] = React.useState("");
-  
+
   const formatName = (name: string) => {
     if (name.length > 30) {
       return ` | [${name.slice(0, 12)}...${name.slice(-12)}]`;
     } else {
       return ` | [${name}]`;
     }
-  }
-  
+  };
+
   useEffect(() => {
-    if(!connection || !connected) {
+    if (!connection || !connected) {
       setHost("");
       setName("");
       return;
     }
-    
+
     if (connection.host.length > 30) {
       setHost(
-        ` - redis${connection.tls ? 's' : ''}://${connection.host.slice(0, 12)}...${connection.host.slice(
-          -12
-        )}:${connection.port}`
+        ` - redis${connection.tls ? "s" : ""}://${connection.host.slice(
+          0,
+          12
+        )}...${connection.host.slice(-12)}:${connection.port}`
       );
     } else {
-      setHost(` - redis${connection.tls ? 's' : ''}://${connection.host}:${connection.port}`);
+      setHost(
+        ` - redis${connection.tls ? "s" : ""}://${connection.host}:${
+          connection.port
+        }`
+      );
     }
-    
-    if(!connection.name) {
-      const conn = favorites.find(fav => {
-        return fav.host === connection.host
-        && fav.port === connection.port
-        && fav.password === connection.password
-        && fav.tls === connection.tls
+
+    if (!connection.name) {
+      const conn = favorites.find((fav) => {
+        return (
+          fav.host === connection.host &&
+          fav.port === connection.port &&
+          fav.password === connection.password &&
+          fav.tls === connection.tls
+        );
       });
-      
-      if(conn) setName(formatName(conn.name ?? ""));
+
+      if (conn) setName(formatName(conn.name ?? ""));
     } else {
-      setName(formatName(connection.name))
+      setName(formatName(connection.name));
     }
-  }, [connection, favorites, connected])
+  }, [connection, favorites, connected]);
 
   return (
     <Background data-testid="frame">
-      {window.electron.platform === 'darwin' && <OSXBar title={`Bluedis ${host}${name}`} />}
-      {window.electron.platform === 'windows' && <WindowsBar title={`Bluedis ${host}${name}`} />}
+      {window.electron.platform === "darwin" && (
+        <OSXBar title={`Bluedis ${host}${name}`} />
+      )}
+      {window.electron.platform !== "darwin" && (
+        <WindowsBar title={`Bluedis ${host}${name}`} />
+      )}
       <WorkingArea>{props.children}</WorkingArea>
     </Background>
   );

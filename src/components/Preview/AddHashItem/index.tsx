@@ -1,17 +1,18 @@
 import React from "react";
+
 import Button from "../../Button";
 import { MessageButtonWrapper } from "../../common/MessageButtonWrapper";
 import { TextArea } from "../../TextArea";
-import { Label } from "./Label";
-import { Input } from "./Input";
 import { MessageContent } from "../../common/MessageContent";
 import { MessageBackground } from "../../common/MessageBackground";
 import { PreviewActions } from "../../common/PreviewActions";
 import { PreviewActionButton } from "../../common/PreviewActionButton";
-
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
-import {t} from "../../../i18n";
+import { t } from "../../../i18n";
+
+import { Input } from "./Input";
+import { Label } from "./Label";
 
 type Props = {
   onSubmit: (value: { key: string; value: string }) => void;
@@ -67,7 +68,10 @@ const AddHashItem: React.FC<Props> = (props) => {
         </Label>
         <Label>
           {t`Value`}: <br />
-          <TextArea ref={textAreaRef} defaultValue={item?.value || t`New item here...`} />
+          <TextArea
+            ref={textAreaRef}
+            defaultValue={item?.value || t`New item here...`}
+          />
         </Label>
         {!newItem && (
           <PreviewActions>
