@@ -29,6 +29,10 @@ class DatabaseManager {
     );
   }
 
+  public async isConnected() {
+    return (await this._instance.ping()) === "PONG";
+  }
+
   public disconnect(): void {
     this._instance.quit();
   }
