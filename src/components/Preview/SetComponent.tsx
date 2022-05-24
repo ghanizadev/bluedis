@@ -1,31 +1,22 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 
 import {
   addSetMember,
-  deleteKey,
+  alterSetMember,
   removeSetMember,
 } from "../../services/mainProcess";
-import { Item } from "../../redux/Types/Item";
-import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
-import { ReactComponent as CopyIcon } from "../../assets/clipboard.svg";
-import { ReactComponent as TTLIcon } from "../../assets/clock.svg";
-import { PreviewActionButton } from "../common/PreviewActionButton";
-import { PreviewActions } from "../common/PreviewActions";
+import { Item, SetType } from "../../redux/Types/Item";
 import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { actions } from "../../redux/store";
 import { t } from "../../i18n";
 
 import AddSetMember from "./AddSetMember";
-
-let timeout: NodeJS.Timeout;
+import { PreviewActions } from "./preview-actions";
 
 type Props = {
-  item: Item;
+  item: Item<SetType>;
 };
 const SetComponent: React.FC<Props> = (props) => {
   const { value, key, ttl } = props.item;
@@ -33,42 +24,22 @@ const SetComponent: React.FC<Props> = (props) => {
     isNew: boolean;
     value: string;
   }>();
-  const [deleting, setDeleting] = React.useState(false);
-
-  const dispatch = useDispatch();
 
   const handleAddOpen = () => {
     setItemValue({ isNew: true, value: "New member here..." });
   };
 
-  const handleItemSubmit = (oldValue: string, value: string) => {
-    if (oldValue) removeSetMember(key, oldValue);
+  const handleItemSubmit = (value: string) => {
+    if (!itemValue) return;
 
-    addSetMember(key, value);
+    if (!itemValue.isNew) alterSetMember(key, itemValue.value, value);
+    else addSetMember(key, value);
+
     setItemValue(undefined);
   };
 
   const handleItemClose = () => {
     setItemValue(undefined);
-  };
-
-  const handleDocumentCopy = () => {
-    const text = JSON.stringify({ [key]: value });
-    navigator.clipboard.writeText(text);
-  };
-
-  const handleDocumentDelete = () => {
-    setDeleting(true);
-
-    timeout = setTimeout(() => {
-      setDeleting(false);
-      deleteKey([key]);
-    }, 1000);
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleting(false);
-    clearTimeout(timeout);
   };
 
   const handleMemberDelete = (value: string) => {
@@ -80,13 +51,9 @@ const SetComponent: React.FC<Props> = (props) => {
     setItemValue({ isNew: false, value: item });
   };
 
-  const handleTTLOpen = () => {
-    dispatch(actions.setEditTTL(props.item));
-  };
-
   return (
     <>
-      <PreviewContainer>
+      <PreviewContainer data-testid={"set-preview"}>
         <PreviewTable>
           <tbody>
             <tr>
@@ -105,48 +72,17 @@ const SetComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
-      <div>
-        <span>
-          {ttl !== -1 &&
-            t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
-              timeZoneName: "short",
-            })}`}
-        </span>
-      </div>
-      <PreviewActions>
-        <PreviewActionButton
-          data-testid="item-add"
-          title={t`Add Item`}
-          onClick={handleAddOpen}
-        >
-          <AddIcon />
-        </PreviewActionButton>
-        <PreviewActionButton
-          data-testid="item-copy"
-          title={t`Copy key as JSON`}
-          onClick={handleDocumentCopy}
-        >
-          <CopyIcon />
-        </PreviewActionButton>
-        <PreviewActionButton
-          data-testid="item-ttl"
-          title={t`Edit TTL`}
-          onClick={handleTTLOpen}
-        >
-          <TTLIcon />
-        </PreviewActionButton>
-        <PreviewActionButton
-          title={t`Remove key`}
-          data-testid="item-remove"
-          remove
-          inAction={deleting}
-          onMouseUp={handleDeleteCancel}
-          onMouseDown={handleDocumentDelete}
-          onMouseLeave={handleDeleteCancel}
-        >
-          <RemoveIcon />
-        </PreviewActionButton>
-      </PreviewActions>
+      <span data-testid={"set-ttl"}>
+        {ttl !== -1 &&
+          t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
+            timeZoneName: "short",
+          })}`}
+      </span>
+      <PreviewActions
+        item={props.item}
+        onAddClick={handleAddOpen}
+        data-testid={"set-actions"}
+      />
       {!!itemValue && (
         <AddSetMember
           onDelete={handleMemberDelete}

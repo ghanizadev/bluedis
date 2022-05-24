@@ -2,13 +2,13 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 
 import "@testing-library/jest-dom/extend-expect";
-import { Item } from "../../../redux/Types/Item";
+import { ItemType } from "../../../redux/Types/Item";
 import { store } from "../../../redux/store";
 import services from "../../../services/services";
 
 import { PreviewActions } from "./index";
 
-const ITEM: Item = {
+const ITEM: ItemType = {
   value: {
     firstKey: "first element",
     secondKey: "second element",

@@ -7,8 +7,9 @@ import { ReactComponent as AddIcon } from "../../../assets/plus.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
 import { ReactComponent as TTLIcon } from "../../../assets/clock.svg";
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
+import { ReactComponent as SaveIcon } from "../../../assets/save.svg";
 import { deleteKey } from "../../../services/mainProcess";
-import { Item } from "../../../redux/Types/Item";
+import { ItemType } from "../../../redux/Types/Item";
 import { actions } from "../../../redux/store";
 
 import { Container } from "./container";
@@ -16,13 +17,14 @@ import { Container } from "./container";
 let timeout: NodeJS.Timeout;
 
 export interface PreviewActionsProps {
-  item: Item;
-  onAddClick: () => void;
+  item: ItemType;
+  onAddClick?: () => void;
+  onSaveClick?: () => void;
   "data-testid"?: string;
 }
 
 export const PreviewActions: FC<PreviewActionsProps> = (props) => {
-  const { item, onAddClick } = props;
+  const { item, onAddClick, onSaveClick } = props;
 
   const [deleting, setDeleting] = React.useState(false);
   const dispatch = useDispatch();
@@ -47,7 +49,11 @@ export const PreviewActions: FC<PreviewActionsProps> = (props) => {
   };
 
   const handleAddOpen = () => {
-    onAddClick();
+    onAddClick && onAddClick();
+  };
+
+  const handleItemSave = () => {
+    onSaveClick && onSaveClick();
   };
 
   const handleTTLOpen = () => {
@@ -58,13 +64,24 @@ export const PreviewActions: FC<PreviewActionsProps> = (props) => {
     <Container
       data-testid={props["data-testid"] ?? "preview-actions-container"}
     >
-      <PreviewActionButton
-        data-testid="item-add"
-        title={t`Add new member`}
-        onClick={handleAddOpen}
-      >
-        <AddIcon />
-      </PreviewActionButton>
+      {onAddClick && (
+        <PreviewActionButton
+          data-testid="item-add"
+          title={t`Add new member`}
+          onClick={handleAddOpen}
+        >
+          <AddIcon />
+        </PreviewActionButton>
+      )}
+      {onSaveClick && (
+        <PreviewActionButton
+          title={t`Save key`}
+          onClick={handleItemSave}
+          data-testid="item-save"
+        >
+          <SaveIcon />
+        </PreviewActionButton>
+      )}
       <PreviewActionButton
         data-testid="item-copy"
         title={t`Copy key as JSON`}

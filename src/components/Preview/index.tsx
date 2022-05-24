@@ -4,6 +4,14 @@ import styled from "styled-components";
 
 import { ReactComponent as CloseIcon } from "../../assets/close.svg";
 import { State } from "../../redux/Types/State";
+import {
+  HashType,
+  Item,
+  ListType,
+  SetType,
+  StringType,
+  ZSetType,
+} from "../../redux/Types/Item";
 
 import HashComponent from "./HashComponent";
 import ListComponent from "./ListComponent";
@@ -53,11 +61,21 @@ const Preview: React.FC<Props> = (props) => {
             </Close>
           </Header>
           <Content>
-            {preview.type === "string" && <StringComponent item={preview} />}
-            {preview.type === "list" && <ListComponent item={preview} />}
-            {preview.type === "zset" && <ZSetComponent item={preview} />}
-            {preview.type === "set" && <SetComponent item={preview} />}
-            {preview.type === "hash" && <HashComponent item={preview} />}
+            {preview.type === "string" && (
+              <StringComponent item={preview as Item<StringType>} />
+            )}
+            {preview.type === "list" && (
+              <ListComponent item={preview as Item<ListType>} />
+            )}
+            {preview.type === "zset" && (
+              <ZSetComponent item={preview as Item<ZSetType>} />
+            )}
+            {preview.type === "set" && (
+              <SetComponent item={preview as Item<SetType>} />
+            )}
+            {preview.type === "hash" && (
+              <HashComponent item={preview as Item<HashType>} />
+            )}
           </Content>
         </>
       )}

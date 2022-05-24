@@ -53,6 +53,7 @@ const translation: LangType = {
   language: "Idioma",
   lastupdate: "Última atualização",
   loadmore: "carregar mais",
+  member: "Membro",
   name: "Nome",
   newitemhere: "Novo item aqui...",
   newkey: "Nova chave",

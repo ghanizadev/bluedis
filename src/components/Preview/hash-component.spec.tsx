@@ -3,12 +3,12 @@ import { Provider } from "react-redux";
 
 import { store } from "../../redux/store";
 import "@testing-library/jest-dom/extend-expect";
-import { Item } from "../../redux/Types/Item";
+import { HashType, Item } from "../../redux/Types/Item";
 import services from "../../services/services";
 
 import HashComponent from "./HashComponent";
 
-const ITEM: Item = {
+const ITEM: Item<HashType> = {
   value: {
     firstKey: "first element",
     secondKey: "second element",

@@ -4,7 +4,7 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableData } from "../common/PreviewTableData";
 import { PreviewTableRow } from "../common/PreviewTableRow";
-import { Item } from "../../redux/Types/Item";
+import { HashType, Item } from "../../redux/Types/Item";
 import { addHashMember, removeHashMember } from "../../services/mainProcess";
 import { t } from "../../i18n";
 
@@ -12,7 +12,7 @@ import AddHashItem from "./AddHashItem";
 import { PreviewActions } from "./preview-actions";
 
 type Props = {
-  item: Item;
+  item: Item<HashType>;
 };
 const HashComponent: React.FC<Props> = (props) => {
   const { key, value, ttl } = props.item;

@@ -106,7 +106,7 @@ class DatabaseManager {
     });
   }
 
-  public async changeString(
+  public async alterString(
     key: string,
     value: string,
     ttl: string | number
@@ -292,7 +292,7 @@ class DatabaseManager {
   ): Promise<void> {
     switch (type) {
       case "string":
-        await this.changeString(key, "New Value", ttl);
+        await this.alterString(key, "New Value", ttl);
         break;
       case "set":
         await this.changeSet(key, "New Member", ttl);

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 
 import Checkbox from "../Checkbox";
-import { Item } from "../../redux/Types/Item";
+import { ItemType } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { loadMore } from "../../services/mainProcess";
@@ -52,8 +52,8 @@ const LoadMore = styled.div`
 `;
 
 type Props = {
-  data: Item[];
-  onItemEdit?: (item: Item) => void;
+  data: ItemType[];
+  onItemEdit?: (item: ItemType) => void;
 };
 
 const Table: React.FC<Props> = (props) => {
@@ -64,7 +64,7 @@ const Table: React.FC<Props> = (props) => {
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
 
-  const handleItemEdit = (item: Item) => {
+  const handleItemEdit = (item: ItemType) => {
     onItemEdit && onItemEdit(item);
   };
 

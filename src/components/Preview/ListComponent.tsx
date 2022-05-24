@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Item } from "../../redux/Types/Item";
+import { Item, ListType } from "../../redux/Types/Item";
 import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
@@ -16,7 +16,7 @@ import AddListMember from "./AddListMember";
 import { PreviewActions } from "./preview-actions";
 
 type Props = {
-  item: Item;
+  item: Item<ListType>;
 };
 const ListComponent: React.FC<Props> = (props) => {
   const {

@@ -2,14 +2,14 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 
 import { store } from "../../redux/store";
-import { Item } from "../../redux/Types/Item";
+import { Item, ListType } from "../../redux/Types/Item";
+import services from "../../services/services";
 
 import ListComponent from "./ListComponent";
 
 import "@testing-library/jest-dom/extend-expect";
-import services from "../../services/services";
 
-const ITEM: Item = {
+const ITEM: Item<ListType> = {
   key: "list:key",
   value: ["first", "second", "third"],
   ttl: -1,
