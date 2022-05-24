@@ -69,7 +69,6 @@ const HashComponent: React.FC<Props> = (props) => {
     setDeleting(true);
 
     timeout = setTimeout(() => {
-      setDeleting(false);
       deleteKey([key]);
     }, 1000);
   };
@@ -85,7 +84,7 @@ const HashComponent: React.FC<Props> = (props) => {
 
   return (
     <>
-      <PreviewContainer>
+      <PreviewContainer data-testid={"hash-preview"}>
         <PreviewTable>
           <tbody>
             <tr>
@@ -106,7 +105,7 @@ const HashComponent: React.FC<Props> = (props) => {
           </tbody>
         </PreviewTable>
       </PreviewContainer>
-      <div>
+      <div data-testid={"hash-ttl"}>
         <span>
           {ttl !== -1 &&
             t`TTL: ${new Date(ttl).toLocaleString(navigator.language, {
@@ -114,7 +113,7 @@ const HashComponent: React.FC<Props> = (props) => {
             })}`}
         </span>
       </div>
-      <PreviewActions>
+      <PreviewActions data-testid={"hash-actions"}>
         <PreviewActionButton
           data-testid="item-add"
           title={t`Add Item`}

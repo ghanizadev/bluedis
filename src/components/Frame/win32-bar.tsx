@@ -11,7 +11,7 @@ import { Resize } from "./Resize";
 import { Close } from "./Close";
 import { Bar } from "./Bar";
 
-export const WindowsBar: FC<{ title?: string }> = ({ title }) => {
+export const Win32Bar: FC<{ title?: string }> = ({ title }) => {
   const handleClose = () => {
     close();
   };
@@ -25,7 +25,7 @@ export const WindowsBar: FC<{ title?: string }> = ({ title }) => {
   };
 
   return (
-    <Bar>
+    <Bar data-testid={"win32-bar"}>
       <div style={{ display: "flex", flex: 1 }}>
         <img
           src={process.env.PUBLIC_URL + "/icon.png"}
