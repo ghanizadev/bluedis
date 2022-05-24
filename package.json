@@ -92,7 +92,8 @@
     "start": "electron-forge start",
     "start:dev": "npx gulp start-dev",
     "start:prod": "npx gulp start-prod",
-    "test": "react-scripts test --watchAll=false --runInBand"
+    "test:app": "jest --config app/jest.config.js --watchAll=false --runInBand",
+    "test:react": "react-scripts test --watchAll=false --runInBand"
   },
   "eslintConfig": {
     "extends": [

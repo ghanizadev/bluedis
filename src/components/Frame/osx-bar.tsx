@@ -46,7 +46,7 @@ export const OSXBar: FC<{ title?: string }> = ({ title }) => {
     fullscreen();
   };
 
-  const handleMaximize = (e: React.MouseEvent) => {
+  const handleMaximize = () => {
     maximize();
   };
 
