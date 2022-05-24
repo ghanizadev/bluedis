@@ -24,3 +24,7 @@
 - [ ] Quick setup for AWS, Azure, Redis Labs...;
 - [ ] Suport to clusters;
 - [ ] Add webpack;
+
+
+- [ ] AddListMember and AlterListMember can be merger into one;
+- [ ] Rename files;

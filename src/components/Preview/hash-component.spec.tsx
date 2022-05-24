@@ -43,11 +43,9 @@ describe("<HashComponent />", () => {
 
     const preview = screen.getByTestId("hash-preview");
     const ttl = screen.getByTestId("hash-ttl");
-    const actions = screen.getByTestId("hash-actions");
 
     expect(preview).toBeInTheDocument();
     expect(ttl).toBeInTheDocument();
-    expect(actions).toBeInTheDocument();
   });
 
   it("Should preview item", () => {
@@ -81,97 +79,7 @@ describe("<HashComponent />", () => {
     expect(secondRowData[1]).toHaveTextContent("second element");
   });
 
-  it("Should copy as JSON", () => {
-    render(
-      <Provider store={store}>
-        <HashComponent item={ITEM} />
-      </Provider>
-    );
-
-    const copy = screen.getByTestId("item-copy");
-
-    act(() => {
-      copy.click();
-    });
-
-    expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(1);
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      JSON.stringify({ [ITEM.key]: ITEM.value })
-    );
-  });
-
-  it("Should edit TTL", () => {
-    render(
-      <Provider store={store}>
-        <HashComponent item={ITEM} />
-      </Provider>
-    );
-
-    const editTTL = screen.getByTestId("item-ttl");
-
-    act(() => {
-      editTTL.click();
-    });
-
-    const ttl = store.getState().editTTL;
-    expect(ttl).toEqual(ITEM);
-  });
-
-  it("Should remove key", async () => {
-    render(
-      <Provider store={store}>
-        <HashComponent item={ITEM} />
-      </Provider>
-    );
-
-    const remove = screen.getByTestId("item-remove");
-
-    await act(async () => {
-      fireEvent.mouseDown(remove);
-      await new Promise((res) => setTimeout(res, 1050));
-      fireEvent.mouseUp(remove);
-    });
-
-    expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("deleteKey", ["some:key"]);
-  });
-
-  it("Should not remove key", async () => {
-    render(
-      <Provider store={store}>
-        <HashComponent item={ITEM} />
-      </Provider>
-    );
-
-    const remove = screen.getByTestId("item-remove");
-
-    await act(async () => {
-      fireEvent.mouseDown(remove);
-      await new Promise((res) => setTimeout(res, 580));
-      fireEvent.mouseUp(remove);
-    });
-
-    expect(sendSpy).toHaveBeenCalledTimes(0);
-  });
-
-  it("Should open add property", async () => {
-    render(
-      <Provider store={store}>
-        <HashComponent item={ITEM} />
-      </Provider>
-    );
-
-    const add = screen.getByTestId("item-add");
-
-    act(() => {
-      add.click();
-    });
-
-    const addModal = screen.getByTestId("hash-add-modal");
-    expect(addModal).toBeInTheDocument();
-  });
-
-  it("Should open add property", async () => {
+  it("Should open add property", () => {
     render(
       <Provider store={store}>
         <HashComponent item={ITEM} />
