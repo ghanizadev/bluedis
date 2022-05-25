@@ -77,8 +77,8 @@ ipcMain.on("addKey", async (event, key, type, ttl) => {
   event.sender.send("keyAdded", doc.pop());
 });
 
-ipcMain.on("changeString", async (event, key, value, ttl) => {
-  await database.changeString(key, value, ttl);
+ipcMain.on("alterString", async (event, key, value, ttl) => {
+  await database.alterString(key, value, ttl);
 
   const doc = await database.findByKeys([key]);
   event.sender.send("dataPreview", doc.pop());

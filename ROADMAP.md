@@ -20,7 +20,12 @@
 - [ ] Implement I18n;
 - [ ] Translation files;
 - [ ] Add a quick tutorial in help tab;
-- [ ] Add suport to export to CSV;
+- [ ] Add support to export to CSV;
 - [ ] Quick setup for AWS, Azure, Redis Labs...;
-- [ ] Suport to clusters;
+- [ ] Support to clusters;
 - [ ] Add webpack;
+
+
+- [ ] AddListMember and AlterListMember can be merger into one;
+- [ ] Rename files;
+- [ ] Add Connect page - split from database

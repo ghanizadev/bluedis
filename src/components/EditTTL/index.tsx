@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 
 import { actions } from "../../redux/store";
-import { Item } from "../../redux/Types/Item";
+import { ItemType } from "../../redux/Types/Item";
 import { State } from "../../redux/Types/State";
 import Button from "../Button";
 import { MessageBackground } from "../common/MessageBackground";
@@ -27,7 +27,9 @@ const Row = styled.div`
 `;
 
 const EditTTL: React.FC = () => {
-  const item = useSelector<State, Item | undefined>((state) => state.editTTL);
+  const item = useSelector<State, ItemType | undefined>(
+    (state) => state.editTTL
+  );
   const [ttlAbsolute, setTTLAbsolute] = React.useState(false);
   const [ttl, setTTL] = React.useState<number | string>(0);
   const [displayTTL, setDisplayTTL] = React.useState<string>("");

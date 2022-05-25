@@ -92,7 +92,8 @@
     "start": "electron-forge start",
     "start:dev": "npx gulp start-dev",
     "start:prod": "npx gulp start-prod",
-    "test": "react-scripts test --watchAll=false --runInBand"
+    "test:app": "jest --config app/jest.config.js --watchAll=false --runInBand",
+    "test:react": "react-scripts test --watchAll=false --runInBand"
   },
   "eslintConfig": {
     "extends": [
@@ -148,6 +149,7 @@
     "modclean": "^3.0.0-beta.1",
     "prettier": "2.6.2",
     "react-test-renderer": "^18.1.0",
+    "redis-memory-server": "^0.5.0",
     "redux-mock-store": "^1.5.4",
     "ts-jest": "^28.0.2",
     "ts-node": "^10.7.0",

@@ -42,8 +42,11 @@ jobs:
       - attach_workspace: 
           at: .
       - run:
-          name: Run test with coverage
-          command: npm run test -- --coverage
+          name: Run React tests with coverage
+          command: npm run test:react -- --coverage
+      - run:
+          name: Run App tests #TODO Add coverage
+          command: npm run test:app
       - persist_to_workspace:
           root: .
           paths:

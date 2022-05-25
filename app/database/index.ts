@@ -9,7 +9,7 @@ type DBResponse =
   | { [key: string]: string }
   | { value: string; score: string }[];
 class DatabaseManager {
-  private _instance: Redis;
+  private _instance: Redis = new Redis({ lazyConnect: true });
 
   public connect(
     host = "localhost",
@@ -27,6 +27,10 @@ class DatabaseManager {
         keepAlive: 5,
       }
     );
+  }
+
+  public async isConnected() {
+    return (await this._instance.ping()) === "PONG";
   }
 
   public disconnect(): void {
@@ -71,12 +75,7 @@ class DatabaseManager {
   };
 
   public selectDatabase = async (db: number): Promise<string> => {
-    return new Promise((res, rej) => {
-      this._instance.select(db, (err, reply) => {
-        if (err) return rej(err);
-        return res(reply);
-      });
-    });
+    return this._instance.select(db);
   };
 
   public async addTTL(key: string, ttl: number | string): Promise<void> {
@@ -106,7 +105,7 @@ class DatabaseManager {
     });
   }
 
-  public async changeString(
+  public async alterString(
     key: string,
     value: string,
     ttl: string | number
@@ -292,7 +291,7 @@ class DatabaseManager {
   ): Promise<void> {
     switch (type) {
       case "string":
-        await this.changeString(key, "New Value", ttl);
+        await this.alterString(key, "New Value", ttl);
         break;
       case "set":
         await this.changeSet(key, "New Member", ttl);
@@ -320,11 +319,7 @@ class DatabaseManager {
         ttl: -1,
       };
 
-      response.type = await new Promise<string>((res) => {
-        this._instance.type(item, (err, reply) => {
-          res(reply);
-        });
-      });
+      response.type = await this._instance.type(item);
 
       return response;
     });
@@ -348,15 +343,11 @@ class DatabaseManager {
 
       const type = await this._instance.type(item);
 
-      const value = await (async (): Promise<DBResponse> => {
+      const value = await (async (): Promise<DBResponse | null> => {
         if (type === "string") return this._instance.get(item);
-
         if (type === "hash") return this._instance.hgetall(item);
-
         if (type === "set") return this._instance.smembers(item);
-
         if (type === "list") return this._instance.lrange(item, 0, -1);
-
         if (type === "zset")
           return this._instance
             .zrange(item, 0, -1, "WITHSCORES")
@@ -374,6 +365,8 @@ class DatabaseManager {
 
               return result;
             });
+
+        return {};
       })();
 
       const ttl = await this._instance.pttl(item).then((ttl) => {
@@ -381,7 +374,7 @@ class DatabaseManager {
         return new Date(Date.now() + ttl).getTime();
       });
 
-      response.value = value;
+      response.value = value ?? "";
       response.type = type;
       response.ttl = ttl;
 

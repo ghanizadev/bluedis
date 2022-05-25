@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import Table from "../../components/Table";
 import Search from "../../components/Search";
-import { Item } from "../../redux/Types/Item";
+import { ItemType } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
@@ -34,8 +34,8 @@ const Wrapper = styled.div`
 `;
 
 const Home = () => {
-  const data = useSelector<State, Item[]>((state) => state.data);
-  const preview = useSelector<State, Item | undefined>(
+  const data = useSelector<State, ItemType[]>((state) => state.data);
+  const preview = useSelector<State, ItemType | undefined>(
     (state) => state.preview
   );
   const connected = useSelector<State, boolean>((state) => state.connected);
@@ -44,7 +44,7 @@ const Home = () => {
 
   const dispatch = useDispatch();
 
-  const handlePreview = (item: Item) => {
+  const handlePreview = (item: ItemType) => {
     if (preview === item) {
       dispatch(actions.setPreview(undefined));
       return;

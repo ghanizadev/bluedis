@@ -1,7 +1,7 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
 import { actions, store } from "../redux/store";
-import { Item } from "../redux/Types/Item";
+import { ItemType } from "../redux/Types/Item";
 import { DarkTheme, LightTheme, defaultAppearanceSettings } from "../theme";
 import { Query } from "../redux/Types/Query";
 
@@ -40,8 +40,8 @@ export const addKey = (key: string, type: string, ttl: number | string) => {
   services.send("addKey", key, type, ttl);
 };
 
-export const changeString = (key: string, value: string) => {
-  services.send("changeString", key, value);
+export const alterString = (key: string, value: string) => {
+  services.send("alterString", key, value);
 };
 
 export const addListMember = (key: string, value: string) => {
@@ -75,6 +75,11 @@ export const addSetMember = (key: string, value: string) => {
   services.send("addSetMember", key, value);
 };
 
+export const alterSetMember = (key: string, old: string, value: string) => {
+  services.send("removeSetMember", key, old);
+  services.send("addSetMember", key, value);
+};
+
 export const removeSetMember = (key: string, value: string) => {
   services.send("removeSetMember", key, value);
 };
@@ -88,7 +93,7 @@ export const removeZSetMember = (key: string, value: string) => {
 };
 
 export const alterZSetMember = (key: string, value: string, score: string) => {
-  services.send("alterSetMember", key, value, score);
+  services.send("alterZSetMember", key, value, score);
 };
 
 export const selectDatabase = (index: number) => {
@@ -186,7 +191,7 @@ services.receive("favorites", (event: any, favorites: any) => {
   store.dispatch(actions.updateFavorites(favorites));
 });
 
-services.receive("keyAdded", (event: any, key: Item) => {
+services.receive("keyAdded", (event: any, key: ItemType) => {
   store.dispatch(actions.addDocument(key));
 });
 
@@ -194,7 +199,7 @@ services.receive("keyRemoved", (event: any, key: string[]) => {
   store.dispatch(actions.removeDocument(key));
 });
 
-services.receive("data", (event: any, data: { docs: Item[] } & Query) => {
+services.receive("data", (event: any, data: { docs: ItemType[] } & Query) => {
   store.dispatch(actions.setQuery(data));
   store.dispatch(actions.setData(data.docs));
   store.dispatch(actions.setConnected(true));
@@ -202,10 +207,13 @@ services.receive("data", (event: any, data: { docs: Item[] } & Query) => {
   store.dispatch(actions.setLoading(false));
 });
 
-services.receive("loadedData", (event: any, data: { docs: Item[] } & Query) => {
-  store.dispatch(actions.setQuery(data));
-  store.dispatch(actions.pushData(data.docs));
-});
+services.receive(
+  "loadedData",
+  (event: any, data: { docs: ItemType[] } & Query) => {
+    store.dispatch(actions.setQuery(data));
+    store.dispatch(actions.pushData(data.docs));
+  }
+);
 
 services.receive("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));

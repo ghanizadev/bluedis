@@ -46,12 +46,12 @@ export const OSXBar: FC<{ title?: string }> = ({ title }) => {
     fullscreen();
   };
 
-  const handleMaximize = (e: React.MouseEvent) => {
-    if (e.detail === 2) maximize();
+  const handleMaximize = () => {
+    maximize();
   };
 
   return (
-    <Bar>
+    <Bar data-testid={"osx-bar"}>
       <ButtonWrapper>
         <MacButton
           color={"hsl(0,100%,66%)"}
@@ -65,11 +65,11 @@ export const OSXBar: FC<{ title?: string }> = ({ title }) => {
         ></MacButton>
         <MacButton
           color={"hsl(127,98%,40%)"}
-          data-testid="frame-maximize"
+          data-testid="frame-fullscreen"
           onClick={handleFullscreen}
         ></MacButton>
       </ButtonWrapper>
-      <TitleWrapper onClick={handleMaximize}>
+      <TitleWrapper onDoubleClick={handleMaximize}>
         <Title data-testid={"frame-titlebar"}>{title}</Title>
       </TitleWrapper>
     </Bar>

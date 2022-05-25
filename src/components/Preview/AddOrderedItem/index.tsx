@@ -24,7 +24,7 @@ const Label = styled.label`
 type Props = {
   onSubmit: (oldValue: string, newValue: string, score: string) => void;
   onClose: () => void;
-  item: { score: string; value: string; isNew: boolean };
+  item: { score: string; value: string; isNew?: boolean };
   onDelete: (item: { score: string; value: string }) => void;
 };
 
@@ -65,8 +65,10 @@ const AddOrderedItem: React.FC<Props> = (props) => {
   return (
     <>
       <MessageBackground />
-      <MessageContent>
-        <h3>{isNew ? t`Add item` : t`Edit item`}</h3>
+      <MessageContent data-testid={"add-item-modal-container"}>
+        <h3 data-testid={"add-item-modal-title"}>
+          {isNew ? t`Add item` : t`Edit item`}
+        </h3>
         <Label>
           {t`Score`}: <br />
           <Input ref={scoreRef} defaultValue={score} />
@@ -77,13 +79,13 @@ const AddOrderedItem: React.FC<Props> = (props) => {
         </Label>
         <PreviewActions>
           <PreviewActionButton
-            data-testid="message-copy"
+            data-testid={"add-item-modal-copy"}
             onClick={handleItemCopy}
           >
             <CopyIcon title={t`Copy as JSON`} />
           </PreviewActionButton>
           <PreviewActionButton
-            data-testid="message-remove"
+            data-testid={"add-item-modal-remove"}
             remove
             onClick={handleItemRemove}
           >
@@ -91,8 +93,16 @@ const AddOrderedItem: React.FC<Props> = (props) => {
           </PreviewActionButton>
         </PreviewActions>
         <MessageButtonWrapper>
-          <Button label={t`Close`} onClick={handleClose} />
-          <Button label={t`Save`} onClick={handleSave} />
+          <Button
+            label={t`Close`}
+            onClick={handleClose}
+            data-testid={"add-item-modal-close"}
+          />
+          <Button
+            label={t`Save`}
+            onClick={handleSave}
+            data-testid={"add-item-modal-save"}
+          />
         </MessageButtonWrapper>
       </MessageContent>
     </>

@@ -1,7 +1,7 @@
 import { Confirmation } from "./Confirmation";
 import { Connection } from "./Connection";
 import { Error } from "./Error";
-import { Item } from "./Item";
+import { ItemType } from "./Item";
 import { Page } from "./Page";
 import { Settings } from "./Settings";
 import { Query } from "./Query";
@@ -9,9 +9,9 @@ import { Query } from "./Query";
 export type State = {
   connected: boolean;
   isLoading: boolean;
-  data: Item[];
-  preview?: Item;
-  editTTL?: Item;
+  data: ItemType[];
+  preview?: ItemType;
+  editTTL?: ItemType;
   selected: string[];
   currentPage: Page;
   settings: Settings;

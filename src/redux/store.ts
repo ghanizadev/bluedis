@@ -9,7 +9,7 @@ import { Appearance } from "./Types/Appearance";
 import { Confirmation } from "./Types/Confirmation";
 import { Connection } from "./Types/Connection";
 import { Error } from "./Types/Error";
-import { Item } from "./Types/Item";
+import { ItemType } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
 import { Query } from "./Types/Query";
@@ -20,7 +20,7 @@ const initialState: State = {
   isLoading: false,
   data: [],
   selected: [],
-  currentPage: "home",
+  currentPage: "database",
   settings: {
     appearance: {
       darkTheme: false,
@@ -39,7 +39,12 @@ const initialState: State = {
   },
   terminal: {
     open: false,
-    stdout: [],
+    stdout: [
+      "Bluedis Terminal (Beta)",
+      "\u00a0",
+      'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
+      "\u00a0",
+    ],
   },
   connected: false,
   favorites: [],
@@ -54,15 +59,15 @@ const slice = createSlice({
     setConnected: (state, action: PayloadAction<boolean>) => {
       state.connected = action.payload;
     },
-    setData: (state, action: PayloadAction<Item[]>) => {
+    setData: (state, action: PayloadAction<ItemType[]>) => {
       state.lastRefresh = new Date();
       state.data = action.payload;
     },
-    pushData: (state, action: PayloadAction<Item[]>) => {
+    pushData: (state, action: PayloadAction<ItemType[]>) => {
       state.lastRefresh = new Date();
       state.data = [...state.data, ...action.payload];
     },
-    setPreview: (state, action: PayloadAction<Item | undefined>) => {
+    setPreview: (state, action: PayloadAction<ItemType | undefined>) => {
       state.preview = action.payload;
     },
     selectAll: (state) => {
@@ -119,13 +124,13 @@ const slice = createSlice({
     ) => {
       state.confirmation = action.payload;
     },
-    setEditTTL: (state, action: PayloadAction<Item | undefined>) => {
+    setEditTTL: (state, action: PayloadAction<ItemType | undefined>) => {
       state.editTTL = action.payload;
     },
     setQuery: (state, action: PayloadAction<Query>) => {
       state.query = action.payload;
     },
-    addDocument: (state, action: PayloadAction<Item>) => {
+    addDocument: (state, action: PayloadAction<ItemType>) => {
       state.data = [action.payload, ...state.data];
       state.query.count = state.query.count + 1;
     },

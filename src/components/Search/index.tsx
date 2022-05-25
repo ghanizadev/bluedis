@@ -22,7 +22,7 @@ const SearchInput = styled(Input)`
 const Search = () => {
   const [match, setMatch] = React.useState<string>();
   const databases = [
-    { value: 0, name: "DB 0" },
+    { value: 0, name: "default" },
     { value: 1, name: "DB 1" },
     { value: 2, name: "DB 2" },
     { value: 3, name: "DB 3" },
@@ -45,20 +45,29 @@ const Search = () => {
   };
 
   const handleDatabaseChange = (item: string) => {
-    const value = databases.find((db) => db.name === item)?.value;
+    const db = databases.find((db) => db.name === item);
 
-    if (typeof value === "number") selectDatabase(value);
+    if (db) selectDatabase(db.value);
   };
 
   return (
-    <Container>
+    <Container data-testid={"search-container"}>
       <span>{t`Search`}:</span>
-      <SearchInput onChange={handleChange} onKeyDown={handleKeyListener} />
+      <SearchInput
+        data-testid={"search-input"}
+        onChange={handleChange}
+        onKeyDown={handleKeyListener}
+      />
       <Dropdown
+        data-testid={"search-dropdown"}
         items={databases.map((db) => db.name)}
         onChange={handleDatabaseChange}
       />
-      <Button label={t`Apply`} onClick={handleSearch} />
+      <Button
+        data-testid={"search-button"}
+        label={t`Apply`}
+        onClick={handleSearch}
+      />
     </Container>
   );
 };

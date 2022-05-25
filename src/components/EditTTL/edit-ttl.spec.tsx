@@ -9,14 +9,10 @@ import EditTTL from "./index";
 import "@testing-library/jest-dom/extend-expect";
 
 describe("<EditTTL />", () => {
-  let receiveSpy: jest.SpyInstance;
   let sendSpy: jest.SpyInstance;
-  let shellSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    receiveSpy = jest.spyOn(services, "receive").mockImplementation(() => ({}));
     sendSpy = jest.spyOn(services, "send").mockImplementation(() => ({}));
-    shellSpy = jest.spyOn(services, "shell").mockImplementation(() => ({}));
   });
 
   it("Should not render", () => {
@@ -95,8 +91,6 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(0);
-    expect(receiveSpy).toHaveBeenCalledTimes(0);
-    expect(shellSpy).toHaveBeenCalledTimes(0);
   });
 
   it("Should add relative TTL", () => {
@@ -128,8 +122,6 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(receiveSpy).toHaveBeenCalledTimes(0);
-    expect(shellSpy).toHaveBeenCalledTimes(0);
     expect(sendSpy).toHaveBeenCalledWith("setTTL", "some:key", 500);
   });
 
@@ -167,8 +159,6 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(receiveSpy).toHaveBeenCalledTimes(0);
-    expect(shellSpy).toHaveBeenCalledTimes(0);
     expect(sendSpy).toHaveBeenCalledWith("setTTL", "some:other:key", now);
   });
 
@@ -198,8 +188,6 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(receiveSpy).toHaveBeenCalledTimes(0);
-    expect(shellSpy).toHaveBeenCalledTimes(0);
     expect(sendSpy).toHaveBeenCalledWith("removeTTL", "some:other:key");
   });
 
@@ -225,7 +213,5 @@ describe("<EditTTL />", () => {
 
     expect(label).toHaveTextContent("not set");
     expect(sendSpy).toHaveBeenCalledTimes(0);
-    expect(receiveSpy).toHaveBeenCalledTimes(0);
-    expect(shellSpy).toHaveBeenCalledTimes(0);
   });
 });

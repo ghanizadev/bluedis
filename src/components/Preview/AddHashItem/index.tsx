@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 
 import Button from "../../Button";
 import { MessageButtonWrapper } from "../../common/MessageButtonWrapper";
@@ -22,7 +22,7 @@ type Props = {
   newItem?: boolean;
 };
 
-const AddHashItem: React.FC<Props> = (props) => {
+const AddHashItem: FC<Props> = (props) => {
   const { onSubmit, onDelete, onClose, item, newItem } = props;
 
   const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
@@ -34,6 +34,7 @@ const AddHashItem: React.FC<Props> = (props) => {
 
   const handleItemRemove = () => {
     onDelete(item);
+    onClose();
   };
 
   const handleItemCopy = () => {
@@ -56,8 +57,10 @@ const AddHashItem: React.FC<Props> = (props) => {
   return (
     <>
       <MessageBackground />
-      <MessageContent>
-        <h4>{newItem ? t`Add item` : t`Edit item`}</h4>
+      <MessageContent data-testid={"hash-add-modal"}>
+        <h4 id={"title"} data-testid={"add-modal-title"}>
+          {newItem ? t`Add item` : t`Edit item`}
+        </h4>
         <Label>
           {t`Key`}: <br />
           <Input
@@ -76,13 +79,13 @@ const AddHashItem: React.FC<Props> = (props) => {
         {!newItem && (
           <PreviewActions>
             <PreviewActionButton
-              data-testid="message-copy"
+              data-testid="add-modal-copy"
               onClick={handleItemCopy}
             >
               <CopyIcon title={t`Copy as JSON`} />
             </PreviewActionButton>
             <PreviewActionButton
-              data-testid="message-remove"
+              data-testid="add-modal-remove"
               remove
               onClick={handleItemRemove}
             >
@@ -91,8 +94,16 @@ const AddHashItem: React.FC<Props> = (props) => {
           </PreviewActions>
         )}
         <MessageButtonWrapper>
-          <Button label={t`Close`} onClick={handleClose} />
-          <Button label={t`Save`} onClick={handleSave} />
+          <Button
+            label={t`Close`}
+            onClick={handleClose}
+            data-testid={"add-modal-close"}
+          />
+          <Button
+            label={t`Save`}
+            onClick={handleSave}
+            data-testid={"add-modal-save"}
+          />
         </MessageButtonWrapper>
       </MessageContent>
     </>
