@@ -86,6 +86,21 @@ workflows:
       - build-app:
           requires:
             - setup
+              
+  develop:
+    when:
+      equal: [ develop, << pipeline.git.branch >> ]
+    jobs:
+      - setup
+      - test:
+          requires:
+            - setup
+      - code-coverage:
+          requires:
+            - test
+      - build-app:
+          requires:
+            - test
 
   deploy:
     when:
