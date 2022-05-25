@@ -20,7 +20,7 @@ const initialState: State = {
   isLoading: false,
   data: [],
   selected: [],
-  currentPage: "home",
+  currentPage: "database",
   settings: {
     appearance: {
       darkTheme: false,
