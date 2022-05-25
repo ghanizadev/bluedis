@@ -1,4 +1,6 @@
 import { app, ipcMain, nativeTheme } from "electron";
+import fs from "fs";
+import path from "path";
 
 import Store from "electron-store";
 
@@ -7,27 +9,9 @@ import DatabaseManager from "../database";
 const store = new Store();
 const database = new DatabaseManager();
 
-const license = `MIT License
-
-Copyright (c) 2020 Ghanizadev Ltd.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.`;
+const license = fs
+  .readFileSync(path.resolve(__dirname, "..", "..", "LICENSE.txt"))
+  .toString("utf-8");
 
 ipcMain.on("close", () => {
   app.quit();
@@ -38,7 +22,7 @@ ipcMain.on("connect", async (event, options) => {
     const { host, port, password, tls } = options;
 
     database.connect(host, port, password, tls);
-    const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
+    const docs = await database.find("*", 0, 100); //TODO Remove hardcoded limit
     event.sender.send("data", docs);
   } catch (e) {
     return event.sender.send("error", e);
@@ -50,7 +34,7 @@ ipcMain.on("disconnect", () => {
 });
 
 ipcMain.on("update", async (event, cursor: number) => {
-  const docs = await database.findAll(cursor, 100); //TODO Remove hardcoded limit
+  const docs = await database.find("*", cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("data", docs);
 });
 
@@ -163,7 +147,7 @@ ipcMain.on("removeZSetMember", async (event, key, index) => {
 ipcMain.on("selectDatabase", async (event, index) => {
   await database.selectDatabase(index);
 
-  const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
+  const docs = await database.find("*", 0, 100); //TODO Remove hardcoded limit
   event.sender.send("data", docs);
 });
 
@@ -180,7 +164,7 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
   store.set("favorites", JSON.stringify(favorites));
 });
 
-ipcMain.on("wipeData", async (event: any) => {
+ipcMain.on("wipeData", async (event) => {
   store.clear();
   event.sender.send("preferences", {
     appearance: {

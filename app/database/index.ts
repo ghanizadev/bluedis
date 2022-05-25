@@ -2,12 +2,10 @@ import Redis from "ioredis";
 import { v4 } from "uuid";
 
 import availableCommands from "./availableCommands.json";
+import { DEFAULT_ITEM } from "./database.constants";
+import { parseZSet } from "./database.helpers";
+import { AnyItem, ItemType, SearchResult } from "./database.dto";
 
-type DBResponse =
-  | string
-  | string[]
-  | { [key: string]: string }
-  | { value: string; score: string }[];
 class DatabaseManager {
   private _instance: Redis = new Redis({ lazyConnect: true });
 
@@ -38,35 +36,20 @@ class DatabaseManager {
   }
 
   public command = async (command: string): Promise<unknown> => {
-    return new Promise((res, rej) => {
-      try {
-        const c = (availableCommands as string[]).find((str) =>
-          command.toLowerCase().startsWith(str)
-        );
+    const c = (availableCommands as string[]).find((str) =>
+      command.toLowerCase().startsWith(str)
+    );
 
-        if (!c) return rej("Command not found");
+    if (!c) throw new Error("Command not found");
 
-        this._instance
-          .call(
-            c,
-            ...command
-              .slice(c.length)
-              .trim()
-              .split(" ")
-              .filter((i) => i !== "")
-          )
-          .then((reply) => {
-            return res(reply);
-          })
-          .catch((e) => {
-            return rej(e);
-          });
-
-        return this._instance;
-      } catch (e) {
-        console.error(e);
-      }
-    });
+    return this._instance.call(
+      c,
+      ...command
+        .slice(c.length)
+        .trim()
+        .split(" ")
+        .filter((i) => i !== "")
+    );
   };
 
   public deleteKey = async (key: string | string[]): Promise<number> => {
@@ -79,30 +62,11 @@ class DatabaseManager {
   };
 
   public async addTTL(key: string, ttl: number | string): Promise<void> {
-    return new Promise((res, rej) => {
-      if (ttl) {
-        if (typeof ttl === "string") {
-          this._instance.pexpireat(key, new Date(ttl).getTime(), (err) => {
-            if (err) rej(err);
-            else res();
-          });
-        } else {
-          this._instance.expire(key, ttl, (err) => {
-            if (err) rej(err);
-            else res();
-          });
-        }
-      } else res();
-    });
+    if (ttl > 0) await this._instance.pexpireat(key, ttl);
   }
 
   public async removeTTL(key: string): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.persist(key, (err) => {
-        if (err) rej(err);
-        else res();
-      });
-    });
+    await this._instance.persist(key);
   }
 
   public async alterString(
@@ -110,12 +74,8 @@ class DatabaseManager {
     value: string,
     ttl: string | number
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.set(key, value, (err) => {
-        if (err) rej(err);
-        else this.addTTL(key, ttl).then(res);
-      });
-    });
+    await this._instance.set(key, value);
+    await this.addTTL(key, ttl);
   }
 
   public async changeSet(
@@ -123,12 +83,8 @@ class DatabaseManager {
     value: string,
     ttl: string | number
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.sadd(key, value, (err) => {
-        if (err) rej(err);
-        else this.addTTL(key, ttl).then(res);
-      });
-    });
+    await this._instance.sadd(key, value);
+    await this.addTTL(key, ttl);
   }
 
   public async changeZSet(
@@ -149,17 +105,13 @@ class DatabaseManager {
     values: { [key: string]: string | number | boolean | Date },
     ttl: number | string
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      const items = Object.keys(values).reduce(
-        (prev, curr) => [...prev, curr, String(values[curr])],
-        Array<string>()
-      );
+    const items = Object.keys(values).reduce(
+      (prev, curr) => [...prev, curr, String(values[curr])],
+      [] as string[]
+    );
 
-      this._instance.hset(key, items, (err) => {
-        if (err) rej(err);
-        else this.addTTL(key, ttl).then(res);
-      });
-    });
+    await this._instance.hset(key, items);
+    await this.addTTL(key, ttl);
   }
 
   public async changeList(
@@ -167,12 +119,8 @@ class DatabaseManager {
     value: string,
     ttl: string | number
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.lpush(key, value, (err) => {
-        if (err) rej(err);
-        else this.addTTL(key, ttl).then(res);
-      });
-    });
+    await this._instance.lpush(key, value);
+    await this.addTTL(key, ttl);
   }
 
   public async addListMember(
@@ -180,33 +128,15 @@ class DatabaseManager {
     value: string,
     position: "tail" | "head" = "tail"
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      if (position === "head") {
-        this._instance.lpush(key, value, (err) => {
-          if (err) rej(err);
-          return res();
-        });
-      } else {
-        this._instance.rpush(key, value, (err) => {
-          if (err) rej(err);
-          return res();
-        });
-      }
-    });
+    if (position === "head") await this._instance.lpush(key, value);
+    else await this._instance.rpush(key, value);
   }
 
   public async removeListMember(key: string, index: number): Promise<void> {
-    return new Promise((res, rej) => {
-      const uuid = v4();
-      this._instance.lset(key, index, uuid, (err) => {
-        if (err) rej(err);
+    const uuid = v4();
 
-        this._instance.lrem(key, 1, uuid, (err) => {
-          if (err) rej(err);
-          return res();
-        });
-      });
-    });
+    await this._instance.lset(key, index, uuid);
+    await this._instance.lrem(key, 1, uuid);
   }
 
   public async alterListMember(
@@ -214,30 +144,15 @@ class DatabaseManager {
     value: string,
     index: number
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.lset(key, index, value, (err) => {
-        if (err) rej(err);
-        res();
-      });
-    });
+    await this._instance.lset(key, index, value);
   }
 
   public async addSetMember(key: string, value: string): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.sadd(key, value, (err) => {
-        if (err) rej(err);
-        return res();
-      });
-    });
+    this._instance.sadd(key, value);
   }
 
   public async removeSetMember(key: string, value: string): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.srem(key, value, (err) => {
-        if (err) rej(err);
-        return res();
-      });
-    });
+    await this._instance.srem(key, value);
   }
 
   public async addZSetMember(
@@ -245,138 +160,97 @@ class DatabaseManager {
     value: string,
     score = "0"
   ): Promise<void> {
-    const args = [score, value];
-    await this._instance.zadd(key, ...args);
+    await this._instance.zadd(key, score, value);
   }
 
   public async removeZSetMember(key: string, value: string): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.zrem(key, value, (err) => {
-        if (err) rej(err);
-        return res();
-      });
-    });
+    await this._instance.zrem(key, value);
   }
 
   public async addHashMember(
     key: string,
     values: { [key: string]: string | number | boolean | Date }
   ): Promise<void> {
-    return new Promise((res, rej) => {
-      const items = Object.keys(values).reduce(
-        (prev, curr) => [...prev, curr, String(values[curr])],
-        Array<string>()
-      );
+    const items = Object.keys(values).reduce(
+      (prev, curr) => [...prev, curr, values[curr].toString()],
+      [] as string[]
+    );
 
-      this._instance.hset(key, items, (err) => {
-        if (err) rej(err);
-        return res();
-      });
-    });
+    await this._instance.hset(key, items);
   }
 
   public async removeHashMember(key: string, value: string): Promise<void> {
-    return new Promise((res, rej) => {
-      this._instance.hdel(key, value, (err) => {
-        if (err) rej(err);
-        return res();
-      });
-    });
+    await this._instance.hdel(key, value);
   }
 
-  public async addKey(
-    key: string,
-    type: "set" | "zset" | "hash" | "string" | "list",
-    ttl: number
-  ): Promise<void> {
+  public async addKey(key: string, type: ItemType, ttl: number): Promise<void> {
     switch (type) {
-      case "string":
+      case ItemType.STRING:
         await this.alterString(key, "New Value", ttl);
         break;
-      case "set":
+      case ItemType.SET:
         await this.changeSet(key, "New Member", ttl);
         break;
-      case "zset":
+      case ItemType.ZSET:
         await this.changeZSet(key, [{ score: "0", value: "New Member" }], ttl);
         break;
-      case "hash":
+      case ItemType.HASH:
         await this.changeHash(key, { "New Item": "New Member" }, ttl);
         break;
-      case "list":
+      case ItemType.LIST:
         await this.changeList(key, "New Member", ttl);
         break;
       default:
-        throw new Error("not impemented");
+        throw new Error("Not implemented");
     }
   }
 
-  private async hydrateShallow(items: string[]) {
-    const promises = items.map(async (item) => {
-      const response = {
-        key: item,
-        value: "",
-        type: "",
-        ttl: -1,
-      };
-
-      response.type = await this._instance.type(item);
-
-      return response;
-    });
+  private async hydrateShallow(keys: string[]): Promise<AnyItem[]> {
+    const promises: Promise<AnyItem>[] = keys.map(async (key) => ({
+      key,
+      type: (await this._instance.type(key)) as ItemType,
+      value: "",
+      ttl: -1,
+    }));
 
     return Promise.all(promises);
   }
 
-  private async hydrateItems(items: string[]): Promise<any[]> {
-    const promises = items.map(async (item) => {
-      const response: {
-        key: string;
-        value: DBResponse;
-        type: string;
-        ttl: number;
-      } = {
-        key: item,
-        value: "",
-        type: "",
-        ttl: -1,
-      };
+  public async findByKeys(keys: string[]): Promise<AnyItem[]> {
+    const promises = keys.map(async (key) => {
+      const response = DEFAULT_ITEM;
 
-      const type = await this._instance.type(item);
-
-      const value = await (async (): Promise<DBResponse | null> => {
-        if (type === "string") return this._instance.get(item);
-        if (type === "hash") return this._instance.hgetall(item);
-        if (type === "set") return this._instance.smembers(item);
-        if (type === "list") return this._instance.lrange(item, 0, -1);
-        if (type === "zset")
-          return this._instance
-            .zrange(item, 0, -1, "WITHSCORES")
-            .then((reply) => {
-              const result: { value: string; score: string }[] = [];
-
-              reply.forEach((item, index) => {
-                if (index % 2 === 1) return;
-
-                result.push({
-                  value: item,
-                  score: reply[index + 1],
-                });
-              });
-
-              return result;
-            });
-
-        return {};
-      })();
-
-      const ttl = await this._instance.pttl(item).then((ttl) => {
-        if (ttl === -1) return -1;
-        return new Date(Date.now() + ttl).getTime();
+      response.key = key;
+      response.type = (await this._instance.type(key)) as ItemType;
+      response.ttl = await this._instance.pttl(key).then((ttl) => {
+        //TODO Oh Lord, why?
+        if (ttl > -1) return new Date(Date.now() + ttl).getTime();
+        return ttl;
       });
 
-      response.value = value ?? "";
-      response.type = type;
-      response.ttl = ttl;
+      switch (response.type) {
+        case ItemType.STRING:
+          response.value = (await this._instance.get(key)) ?? "";
+          break;
+        case ItemType.HASH:
+          response.value = await this._instance.hgetall(key);
+          break;
+        case ItemType.SET:
+          response.value = await this._instance.smembers(key);
+          break;
+        case ItemType.LIST:
+          response.value = await this._instance.lrange(key, 0, -1);
+          break;
+        case ItemType.ZSET:
+          response.value = await this._instance.zrange(
+            key,
+            0,
+            -1,
+            "WITHSCORES"
+          );
+          response.value = parseZSet(response.value);
+          break;
+      }
 
       return response;
     });
@@ -392,15 +266,9 @@ class DatabaseManager {
     match: string,
     cursor = 0,
     limit = Number.MAX_SAFE_INTEGER
-  ): Promise<{
-    docs: any[];
-    cursor: number;
-    count: number;
-    input: string;
-    done: boolean;
-  }> {
+  ): Promise<SearchResult> {
     let newCursor = cursor > 0 ? cursor : -1;
-    let resultItems: any[] = [];
+    let resultItems: string[] = [];
 
     while (newCursor !== 0 && resultItems.length <= limit) {
       if (newCursor === -1) newCursor = 0;
@@ -425,18 +293,6 @@ class DatabaseManager {
       count: resultItems.length,
       done: newCursor === 0,
     };
-  }
-
-  public async findAll(
-    cursor = 0,
-    limit = Number.MAX_SAFE_INTEGER
-  ): Promise<{ docs: any[]; cursor: number; count: number; input: string }> {
-    return this.find("*", cursor, limit);
-  }
-
-  public async findByKeys(keys: string[]): Promise<any[]> {
-    console.log(keys.length);
-    return this.hydrateItems(keys);
   }
 }
 
