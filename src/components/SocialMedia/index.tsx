@@ -49,19 +49,19 @@ const SocialMedia: React.FC = () => {
   };
   return (
     <Container>
-      <Button onClick={handleClick(LINKEDIN)}>
+      <Button data-testid={"links-linkedin"} onClick={handleClick(LINKEDIN)}>
         <Linkedin />
       </Button>
-      <Button onClick={handleClick(GITHUB)}>
+      <Button data-testid={"links-github"} onClick={handleClick(GITHUB)}>
         <Github />
       </Button>
-      <Button onClick={handleClick(FACEBOOK)}>
+      <Button data-testid={"links-facebook"} onClick={handleClick(FACEBOOK)}>
         <Facebook />
       </Button>
-      <Button onClick={handleClick(INSTAGRAM)}>
+      <Button data-testid={"links-instagram"} onClick={handleClick(INSTAGRAM)}>
         <Instagram />
       </Button>
-      <Button onClick={handleClick(TWITTER)}>
+      <Button data-testid={"links-twitter"} onClick={handleClick(TWITTER)}>
         <Twitter />
       </Button>
     </Container>

@@ -28,4 +28,4 @@
 
 - [ ] AddListMember and AlterListMember can be merger into one;
 - [ ] Rename files;
-- [ ] Add Set item to index;
+- [ ] Add Connect page - split from database

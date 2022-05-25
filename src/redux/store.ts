@@ -39,7 +39,12 @@ const initialState: State = {
   },
   terminal: {
     open: false,
-    stdout: [],
+    stdout: [
+      "Bluedis Terminal (Beta)",
+      "\u00a0",
+      'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
+      "\u00a0",
+    ],
   },
   connected: false,
   favorites: [],

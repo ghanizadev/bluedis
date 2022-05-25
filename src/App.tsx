@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 
 import Frame from "./components/Frame";
-import Home from "./pages/Home";
+import Database from "./pages/Database";
 import { State } from "./redux/Types/State";
 import { Page } from "./redux/Types/Page";
 import Help from "./pages/Help";
@@ -16,7 +16,6 @@ import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";
 import Loading from "./components/Loading";
 import { Appearance } from "./redux/Types/Appearance";
-import { t } from "./i18n";
 
 const App = () => {
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
@@ -26,7 +25,6 @@ const App = () => {
 
   React.useEffect(() => {
     getPreferences();
-    console.log(t`something that ${9 + 2} needs to be translated ${9 + 2}`);
   }, []);
 
   return (
@@ -41,7 +39,7 @@ const App = () => {
           }}
         >
           <Sidebar />
-          {currentPage === "home" && <Home />}
+          {currentPage === "database" && <Database />}
           {currentPage === "settings" && <Settings />}
           {currentPage === "help" && <Help />}
         </div>

@@ -51,14 +51,23 @@ const Search = () => {
   };
 
   return (
-    <Container>
+    <Container data-testid={"search-container"}>
       <span>{t`Search`}:</span>
-      <SearchInput onChange={handleChange} onKeyDown={handleKeyListener} />
+      <SearchInput
+        data-testid={"search-input"}
+        onChange={handleChange}
+        onKeyDown={handleKeyListener}
+      />
       <Dropdown
+        data-testid={"search-dropdown"}
         items={databases.map((db) => db.name)}
         onChange={handleDatabaseChange}
       />
-      <Button label={t`Apply`} onClick={handleSearch} />
+      <Button
+        data-testid={"search-button"}
+        label={t`Apply`}
+        onClick={handleSearch}
+      />
     </Container>
   );
 };

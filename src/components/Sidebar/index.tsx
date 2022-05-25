@@ -16,9 +16,7 @@ import { Item } from "./Item";
 
 const Sidebar = () => {
   const [open, setOpen] = React.useState(false);
-  const page = useSelector<State, "help" | "home" | "settings">(
-    (state) => state.currentPage
-  );
+  const page = useSelector<State, Page>((state) => state.currentPage);
   const dispatch = useDispatch();
 
   const handlePageChange = (page: Page) => {
@@ -30,13 +28,15 @@ const Sidebar = () => {
       <MenuIcon data-testid="menu-button" onClick={() => setOpen(!open)} />
       <Items open={open}>
         <Item
-          data-selected={page === "home"}
-          onClick={() => handlePageChange("home")}
+          data-testid={"menu-database"}
+          data-selected={page === "database"}
+          onClick={() => handlePageChange("database")}
         >
           <DatabaseIcon />
           <span>{t`Database`}</span>
         </Item>
         <Item
+          data-testid={"menu-settings"}
           data-selected={page === "settings"}
           onClick={() => handlePageChange("settings")}
         >
@@ -44,6 +44,7 @@ const Sidebar = () => {
           <span>{t`Settings`}</span>
         </Item>
         <Item
+          data-testid={"menu-help"}
           data-selected={page === "help"}
           onClick={() => handlePageChange("help")}
         >
