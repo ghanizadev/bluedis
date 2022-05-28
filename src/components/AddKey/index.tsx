@@ -5,7 +5,7 @@ import Button from "../Button";
 import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import Dropdown from "../Dropdown";
-import Input from "../Input";
+import { Input } from "../Input";
 import Toggle from "../Toggle";
 import { t } from "../../i18n";
 import { KeyType } from "../../shared/constants/key-type.dto";

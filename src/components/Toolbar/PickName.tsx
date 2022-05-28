@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import Button from "../Button";
-import Input from "../Input";
+import { Input } from "../Input";
 import { t } from "../../i18n";
 
 const Container = styled.div`

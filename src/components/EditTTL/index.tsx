@@ -8,7 +8,7 @@ import { State } from "../../redux/Types/State";
 import Button from "../Button";
 import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
-import Input from "../Input";
+import { Input } from "../Input";
 import Toggle from "../Toggle";
 import * as services from "../../services/mainProcess";
 import { t } from "../../i18n";

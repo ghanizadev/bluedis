@@ -148,8 +148,6 @@ services.receive("keyRemoved", (event: any, key: string[]) => {
 });
 
 services.receive("data", (event: any, data: { docs: ItemType[] } & Query) => {
-  console.log(data);
-
   store.dispatch(actions.setQuery(data));
   store.dispatch(actions.setData(data.docs));
   store.dispatch(actions.setConnected(true));
