@@ -76,7 +76,7 @@ describe("<AddKey />", () => {
     confirmButton.click();
 
     expect(mock).toBeCalledTimes(1);
-    expect(mock).toBeCalledWith("set", "some:key", 0);
+    expect(mock).toBeCalledWith("set", "some:key", -1, false);
   });
 
   it("Should add a string key", () => {
@@ -101,7 +101,7 @@ describe("<AddKey />", () => {
     });
 
     expect(mock).toBeCalledTimes(1);
-    expect(mock).toBeCalledWith("string", "some:other:key", 0);
+    expect(mock).toBeCalledWith("string", "some:other:key", -1, false);
   });
 
   it("Should add a key with TTL", () => {
@@ -132,6 +132,6 @@ describe("<AddKey />", () => {
     });
 
     expect(mock).toBeCalledTimes(1);
-    expect(mock).toBeCalledWith("hash", "some:ttl:key", 15);
+    expect(mock).toBeCalledWith("hash", "some:ttl:key", 15, false);
   });
 });

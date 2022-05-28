@@ -6,9 +6,10 @@ import Checkbox from "../Checkbox";
 import { ItemType } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { loadMore } from "../../services/mainProcess";
+import { loadMore } from "../../services/main-process";
 import { Query } from "../../redux/Types/Query";
 import { t } from "../../i18n";
+import { useLoading } from "../../shared/hooks/use-loading.hook";
 
 import { Type } from "./Type";
 import { Data } from "./Data";
@@ -60,11 +61,13 @@ const Table: React.FC<Props> = (props) => {
   const { data, onItemEdit } = props;
   const dispatch = useDispatch();
 
+  const loading = useLoading();
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
 
   const handleItemEdit = (item: ItemType) => {
+    loading(true);
     onItemEdit && onItemEdit(item);
   };
 

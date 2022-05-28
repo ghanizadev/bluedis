@@ -58,9 +58,10 @@ describe("<Input />", () => {
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
     expect(sendSpy).toHaveBeenCalledWith(
-      "alterString",
+      "alter",
       "string:key",
-      "some other string"
+      "some other string",
+      undefined
     );
   });
 });

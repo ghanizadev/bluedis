@@ -7,11 +7,11 @@ const Container = styled.div`
 `;
 
 const Select = styled.select`
-  height: 30px;
+  height: 40px;
   min-width: 100px;
   border: none;
   appearance: initial;
-  padding: 5px 15px 5px 5px;
+  padding: 6px 15px 6px 6px;
 
   background-color: ${(props) => props.theme.foreground};
 

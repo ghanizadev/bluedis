@@ -107,10 +107,10 @@ describe("<SetComponent />", () => {
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
     expect(sendSpy).toHaveBeenCalledWith(
-      "addZSetMember",
+      "alter",
       "zset:key",
-      "new member value",
-      "75"
+      [{ value: "new member value", score: "75" }],
+      { oldValue: "" }
     );
   });
 
@@ -146,17 +146,12 @@ describe("<SetComponent />", () => {
       save.click();
     });
 
-    expect(sendSpy).toHaveBeenCalledTimes(2);
+    expect(sendSpy).toHaveBeenCalledTimes(1);
     expect(sendSpy).toHaveBeenCalledWith(
-      "removeZSetMember",
+      "alter",
       "zset:key",
-      "first"
-    );
-    expect(sendSpy).toHaveBeenCalledWith(
-      "addZSetMember",
-      "zset:key",
-      "new other member value",
-      "15"
+      [{ score: "15", value: "new other member value" }],
+      { oldValue: "first" }
     );
   });
 
@@ -207,10 +202,6 @@ describe("<SetComponent />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith(
-      "removeZSetMember",
-      "zset:key",
-      "third"
-    );
+    expect(sendSpy).toHaveBeenCalledWith("del", "zset:key", "third");
   });
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 
@@ -12,6 +12,7 @@ import {
   StringType,
   ZSetType,
 } from "../../redux/Types/Item";
+import { useLoading } from "../../shared/hooks/use-loading.hook";
 
 import HashComponent from "./HashComponent";
 import ListComponent from "./ListComponent";
@@ -26,6 +27,9 @@ const Close = styled.button`
   border: none;
   margin-left: 3px;
   color: ${(props) => props.theme.text};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &:hover {
     color: tomato;
@@ -44,7 +48,13 @@ type Props = {
 
 const Preview: React.FC<Props> = (props) => {
   const { onCloseRequest } = props;
+
   const preview = useSelector((state: State) => state.preview);
+  const loading = useLoading();
+
+  useEffect(() => {
+    if (preview) loading(false);
+  }, [preview]);
 
   const handleCloseRequest = () => {
     onCloseRequest && onCloseRequest();

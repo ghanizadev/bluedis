@@ -104,7 +104,7 @@ describe("<PreviewActions />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("deleteKey", ["some:key"]);
+    expect(sendSpy).toHaveBeenCalledWith("remove", ["some:key"]);
   });
 
   it("Should not remove key", async () => {

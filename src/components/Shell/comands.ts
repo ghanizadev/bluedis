@@ -1,5 +1,5 @@
 import { actions, store } from "../../redux/store";
-import { updateData } from "../../services/mainProcess";
+import { updateData } from "../../services/main-process";
 
 export const command: { [key: string]: () => void } = {
   clear: () => store.dispatch(actions.clearSTDOUT()),

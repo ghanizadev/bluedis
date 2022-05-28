@@ -1,70 +1,22 @@
 import React from "react";
-import styled from "styled-components";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
 
-import { connect, saveFavorites } from "../../../services/mainProcess";
-import { actions, store } from "../../../redux/store";
-import { State } from "../../../redux/Types/State";
-import { Connection } from "../../../redux/Types/Connection";
-import SocialMedia from "../../../components/SocialMedia";
-import { t } from "../../../i18n";
+import { connect, saveFavorites } from "../../services/main-process";
+import { actions, store } from "../../redux/store";
+import { State } from "../../redux/Types/State";
+import { Connection } from "../../redux/Types/Connection";
+import SocialMedia from "../../components/SocialMedia";
+import { t } from "../../i18n";
 
-import Favorite from "./Favorite";
-
-const Container = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Content = styled.div`
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const Recent = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  border-left: 1px solid gray;
-  margin: 0 15px;
-  padding: 0 15px;
-  width: 230px;
-`;
-
-const Form = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ConnectionsList = styled.ul`
-  list-style: none;
-`;
-
-const ListWrapper = styled.div`
-  flex: 1;
-  flex-basis: 0;
-  overflow: hidden auto;
-`;
-
-const LoginButton = styled.button`
-  width: 100%;
-  margin: 8px 0;
-  border: none;
-  height: 30px;
-  padding: 5px 8px;
-
-  background-color: ${(props) => props.theme.foreground};
-  color: ${(props) => props.theme.innerText};
-
-  &:hover {
-    filter: brightness(0.95);
-  }
-`;
+import { Favorite } from "./components/favorite";
+import { Container } from "./components/container";
+import { Content } from "./components/content";
+import { Form } from "./components/form";
+import { LoginButton } from "./components/login-button";
+import { Recent } from "./components/recent";
+import { ListWrapper } from "./components/list-wrapper";
+import { ConnectionList } from "./components/connection-list";
 
 const Connect = () => {
   const [connection, setConnection] = React.useState({
@@ -144,7 +96,7 @@ const Connect = () => {
             <p>{t`Favorites`}</p>
             <br />
             <ListWrapper>
-              <ConnectionsList>
+              <ConnectionList>
                 {favorites.map((connection) => {
                   return (
                     <Favorite
@@ -160,12 +112,12 @@ const Connect = () => {
                     <p style={{ color: "gray" }}>{t`No favorites so far...`}</p>
                   </>
                 )}
-              </ConnectionsList>
+              </ConnectionList>
             </ListWrapper>
           </Recent>
         </Content>
+        <SocialMedia />
       </Container>
-      <SocialMedia />
     </>
   );
 };

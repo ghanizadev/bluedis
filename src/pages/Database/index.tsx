@@ -13,12 +13,10 @@ import {
   getDBCount,
   updateData,
   updatePreview,
-} from "../../services/mainProcess";
+} from "../../services/main-process";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
-
-import Connect from "./Connect";
 
 const Content = styled.div`
   width: 100%;
@@ -72,10 +70,11 @@ const Home = () => {
   const handleAddConfirm = (
     type: "set" | "zset" | "hash" | "string" | "list",
     key: string,
-    ttl: number | string
+    ttl: number,
+    ttlAbsolute: boolean
   ) => {
+    addKey(key, type, ttl, ttlAbsolute);
     setAddItem(false);
-    addKey(key, type, ttl);
   };
 
   React.useEffect(() => {
@@ -85,26 +84,21 @@ const Home = () => {
   return (
     <>
       <Content>
-        {connected && (
-          <>
-            <Search />
-            <Toolbar onAddKey={handleAddOpen} onRefresh={handleRefresh} />
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                flex: 1,
-              }}
-            >
-              <Wrapper>
-                <Table data={data} onItemEdit={handlePreview} />
-              </Wrapper>
-              <Preview onCloseRequest={handlePreviewClose} />
-            </div>
-            <Shell />
-          </>
-        )}
-        {!connected && <Connect />}
+        <Search />
+        <Toolbar onAddKey={handleAddOpen} onRefresh={handleRefresh} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flex: 1,
+          }}
+        >
+          <Wrapper>
+            <Table data={data} onItemEdit={handlePreview} />
+          </Wrapper>
+          <Preview onCloseRequest={handlePreviewClose} />
+        </div>
+        <Shell />
       </Content>
       {addItem && (
         <AddKey onCancel={handleAddCancel} onConfirm={handleAddConfirm} />

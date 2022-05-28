@@ -7,7 +7,7 @@
 - [x] [Add native promise-base](https://github.com/luin/ioredis#plugging-in-your-own-promises-library) library to Redis instance;
 - [ ] Add support to SSH/TLS;
 - [ ] Load data from external files;
-- [ ] Add MEMORY USAGE to keys when inpected;
+- [ ] Add MEMORY USAGE to keys when inspected;
 - [ ] Add flush database functionality (FLUSHDB);
 - [ ] Add option for monitor (logging);
 - [ ] Add custom timeout for connections;
@@ -17,15 +17,17 @@
 
 ## To be considered
 
-- [ ] Implement I18n;
-- [ ] Translation files;
+- [x] Implement I18n;
+- [x] Translation files;
 - [ ] Add a quick tutorial in help tab;
 - [ ] Add support to export to CSV;
 - [ ] Quick setup for AWS, Azure, Redis Labs...;
 - [ ] Support to clusters;
-- [ ] Add webpack;
-
-
-- [ ] AddListMember and AlterListMember can be merger into one;
+- [x] AddListMember and AlterListMember can be merger into one;
 - [ ] Rename files;
-- [ ] Add Connect page - split from database
+- [x] Add Connect page - split from Database page;
+- [x] Refresh after updating a key;
+- [x] Split database manager by key types;
+- [ ] Add type to preview dashboard
+- [ ] Make preview scale according to screen size;
+- [ ] Add info tab;

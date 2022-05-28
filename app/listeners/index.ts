@@ -1,33 +1,17 @@
 import { app, ipcMain, nativeTheme } from "electron";
+import fs from "fs";
+import path from "path";
 
 import Store from "electron-store";
 
-import DatabaseManager from "../database";
+import { Manager } from "../database/manager";
 
 const store = new Store();
-const database = new DatabaseManager();
+const manager = new Manager();
 
-const license = `MIT License
-
-Copyright (c) 2020 Ghanizadev Ltd.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.`;
+const license = fs
+  .readFileSync(path.resolve(__dirname, "..", "..", "LICENSE.txt"))
+  .toString("utf-8");
 
 ipcMain.on("close", () => {
   app.quit();
@@ -37,32 +21,36 @@ ipcMain.on("connect", async (event, options) => {
   try {
     const { host, port, password, tls } = options;
 
-    database.connect(host, port, password, tls);
-    const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
+    await manager.connect(
+      `redis${tls ? "s" : ""}://${
+        password ? `:${password}@` : ""
+      }${host}:${port}`
+    );
+
+    const docs = await manager.find("*", 0, 100);
     event.sender.send("data", docs);
   } catch (e) {
     return event.sender.send("error", e);
   }
 });
 
-ipcMain.on("disconnect", () => {
-  database.disconnect();
+ipcMain.on("disconnect", async () => {
+  await manager.disconnect();
 });
 
-ipcMain.on("update", async (event, cursor: number) => {
-  const docs = await database.findAll(cursor, 100); //TODO Remove hardcoded limit
+ipcMain.on("update", async (event, query: any) => {
+  const docs = await manager.find(query.input ?? "*", query.cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("data", docs);
 });
 
-ipcMain.on("deleteKey", async (event, key: string[]) => {
-  await database.deleteKey(key);
+ipcMain.on("remove", async (event, key: string[]) => {
+  await manager.remove(key);
   event.sender.send("keyRemoved", key);
 });
 
-ipcMain.on("executeCommand", async (event, command: string) => {
+ipcMain.on("execute", async (event, command: string) => {
   try {
-    console.log({ command });
-    const reply = await database.command(command.replace(/\s\s+/g, " ").trim());
+    const reply = await manager.command(command.replace(/\s\s+/g, " ").trim());
     event.sender.send("commandReply", reply);
   } catch (e) {
     console.log(e);
@@ -70,105 +58,39 @@ ipcMain.on("executeCommand", async (event, command: string) => {
   }
 });
 
-ipcMain.on("addKey", async (event, key, type, ttl) => {
-  await database.addKey(key, type, ttl);
+ipcMain.on("add", async (event, key, type, ttl, ttlAbsolute) => {
+  const doc = await manager.createKey(key, type);
 
-  const doc = await database.findByKeys([key]);
-  event.sender.send("keyAdded", doc.pop());
+  if (ttl > 0) await manager.setTTL(key, ttl, ttlAbsolute);
+
+  event.sender.send("keyAdded", doc);
 });
 
-ipcMain.on("alterString", async (event, key, value, ttl) => {
-  await database.alterString(key, value, ttl);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
+ipcMain.on("alter", async (event, key, value, update) => {
+  const doc = await manager.setKey(key, value, update);
+  event.sender.send("dataPreview", doc);
 });
 
-ipcMain.on("addListMember", async (event, key, value) => {
-  await database.addListMember(key, value);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
+ipcMain.on("del", async (event, key, indexOrName: string) => {
+  const doc = await manager.remKey(key, indexOrName);
+  event.sender.send("dataPreview", doc);
 });
 
-ipcMain.on("removeListMember", async (event, key, index) => {
-  await database.removeListMember(key, index);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("alterListMember", async (event, key, value, index) => {
-  await database.alterListMember(key, value, index);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("addSetMember", async (event, key, value) => {
-  await database.addSetMember(key, value);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("removeSetMember", async (event, key, index) => {
-  await database.removeSetMember(key, index);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("addHashMember", async (event, key, value) => {
-  await database.addHashMember(key, value);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("removeHashMember", async (event, key, index) => {
-  await database.removeHashMember(key, index);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-ipcMain.on("addZSetMember", async (event, key, value, score) => {
-  await database.addZSetMember(key, value, score);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("setTTL", async (event, key, ttl) => {
-  await database.addTTL(key, ttl);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("removeTTL", async (event, key) => {
-  await database.removeTTL(key);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
-});
-
-ipcMain.on("removeZSetMember", async (event, key, index) => {
-  await database.removeZSetMember(key, index);
-
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
+ipcMain.on("setTTL", async (event, key, ttl, absoluteTTl) => {
+  await manager.setTTL(key, ttl, absoluteTTl);
+  const doc = await manager.getKey(key);
+  event.sender.send("dataPreview", doc);
 });
 
 ipcMain.on("selectDatabase", async (event, index) => {
-  await database.selectDatabase(index);
+  await manager.selectDB(index);
 
-  const docs = await database.findAll(0, 100); //TODO Remove hardcoded limit
+  const docs = await manager.find("*", 0, 100); //TODO Remove hardcoded limit
   event.sender.send("data", docs);
 });
 
 ipcMain.on("getCountDB", async (event) => {
-  const count = await database.countDocuments();
+  const count = await manager.count();
   event.sender.send("setCountDB", count);
 });
 
@@ -180,7 +102,7 @@ ipcMain.on("saveFavorites", async (event, favorites) => {
   store.set("favorites", JSON.stringify(favorites));
 });
 
-ipcMain.on("wipeData", async (event: any) => {
+ipcMain.on("wipeData", async (event) => {
   store.clear();
   event.sender.send("preferences", {
     appearance: {
@@ -217,21 +139,27 @@ ipcMain.on("initial", async (event) => {
 });
 
 ipcMain.on("find", async (event, match: string, cursor: number) => {
-  const result = await database.find(match, cursor, 100); //TODO Remove hardcoded limit
+  const result = await manager.find(match, cursor, 100);
   event.sender.send("data", result);
 });
 
 ipcMain.on("loadMore", async (event, match, cursor) => {
-  const result = await database.find(match, cursor, 100); //TODO Remove hardcoded limit
+  const result = await manager.find(match, cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("loadedData", result);
 });
 
 ipcMain.on("updatePreview", async (event, key) => {
-  const doc = await database.findByKeys([key]);
-  event.sender.send("dataPreview", doc.pop());
+  const doc = await manager.getKey(key);
+  event.sender.send("dataPreview", doc);
 });
 
 ipcMain.on("exportItems", async (event, items) => {
-  const docs = await database.findByKeys(items);
-  event.sender.send("exportedItems", { docs });
+  const response = await Promise.all(items.map(manager.getKey.bind(manager)));
+  const docs = response.reduce(
+    (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
+    {}
+  );
+
+  const string = JSON.stringify(docs, null, 2);
+  event.sender.send("exportedItems", Buffer.from(string, "utf-8"));
 });

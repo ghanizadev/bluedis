@@ -36,7 +36,7 @@ const translation: LangType = {
   editkey: "Editar chave",
   editttl: "Editar TTL",
   email: "correio eletrônico",
-  expirationseconds: "Validade (segundos)",
+  expirationmilliseconds: "Validade (milisegundos)",
   expiresat: "Valido até",
   exportselected: "Exportar selecionados",
   favorites: "Favoritos",

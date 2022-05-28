@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { t } from "../../i18n";
 import { State } from "../../redux/Types/State";
-import { openLink } from "../../services/mainProcess";
+import { openLink } from "../../services/main-process";
 
 const Container = styled.div`
   width: 100%;

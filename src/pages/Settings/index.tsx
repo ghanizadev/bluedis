@@ -2,12 +2,12 @@ import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import Dropdown from "../../components/Dropdown";
-import Input from "../../components/Input";
+import { Input } from "../../components/Input";
 import Toggle from "../../components/Toggle";
 import { State } from "../../redux/Types/State";
 import { Settings as ISettings } from "../../redux/Types/Settings";
 import { actions, store } from "../../redux/store";
-import { savePreferences, wipeData } from "../../services/mainProcess";
+import { savePreferences, wipeData } from "../../services/main-process";
 import Button from "../../components/Button";
 import { DarkTheme, LightTheme } from "../../theme";
 import { t } from "../../i18n";

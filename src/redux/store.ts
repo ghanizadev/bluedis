@@ -144,8 +144,11 @@ const slice = createSlice({
     setTerminal: (state, action: PayloadAction<boolean>) => {
       state.terminal.open = action.payload;
     },
-    updateSTDOUT: (state, action: PayloadAction<string>) => {
-      state.terminal.stdout = [...state.terminal.stdout, action.payload];
+    updateSTDOUT: (state, action: PayloadAction<string | string[]>) => {
+      if (typeof action.payload === "string")
+        state.terminal.stdout = [...state.terminal.stdout, action.payload];
+      else
+        state.terminal.stdout = [...state.terminal.stdout, ...action.payload];
     },
     clearSTDOUT: (state) => {
       state.terminal.stdout = [];
