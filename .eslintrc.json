@@ -38,5 +38,5 @@
     ]
   },
   "parser": "@typescript-eslint/parser",
-  "ignorePatterns": ["*.js"]
+  "ignorePatterns": ["*.js", "dist/*", "out/*", "build/*"]
 }
