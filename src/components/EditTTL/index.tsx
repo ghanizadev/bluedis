@@ -3,14 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 
 import { actions } from "../../redux/store";
-import { Item } from "../../redux/Types/Item";
+import { ItemType } from "../../redux/Types/Item";
 import { State } from "../../redux/Types/State";
 import Button from "../Button";
 import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
-import Input from "../Input";
+import { Input } from "../Input";
 import Toggle from "../Toggle";
-import * as services from "../../services/mainProcess";
+import * as services from "../../services/main-process";
 import { t } from "../../i18n";
 
 const Row = styled.div`
@@ -27,22 +27,24 @@ const Row = styled.div`
 `;
 
 const EditTTL: React.FC = () => {
-  const item = useSelector<State, Item | undefined>((state) => state.editTTL);
+  const item = useSelector<State, ItemType | undefined>(
+    (state) => state.editTTL
+  );
   const [ttlAbsolute, setTTLAbsolute] = React.useState(false);
-  const [ttl, setTTL] = React.useState<number | string>(0);
+  const [ttl, setTTL] = React.useState<number>(0);
   const [displayTTL, setDisplayTTL] = React.useState<string>("");
 
   const dispatch = useDispatch();
 
   const handleConfirm = () => {
     if (!item) return;
-    services.setTTL(item.key, ttl);
+    services.setTTL(item.key, ttl, ttlAbsolute);
     dispatch(actions.setEditTTL(undefined));
   };
 
   const handleRemove = () => {
     if (!item) return;
-    services.removeTTL(item.key);
+    services.setTTL(item.key, -1);
     dispatch(actions.setEditTTL(undefined));
   };
 
@@ -52,8 +54,9 @@ const EditTTL: React.FC = () => {
 
   const handleTTLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (ttlAbsolute) {
-      setTTL(e.target.value);
-    } else setTTL(e.target.valueAsNumber);
+      const absTTL = new Date(e.target.value);
+      setTTL(absTTL.getTime());
+    } else setTTL(+e.target.value);
   };
 
   React.useEffect(() => {
@@ -82,6 +85,7 @@ const EditTTL: React.FC = () => {
               <span>{t`Absolute TTL`}: </span>
               <Toggle
                 data-testid={"edit-ttl-toggle"}
+                defaultChecked={ttlAbsolute}
                 onChange={() => {
                   setTTLAbsolute(!ttlAbsolute);
                 }}
@@ -89,11 +93,13 @@ const EditTTL: React.FC = () => {
             </Row>
             <Row>
               <span>
-                {ttlAbsolute ? t`Expires At` : t`Expiration (seconds)`}:{" "}
+                {ttlAbsolute ? t`Expires At` : t`Expiration (milliseconds)`}:{" "}
               </span>
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}
                 style={{ width: ttlAbsolute ? "unset" : "80px" }}
+                min={0}
+                step={1000}
                 data-testid={"edit-ttl-input"}
                 onChange={handleTTLChange}
               />

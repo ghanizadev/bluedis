@@ -5,7 +5,7 @@ import Button from "../Button";
 import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import Dropdown from "../Dropdown";
-import Input from "../Input";
+import { Input } from "../Input";
 import Toggle from "../Toggle";
 import { t } from "../../i18n";
 import { KeyType } from "../../shared/constants/key-type.dto";
@@ -29,20 +29,25 @@ const Key = styled(Input)`
 
 type Props = {
   onCancel: () => void;
-  onConfirm: (type: KeyType, key: string, ttl: number | string) => void;
+  onConfirm: (
+    type: KeyType,
+    key: string,
+    ttl: number,
+    ttlAbsolute: boolean
+  ) => void;
 };
 
 const AddKey: React.FC<Props> = (props) => {
   const { onCancel, onConfirm } = props;
   const [type, setType] = React.useState<KeyType>("set");
   const [key, setKey] = React.useState("");
-  const [ttl, setTTL] = React.useState<string | number>(0);
+  const [ttl, setTTL] = React.useState<number>(-1);
   const [useTTL, setUseTTL] = React.useState(false);
   const [ttlAbsolute, setTTLAbsolute] = React.useState(false);
 
   const handleConfirm = () => {
     if (!type || !key) return;
-    onConfirm(type, key, ttl);
+    onConfirm(type, key, ttl, ttlAbsolute);
   };
 
   const handleCancel = () => {
@@ -59,8 +64,9 @@ const AddKey: React.FC<Props> = (props) => {
 
   const handleTTLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (ttlAbsolute) {
-      setTTL(e.target.value);
-    } else setTTL(e.target.valueAsNumber);
+      const absTTL = new Date(e.target.value);
+      setTTL(absTTL.getTime());
+    } else setTTL(+e.target.value);
   };
 
   return (
@@ -101,7 +107,7 @@ const AddKey: React.FC<Props> = (props) => {
             </Row>
             <Row>
               <span>
-                {ttlAbsolute ? t`Expires At` : t`Expiration (seconds)`}:{" "}
+                {ttlAbsolute ? t`Expires At` : t`Expiration (milliseconds)`}:{" "}
               </span>
               <Input
                 type={ttlAbsolute ? "datetime-local" : "number"}

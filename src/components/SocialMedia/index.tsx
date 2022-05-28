@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import { openLink } from "../../services/mainProcess";
+import { openLink } from "../../services/main-process";
 import { ReactComponent as Instagram } from "../../assets/instagram.svg";
 import { ReactComponent as Github } from "../../assets/github.svg";
 import { ReactComponent as Facebook } from "../../assets/facebook.svg";
@@ -19,6 +19,7 @@ const Container = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin-top: 100px;
 
   & button {
     margin: 5px;
@@ -47,21 +48,22 @@ const SocialMedia: React.FC = () => {
       openLink(url);
     };
   };
+
   return (
     <Container>
-      <Button onClick={handleClick(LINKEDIN)}>
+      <Button data-testid={"links-linkedin"} onClick={handleClick(LINKEDIN)}>
         <Linkedin />
       </Button>
-      <Button onClick={handleClick(GITHUB)}>
+      <Button data-testid={"links-github"} onClick={handleClick(GITHUB)}>
         <Github />
       </Button>
-      <Button onClick={handleClick(FACEBOOK)}>
+      <Button data-testid={"links-facebook"} onClick={handleClick(FACEBOOK)}>
         <Facebook />
       </Button>
-      <Button onClick={handleClick(INSTAGRAM)}>
+      <Button data-testid={"links-instagram"} onClick={handleClick(INSTAGRAM)}>
         <Instagram />
       </Button>
-      <Button onClick={handleClick(TWITTER)}>
+      <Button data-testid={"links-twitter"} onClick={handleClick(TWITTER)}>
         <Twitter />
       </Button>
     </Container>

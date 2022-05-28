@@ -3,30 +3,30 @@ import { useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 
 import Frame from "./components/Frame";
-import Home from "./pages/Home";
+import Database from "./pages/Database";
 import { State } from "./redux/Types/State";
 import { Page } from "./redux/Types/Page";
 import Help from "./pages/Help";
 import Settings from "./pages/Settings";
 import Sidebar from "./components/Sidebar";
 import { GlobalStyles } from "./theme/globalStyles";
-import { getPreferences } from "./services/mainProcess";
+import { getPreferences } from "./services/main-process";
 import ErrorMessage from "./components/ErrorMessage";
 import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";
 import Loading from "./components/Loading";
 import { Appearance } from "./redux/Types/Appearance";
-import { t } from "./i18n";
+import Connect from "./pages/connect";
 
 const App = () => {
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
+  const isConnected = useSelector<State, boolean>((state) => state.connected);
   const appearance = useSelector<State, Appearance>(
     (state) => state.settings.appearance
   );
 
   React.useEffect(() => {
     getPreferences();
-    console.log(t`something that ${9 + 2} needs to be translated ${9 + 2}`);
   }, []);
 
   return (
@@ -41,7 +41,14 @@ const App = () => {
           }}
         >
           <Sidebar />
-          {currentPage === "home" && <Home />}
+          {!isConnected ? (
+            <Connect />
+          ) : (
+            <>
+              {currentPage === "database" && <Database />}
+              {/* TODO add message debugger */}
+            </>
+          )}
           {currentPage === "settings" && <Settings />}
           {currentPage === "help" && <Help />}
         </div>

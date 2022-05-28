@@ -2,9 +2,9 @@ import styled from "styled-components";
 
 export const Container = styled.button`
   border: none;
-  height: 30px;
-  padding: 5px 8px;
-  margin: 0 5px;
+  height: 40px;
+  padding: 3px 6px;
+  margin: 0 6px;
 
   background-color: ${(props) => props.theme.foreground};
 

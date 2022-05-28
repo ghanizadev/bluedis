@@ -1,3 +1,8 @@
 global.electron = {
-  platform: "win32"
+  platform: "win32",
+  send: () => ({}),
+  receive: () => ({}),
+  shell: {
+    openExternal: () => ({})
+  },
 }

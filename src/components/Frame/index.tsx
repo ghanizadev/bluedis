@@ -7,7 +7,7 @@ import { Connection } from "../../redux/Types/Connection";
 import { WorkingArea } from "./WorkingArea";
 import { Background } from "./Background";
 import { OSXBar } from "./osx-bar";
-import { WindowsBar } from "./windows-bar";
+import { Win32Bar } from "./win32-bar";
 
 const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
   props
@@ -74,7 +74,7 @@ const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
         <OSXBar title={`Bluedis ${host}${name}`} />
       )}
       {window.electron.platform !== "darwin" && (
-        <WindowsBar title={`Bluedis ${host}${name}`} />
+        <Win32Bar title={`Bluedis ${host}${name}`} />
       )}
       <WorkingArea>{props.children}</WorkingArea>
     </Background>

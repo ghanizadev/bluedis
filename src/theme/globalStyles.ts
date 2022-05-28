@@ -98,4 +98,8 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.loading, .loading * {
+  cursor: progress !important;
+}
 `;

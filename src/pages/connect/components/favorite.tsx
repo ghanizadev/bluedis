@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 
 import { ReactComponent as CloseIcon } from "../../../assets/close.svg";
@@ -43,7 +43,8 @@ type Props = {
   onConnect: (connection: Connection) => void;
   onRemove: (connection: Connection) => void;
 };
-const Favorite: React.FC<Props> = (props) => {
+
+export const Favorite: FC<Props> = (props) => {
   const { connection, onConnect, onRemove } = props;
 
   const handleRemove = (connection: Connection) => {
@@ -63,5 +64,3 @@ const Favorite: React.FC<Props> = (props) => {
     </Container>
   );
 };
-
-export default Favorite;

@@ -3,12 +3,13 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 
 import Checkbox from "../Checkbox";
-import { Item } from "../../redux/Types/Item";
+import { ItemType } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { loadMore } from "../../services/mainProcess";
+import { loadMore } from "../../services/main-process";
 import { Query } from "../../redux/Types/Query";
 import { t } from "../../i18n";
+import { useLoading } from "../../shared/hooks/use-loading.hook";
 
 import { Type } from "./Type";
 import { Data } from "./Data";
@@ -52,19 +53,21 @@ const LoadMore = styled.div`
 `;
 
 type Props = {
-  data: Item[];
-  onItemEdit?: (item: Item) => void;
+  data: ItemType[];
+  onItemEdit?: (item: ItemType) => void;
 };
 
 const Table: React.FC<Props> = (props) => {
   const { data, onItemEdit } = props;
   const dispatch = useDispatch();
 
+  const loading = useLoading();
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
 
-  const handleItemEdit = (item: Item) => {
+  const handleItemEdit = (item: ItemType) => {
+    loading(true);
     onItemEdit && onItemEdit(item);
   };
 
@@ -82,12 +85,13 @@ const Table: React.FC<Props> = (props) => {
   }, [query]);
 
   return (
-    <Container data-testid="home-table">
+    <Container data-testid={"database-table-container"}>
       <TableContainer>
         <tbody>
-          <Row data-testid="home-table-header">
+          <Row data-testid={"database-table-header"}>
             <Header style={{ width: "40px" }}>
               <Checkbox
+                data-testid={"database-table-select-all"}
                 checked={
                   data.length !== 0 &&
                   data.every((item) => selected.includes(item.key))
@@ -100,7 +104,7 @@ const Table: React.FC<Props> = (props) => {
           </Row>
           {data.map((item, index) => {
             return (
-              <Row key={index} data-testid="item-table-row">
+              <Row key={index} data-testid="database-table-item">
                 <Data
                   style={{
                     minWidth: "50px",
@@ -117,15 +121,21 @@ const Table: React.FC<Props> = (props) => {
                     }}
                   >
                     <Checkbox
+                      data-testid={"database-table-item-checkbox"}
                       checked={selected.includes(item.key)}
                       onChangeValue={() => handleSelect(item.key)}
                     />
                   </div>
                 </Data>
-                <Data align="center" style={{ width: "15%" }}>
+                <Data
+                  data-testid={"database-table-item-type"}
+                  align="center"
+                  style={{ width: "15%" }}
+                >
                   <Type>{item.type}</Type>
                 </Data>
                 <Data
+                  data-testid={"database-table-item-key"}
                   style={{ width: "75%" }}
                   title={t`Click to view`}
                   onClick={() => handleItemEdit(item)}
@@ -142,7 +152,11 @@ const Table: React.FC<Props> = (props) => {
           {query.done && t`showing all ${currentCount} keys`}
           {!query.done && t`showing ${currentCount} keys - `}
           {query.cursor !== 0 && (
-            <button disabled={query.cursor === 0} onClick={handleLoadMore}>
+            <button
+              disabled={query.cursor === 0}
+              onClick={handleLoadMore}
+              data-testid={"database-table-load-more"}
+            >
               {t`load more`}
             </button>
           )}

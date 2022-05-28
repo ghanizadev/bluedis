@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import Button from "../Button";
-import Input from "../Input";
+import { Input } from "../Input";
 import { t } from "../../i18n";
 
 const Container = styled.div`
@@ -74,14 +74,22 @@ const PickName: React.FC<Props> = (props) => {
   return (
     <>
       <Container />
-      <Content>
+      <Content data-testid={"pick-container"}>
         <div id="input-container">
           <span>{t`Pick a name`}: </span>
-          <InputName ref={inputRef} />
+          <InputName data-testid={"pick-input"} ref={inputRef} />
         </div>
         <ButtonsWrapper>
-          <Button label={t`Cancel`} onClick={handleCancel} />
-          <Button label={t`Confirm`} onClick={handleConfirm} />
+          <Button
+            label={t`Cancel`}
+            onClick={handleCancel}
+            data-testid={"pick-cancel"}
+          />
+          <Button
+            label={t`Confirm`}
+            onClick={handleConfirm}
+            data-testid={"pick-confirm"}
+          />
         </ButtonsWrapper>
       </Content>
     </>

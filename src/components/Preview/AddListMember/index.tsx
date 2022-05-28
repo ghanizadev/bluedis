@@ -12,10 +12,10 @@ import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
 import { t } from "../../../i18n";
 
 type Props = {
-  onSubmit: (value: string, index: number) => void;
+  onSubmit: (value: string, index?: number) => void;
   onDelete: (value: string, index: number) => void;
   onClose: () => void;
-  value?: { value: string; index: number };
+  value: { value: string; index: number };
 };
 
 const AddListMember: React.FC<Props> = (props) => {
@@ -28,8 +28,10 @@ const AddListMember: React.FC<Props> = (props) => {
   };
 
   const handleSave = () => {
-    if (textAreaRef.current?.value)
-      onSubmit(textAreaRef.current.value, value?.index ?? -1);
+    if (!textAreaRef.current?.value) return;
+
+    if (value?.index >= 0) onSubmit(textAreaRef.current.value, value?.index);
+    else onSubmit(textAreaRef.current.value);
   };
   const handleItemCopy = () => {
     if (value && textAreaRef.current) {
@@ -45,18 +47,18 @@ const AddListMember: React.FC<Props> = (props) => {
   return (
     <>
       <MessageBackground />
-      <MessageContent>
-        <h3>{t`Add/Edit Item`}</h3>
+      <MessageContent data-testid={"add-item-modal"}>
+        <h3>{props.value.index < 0 ? t`Add item` : t`Edit item`}</h3>
         <TextArea ref={textAreaRef} defaultValue={value?.value} />
         <PreviewActions>
           <PreviewActionButton
-            data-testid="message-copy"
+            data-testid="add-item-modal-copy"
             onClick={handleItemCopy}
           >
             <CopyIcon title={t`Copy as JSON`} />
           </PreviewActionButton>
           <PreviewActionButton
-            data-testid="message-remove"
+            data-testid="add-item-modal-remove"
             remove
             onClick={handleItemRemove}
           >
@@ -64,8 +66,16 @@ const AddListMember: React.FC<Props> = (props) => {
           </PreviewActionButton>
         </PreviewActions>
         <MessageButtonWrapper>
-          <Button label={t`Close`} onClick={handleClose} />
-          <Button label={t`Save`} onClick={handleSave} />
+          <Button
+            label={t`Close`}
+            onClick={handleClose}
+            data-testid={"add-item-modal-close"}
+          />
+          <Button
+            label={t`Save`}
+            onClick={handleSave}
+            data-testid={"add-item-modal-save"}
+          />
         </MessageButtonWrapper>
       </MessageContent>
     </>

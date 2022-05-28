@@ -4,30 +4,13 @@ import styled from "styled-components";
 
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { executeCommand } from "../../services/mainProcess";
+import { executeCommand } from "../../services/main-process";
 
 import { command } from "./comands";
 import availableCommands from "./availableCommands.json";
 
-export const Background = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  background-color: rgba(0, 0, 0, 0.15);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  z-index: 10;
-`;
-
 const Container = styled.section`
-  /* flex: 0 1; */
-  min-height: 100px;
+  min-height: 180px;
   overflow: auto;
   background-color: ${(props) => props.theme.sidebarBackground};
   color: ${(props) => props.theme.text};
@@ -119,25 +102,32 @@ const Shell: React.FC = () => {
 
     if (!div) throw new Error("shell container not found");
 
-    div.scrollTo({ top: div.scrollTop, behavior: "smooth" });
+    div.scrollTo && div.scrollTo({ top: div.scrollTop, behavior: "smooth" });
   }, [terminal.stdout]);
 
   return (
     <>
       {terminal.open && (
         <Container>
-          <Terminal id="terminal" onClick={handleOnTerminalClick}>
-            {terminal.stdout.map((command) => (
-              <div>{command}</div>
+          <Terminal
+            id="terminal"
+            onClick={handleOnTerminalClick}
+            data-testid={"shell-terminal"}
+          >
+            {terminal.stdout.map((command, i) => (
+              <div key={command + i}>{command}</div>
             ))}
-            <p>
-              <div>{"> "}</div>
-              <input
-                spellCheck={false}
-                ref={inputRef}
-                onKeyDown={handleCommandSubmit}
-              />
-            </p>
+            <div>
+              <span>
+                {"> "}
+                <input
+                  data-testid={"shell-input"}
+                  spellCheck={false}
+                  ref={inputRef}
+                  onKeyDown={handleCommandSubmit}
+                />
+              </span>
+            </div>
           </Terminal>
         </Container>
       )}

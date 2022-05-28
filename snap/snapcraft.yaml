@@ -31,7 +31,9 @@ parts:
   bluedis:
     plugin: nil
     source: .
-    override-build: ./build
+    override-build: |
+      cp -rv "$SNAPCRAFT_PART_BUILD"/out/Bluedis-* "$SNAPCRAFT_PART_INSTALL"
+      mv "$SNAPCRAFT_PART_INSTALL"/Bluedis-* "$SNAPCRAFT_PART_INSTALL"/bin
     build-snaps:
     - node/14/stable
     build-packages:
