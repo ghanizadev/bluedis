@@ -44,10 +44,10 @@ export class ListManager implements KeyManager<ListType> {
 
       if (!item) throw new Error("Impossible to replace an empty list");
       await this.redis.lset(key, payload.index, item);
-    } else {
-      if (payload.position === "tail") await this.redis.rpush(key, ...value);
-      else await this.redis.lpush(key, ...value);
-    }
+    } else if (payload.position === "tail")
+      await this.redis.rpush(key, ...value);
+    else await this.redis.lpush(key, ...value);
+
     return this.get(key);
   }
 
@@ -68,6 +68,6 @@ export class ListManager implements KeyManager<ListType> {
   }
 
   public async create(key: string): Promise<Item<ListType>> {
-    return this.set(key, ["value"]);
+    return this.set(key, ["new list value"]);
   }
 }

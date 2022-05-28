@@ -39,6 +39,6 @@ export class SetManager implements KeyManager<SetType> {
   }
 
   public async create(key: string): Promise<Item<SetType>> {
-    return this.set(key, ["value"]);
+    return this.set(key, ["new set value"]);
   }
 }
