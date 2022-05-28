@@ -22,7 +22,10 @@ export class StringManager implements KeyManager<StringType> {
     };
   }
 
-  public async update(key: string, payload: string): Promise<Item<StringType>> {
-    return this.set(key, payload);
+  public async del(
+    key: string,
+    indexOrName: number | string
+  ): Promise<Item<StringType>> {
+    return Promise.resolve(undefined);
   }
 }

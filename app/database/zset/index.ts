@@ -1,6 +1,12 @@
 import Redis from "ioredis";
 
-import { Item, ItemType, KeyManager, ZSetType } from "../database.dto";
+import {
+  Item,
+  ItemType,
+  KeyManager,
+  KeyUpdate,
+  ZSetType,
+} from "../database.dto";
 
 export class ZSetManager implements KeyManager<ZSetType> {
   constructor(public redis: Redis) {}
@@ -27,7 +33,11 @@ export class ZSetManager implements KeyManager<ZSetType> {
     );
   }
 
-  public async set(key: string, value: ZSetType): Promise<Item<ZSetType>> {
+  public async set(
+    key: string,
+    value: ZSetType,
+    update?: KeyUpdate
+  ): Promise<Item<ZSetType>> {
     const args = this.unmarshall(value);
     await this.redis.zadd(key, ...args);
     return this.get(key);
@@ -45,11 +55,8 @@ export class ZSetManager implements KeyManager<ZSetType> {
     };
   }
 
-  public async update(
-    key: string,
-    payload: { score: string; value: string }
-  ): Promise<Item<ZSetType>> {
-    await this.redis.zadd(key, payload.score, payload.value);
+  public async del(key: string, name: string): Promise<Item<ZSetType>> {
+    await this.redis.zrem(key, name);
     return this.get(key);
   }
 }

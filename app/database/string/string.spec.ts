@@ -44,15 +44,4 @@ describe("StringManager", () => {
     expect(result.key).toEqual("my:string");
     expect(result.type).toEqual("string");
   });
-
-  it("Should update a key", async () => {
-    const instance = new StringManager(redis);
-    const result = await instance.update("my:string", "this is other string");
-
-    expect(result).toBeDefined();
-    expect(result.value).toEqual("this is other string");
-    expect(result.ttl).toEqual(-1);
-    expect(result.key).toEqual("my:string");
-    expect(result.type).toEqual("string");
-  });
 });

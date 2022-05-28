@@ -29,3 +29,5 @@
 - [ ] Add Connect page - split from Database page;
 - [ ] Refresh after updating a key;
 - [ ] Split database manager by key types;
+- [ ] Add type to preview dashboard
+- [ ] Make preview scale according to screen size;

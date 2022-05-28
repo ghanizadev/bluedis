@@ -48,7 +48,7 @@ describe("SetManager", () => {
 
   it("Should update a key", async () => {
     const instance = new SetManager(redis);
-    const result = await instance.update("my:set", "4");
+    const result = await instance.set("my:set", ["4"]);
 
     expect(result).toBeDefined();
     expect(result.value.sort()).toEqual(["1", "2", "3", "4"]);

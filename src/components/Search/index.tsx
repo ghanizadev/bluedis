@@ -3,9 +3,9 @@ import styled from "styled-components";
 
 import Button from "../Button";
 import Dropdown from "../Dropdown";
-import Input from "../Input";
 import { find, selectDatabase } from "../../services/mainProcess";
 import { t } from "../../i18n";
+import { InputAlt } from "../Input";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -15,7 +15,7 @@ const Container = styled.div`
   flex: 0 1;
 `;
 
-const SearchInput = styled(Input)`
+const SearchInput = styled(InputAlt)`
   flex: 1;
 `;
 

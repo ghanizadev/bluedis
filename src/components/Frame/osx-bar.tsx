@@ -1,12 +1,16 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import styled from "styled-components";
 
+import { ReactComponent as CloseIcon } from "../../assets/close.svg";
+import { ReactComponent as MinimizeIcon } from "../../assets/minimize.svg";
+import { ReactComponent as MaximizeIcon } from "../../assets/maximize.svg";
 import {
   close,
   fullscreen,
   maximize,
   minimize,
 } from "../../services/mainProcess";
+import { useBlur } from "../../shared/hooks/use-blur.hook";
 
 import { Title } from "./Title";
 import { ButtonWrapper } from "./ButtonWrapper";
@@ -34,6 +38,9 @@ const TitleWrapper = styled.div`
 `;
 
 export const OSXBar: FC<{ title?: string }> = ({ title }) => {
+  const [hover, setHover] = useState(false);
+  const { isBlurred } = useBlur();
+
   const handleClose = () => {
     close();
   };
@@ -52,22 +59,31 @@ export const OSXBar: FC<{ title?: string }> = ({ title }) => {
 
   return (
     <Bar data-testid={"osx-bar"}>
-      <ButtonWrapper>
+      <ButtonWrapper
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
         <MacButton
-          color={"hsl(0,100%,66%)"}
+          color={isBlurred ? "#ccc" : "hsl(0,100%,66%)"}
           data-testid="frame-close"
           onClick={handleClose}
-        ></MacButton>
+        >
+          {hover && <CloseIcon width={10} height={10} strokeWidth={2} />}
+        </MacButton>
         <MacButton
-          color={"hsl(45,100%,50%)"}
+          color={isBlurred ? "#ccc" : "hsl(45,100%,50%)"}
           data-testid="frame-minimize"
           onClick={handleMinimize}
-        ></MacButton>
+        >
+          {hover && <MinimizeIcon width={10} height={10} strokeWidth={2} />}
+        </MacButton>
         <MacButton
-          color={"hsl(127,98%,40%)"}
+          color={isBlurred ? "#ccc" : "hsl(127,98%,40%)"}
           data-testid="frame-fullscreen"
           onClick={handleFullscreen}
-        ></MacButton>
+        >
+          {hover && <MaximizeIcon width={10} height={10} strokeWidth={2} />}
+        </MacButton>
       </ButtonWrapper>
       <TitleWrapper onDoubleClick={handleMaximize}>
         <Title data-testid={"frame-titlebar"}>{title}</Title>

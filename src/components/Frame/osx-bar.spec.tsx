@@ -109,6 +109,32 @@ describe("<OSXBar />", () => {
     expect(sendSpy).toHaveBeenCalledWith("close");
   });
 
+  it("Should turn button gray on blur", () => {
+    render(
+      <Provider store={store}>
+        <Frame />
+      </Provider>
+    );
+
+    const close = screen.getByTestId("frame-close");
+    const fullscreen = screen.getByTestId("frame-fullscreen");
+    const minimize = screen.getByTestId("frame-minimize");
+
+    act(() => {
+      fireEvent.blur(window);
+    });
+
+    expect(getComputedStyle(fullscreen).backgroundColor).toEqual(
+      "rgb(204, 204, 204)"
+    );
+    expect(getComputedStyle(close).backgroundColor).toEqual(
+      "rgb(204, 204, 204)"
+    );
+    expect(getComputedStyle(minimize).backgroundColor).toEqual(
+      "rgb(204, 204, 204)"
+    );
+  });
+
   it("Should have right title", () => {
     render(
       <Provider store={store}>

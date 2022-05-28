@@ -16,9 +16,11 @@ import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";
 import Loading from "./components/Loading";
 import { Appearance } from "./redux/Types/Appearance";
+import Connect from "./pages/connect";
 
 const App = () => {
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
+  const isConnected = useSelector<State, boolean>((state) => state.connected);
   const appearance = useSelector<State, Appearance>(
     (state) => state.settings.appearance
   );
@@ -39,7 +41,14 @@ const App = () => {
           }}
         >
           <Sidebar />
-          {currentPage === "database" && <Database />}
+          {!isConnected ? (
+            <Connect />
+          ) : (
+            <>
+              {currentPage === "database" && <Database />}
+              {/* TODO add message debugger */}
+            </>
+          )}
           {currentPage === "settings" && <Settings />}
           {currentPage === "help" && <Help />}
         </div>

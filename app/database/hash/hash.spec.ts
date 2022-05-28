@@ -46,7 +46,7 @@ describe("HashManager", () => {
 
   it("Should update key", async () => {
     const instance = new HashManager(redis);
-    const result = await instance.update("my:hash", { another: "msg" });
+    const result = await instance.set("my:hash", { another: "msg" });
 
     expect(result).toBeDefined();
     expect(result.value.message).toEqual("hello world!");

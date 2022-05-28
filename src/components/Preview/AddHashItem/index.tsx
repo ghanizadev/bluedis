@@ -9,9 +9,9 @@ import { PreviewActions } from "../../common/PreviewActions";
 import { PreviewActionButton } from "../../common/PreviewActionButton";
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
+import { Input } from "../../Input";
 import { t } from "../../../i18n";
 
-import { Input } from "./Input";
 import { Label } from "./Label";
 
 type Props = {

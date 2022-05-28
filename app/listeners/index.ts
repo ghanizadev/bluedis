@@ -5,9 +5,11 @@ import path from "path";
 import Store from "electron-store";
 
 import DatabaseManager from "../database";
+import { Manager } from "../database/manager";
 
 const store = new Store();
 const database = new DatabaseManager();
+const manager = new Manager();
 
 const license = fs
   .readFileSync(path.resolve(__dirname, "..", "..", "LICENSE.txt"))
@@ -21,16 +23,24 @@ ipcMain.on("connect", async (event, options) => {
   try {
     const { host, port, password, tls } = options;
 
-    database.connect(host, port, password, tls);
-    const docs = await database.find("*", 0, 100); //TODO Remove hardcoded limit
+    database.connect(host, port, password, tls); // TODO Remove old api
+    await manager.connect(
+      `redis${tls ? "s" : ""}://${
+        password ? `:${password}@` : ""
+      }${host}:${port}`
+    );
+
+    const docs = await manager.find("*", 0, 100);
+
     event.sender.send("data", docs);
   } catch (e) {
     return event.sender.send("error", e);
   }
 });
 
-ipcMain.on("disconnect", () => {
-  database.disconnect();
+ipcMain.on("disconnect", async () => {
+  database.disconnect(); //TODO remove old api
+  await manager.disconnect();
 });
 
 ipcMain.on("update", async (event, cursor: number) => {
@@ -201,7 +211,8 @@ ipcMain.on("initial", async (event) => {
 });
 
 ipcMain.on("find", async (event, match: string, cursor: number) => {
-  const result = await database.find(match, cursor, 100); //TODO Remove hardcoded limit
+  // const result = await database.find(match, cursor, 100); //TODO Remove hardcoded limit
+  const result = await manager.find(match, cursor, 100);
   event.sender.send("data", result);
 });
 

@@ -46,37 +46,37 @@ describe("ListManager", () => {
     expect(result.type).toEqual("list");
   });
 
-  it("Should update a key - head", async () => {
-    const instance = new ListManager(redis);
-    const result = await instance.update("my:list", {
-      value: "another one",
-      position: "head",
-    });
-
-    expect(result).toBeDefined();
-    expect(result.value).toEqual(["another one", "first", "second", "third"]);
-    expect(result.ttl).toEqual(-1);
-    expect(result.key).toEqual("my:list");
-    expect(result.type).toEqual("list");
-  });
-
-  it("Should update a key - tail", async () => {
-    const instance = new ListManager(redis);
-    const result = await instance.update("my:list", {
-      value: "one more",
-      position: "tail",
-    });
-
-    expect(result).toBeDefined();
-    expect(result.value).toEqual([
-      "another one",
-      "first",
-      "second",
-      "third",
-      "one more",
-    ]);
-    expect(result.ttl).toEqual(-1);
-    expect(result.key).toEqual("my:list");
-    expect(result.type).toEqual("list");
-  });
+  // it("Should update a key - head", async () => {
+  //   const instance = new ListManager(redis);
+  //   const result = await instance.update("my:list", {
+  //     value: "another one",
+  //     position: "head",
+  //   });
+  //
+  //   expect(result).toBeDefined();
+  //   expect(result.value).toEqual(["another one", "first", "second", "third"]);
+  //   expect(result.ttl).toEqual(-1);
+  //   expect(result.key).toEqual("my:list");
+  //   expect(result.type).toEqual("list");
+  // });
+  //
+  // it("Should update a key - tail", async () => {
+  //   const instance = new ListManager(redis);
+  //   const result = await instance.update("my:list", {
+  //     value: "one more",
+  //     position: "tail",
+  //   });
+  //
+  //   expect(result).toBeDefined();
+  //   expect(result.value).toEqual([
+  //     "another one",
+  //     "first",
+  //     "second",
+  //     "third",
+  //     "one more",
+  //   ]);
+  //   expect(result.ttl).toEqual(-1);
+  //   expect(result.key).toEqual("my:list");
+  //   expect(result.type).toEqual("list");
+  // });
 });

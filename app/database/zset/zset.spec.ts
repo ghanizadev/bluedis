@@ -54,10 +54,12 @@ describe("ZZSetManager", () => {
 
   it("Should update a key", async () => {
     const instance = new ZSetManager(redis);
-    const result = await instance.update("my:zset", {
-      score: "150",
-      value: "third value",
-    });
+    const result = await instance.set("my:zset", [
+      {
+        score: "150",
+        value: "third value",
+      },
+    ]);
 
     expect(result.value).toEqual([
       { score: "0", value: "first value" },

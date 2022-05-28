@@ -22,7 +22,8 @@ export class SetManager implements KeyManager<ListType> {
     };
   }
 
-  public async update(key: string, payload: string): Promise<Item<ListType>> {
-    return this.set(key, [payload]);
+  public async del(key: string, name: string): Promise<Item<ListType>> {
+    await this.redis.srem(key, name);
+    return this.get(key);
   }
 }

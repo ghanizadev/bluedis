@@ -19,6 +19,7 @@ const Container = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin-top: 100px;
 
   & button {
     margin: 5px;
@@ -47,6 +48,7 @@ const SocialMedia: React.FC = () => {
       openLink(url);
     };
   };
+
   return (
     <Container>
       <Button data-testid={"links-linkedin"} onClick={handleClick(LINKEDIN)}>

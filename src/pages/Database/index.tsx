@@ -18,8 +18,6 @@ import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
 
-import Connect from "./Connect";
-
 const Content = styled.div`
   width: 100%;
   height: 100%;
@@ -85,26 +83,21 @@ const Home = () => {
   return (
     <>
       <Content>
-        {connected && (
-          <>
-            <Search />
-            <Toolbar onAddKey={handleAddOpen} onRefresh={handleRefresh} />
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                flex: 1,
-              }}
-            >
-              <Wrapper>
-                <Table data={data} onItemEdit={handlePreview} />
-              </Wrapper>
-              <Preview onCloseRequest={handlePreviewClose} />
-            </div>
-            <Shell />
-          </>
-        )}
-        {!connected && <Connect />}
+        <Search />
+        <Toolbar onAddKey={handleAddOpen} onRefresh={handleRefresh} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flex: 1,
+          }}
+        >
+          <Wrapper>
+            <Table data={data} onItemEdit={handlePreview} />
+          </Wrapper>
+          <Preview onCloseRequest={handlePreviewClose} />
+        </div>
+        <Shell />
       </Content>
       {addItem && (
         <AddKey onCancel={handleAddCancel} onConfirm={handleAddConfirm} />

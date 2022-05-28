@@ -31,10 +31,8 @@ export class HashManager implements KeyManager<HashType> {
     };
   }
 
-  public async update(
-    key: string,
-    payload: { [k: string]: string }
-  ): Promise<Item<HashType>> {
-    return this.set(key, payload);
+  public async del(key: string, indexOrName: string): Promise<Item<HashType>> {
+    await this.redis.hdel(key, indexOrName);
+    return this.get(key);
   }
 }

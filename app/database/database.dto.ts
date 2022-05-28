@@ -38,8 +38,14 @@ export type SearchResult = {
   done: boolean;
 };
 
+export interface KeyUpdate {
+  index?: number;
+  score?: number;
+  position: "head" | "tail";
+}
+
 export interface KeyManager<T> {
   get(key: string): Promise<Item<T>>;
-  set(key: string, value: T): Promise<Item<T>>;
-  update(key: string, payload: any, scoreOrIndex?: string): Promise<Item<T>>;
+  set(key: string, payload: any, update?: KeyUpdate): Promise<Item<T>>;
+  del(key: string, indexOrName: number | string): Promise<Item<T>>;
 }
