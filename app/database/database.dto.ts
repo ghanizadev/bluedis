@@ -41,11 +41,13 @@ export type SearchResult = {
 export interface KeyUpdate {
   index?: number;
   score?: number;
-  position: "head" | "tail";
+  oldValue?: string;
+  position?: "head" | "tail";
 }
 
 export interface KeyManager<T> {
   get(key: string): Promise<Item<T>>;
   set(key: string, payload: any, update?: KeyUpdate): Promise<Item<T>>;
+  create(key: string): Promise<Item<T>>;
   del(key: string, indexOrName: number | string): Promise<Item<T>>;
 }

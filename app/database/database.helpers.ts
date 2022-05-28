@@ -1,4 +1,4 @@
-import { ZSetType } from "../../src/redux/Types/Item";
+import { ZSetType } from "./database.dto";
 
 export const parseZSet = (input: string[]): ZSetType => {
   const result: { value: string; score: string }[] = [];

@@ -6,23 +6,19 @@ import { StringManager } from "./string";
 import { HashManager } from "./hash";
 import { ListManager } from "./list";
 import { AnyItem, KeyUpdate, SearchResult } from "./database.dto";
+import { CommandManager } from "./command";
 
 export class Manager {
-  private redis: Redis = new Redis({ lazyConnect: true });
+  private redis?: Redis;
 
-  private readonly zsetManager: ZSetManager;
-  private readonly setManager: SetManager;
-  private readonly stringManager: StringManager;
-  private readonly hashManager: HashManager;
-  private readonly listManager: ListManager;
-
-  constructor() {
-    this.zsetManager = new ZSetManager(this.redis);
-    this.setManager = new SetManager(this.redis);
-    this.stringManager = new StringManager(this.redis);
-    this.hashManager = new HashManager(this.redis);
-    this.listManager = new ListManager(this.redis);
-  }
+  constructor(
+    private readonly zsetManager = new ZSetManager(),
+    private readonly setManager = new SetManager(),
+    private readonly strManager = new StringManager(),
+    private readonly hashManager = new HashManager(),
+    private readonly listManager = new ListManager(),
+    private readonly commandManager = new CommandManager()
+  ) {}
 
   public async connect(connectionString: string) {
     this.redis = new Redis(connectionString, {
@@ -35,9 +31,10 @@ export class Manager {
 
     this.zsetManager.redis = this.redis;
     this.setManager.redis = this.redis;
-    this.stringManager.redis = this.redis;
+    this.strManager.redis = this.redis;
     this.hashManager.redis = this.redis;
     this.listManager.redis = this.redis;
+    this.commandManager.redis = this.redis;
   }
 
   public async disconnect() {
@@ -92,36 +89,49 @@ export class Manager {
     return this.redis.dbsize();
   }
 
+  public async selectDB(index: number) {
+    return this.redis.select(index);
+  }
+
+  public async createKey(key: string, type: string) {
+    return this.switchType(key, type, "create");
+  }
+
   public async getKey(key: string) {
-    return this.switchType(key, "get");
+    return this.switchType(key, "", "get");
   }
 
   public async setKey(key: string, payload: any, update?: KeyUpdate) {
-    return this.switchType(key, "set", payload, update);
+    return this.switchType(key, "", "set", payload, update);
   }
 
   public async remKey(key: string, indexOrName: string | number) {
-    return this.switchType(key, "del", indexOrName);
+    return this.switchType(key, "", "del", indexOrName);
+  }
+
+  public async command(command: string) {
+    return this.commandManager.call(command);
   }
 
   private async switchType(
     key: string,
-    callback: "get" | "set" | "del",
+    type: string,
+    callback: "get" | "set" | "del" | "create",
     ...args: any[]
   ): Promise<any> {
-    const type = await this.redis.type(key);
+    const t = type ? type : await this.redis.type(key);
 
-    switch (type) {
+    switch (t) {
       case "string":
-        return this.stringManager[callback].call(this.stringManager, ...args);
+        return this.strManager[callback].call(this.strManager, key, ...args);
       case "set":
-        return this.setManager[callback].call(this.setManager, ...args);
+        return this.setManager[callback].call(this.setManager, key, ...args);
       case "zset":
-        return this.zsetManager[callback].call(this.zsetManager, ...args);
+        return this.zsetManager[callback].call(this.zsetManager, key, ...args);
       case "list":
-        return this.listManager[callback].call(this.listManager, ...args);
+        return this.listManager[callback].call(this.listManager, key, ...args);
       case "hash":
-        return this.hashManager[callback].call(this.hashManager, ...args);
+        return this.hashManager[callback].call(this.hashManager, key, ...args);
       default:
         throw new Error("not implemented");
     }

@@ -1,10 +1,6 @@
 import React from "react";
 
-import {
-  addSetMember,
-  alterSetMember,
-  removeSetMember,
-} from "../../services/mainProcess";
+import { alterKey, delKeyMember } from "../../services/mainProcess";
 import { Item, SetType } from "../../redux/Types/Item";
 import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
@@ -32,8 +28,9 @@ const SetComponent: React.FC<Props> = (props) => {
   const handleItemSubmit = (value: string) => {
     if (!itemValue) return;
 
-    if (!itemValue.isNew) alterSetMember(key, itemValue.value, value);
-    else addSetMember(key, value);
+    alterKey(key, [value], {
+      oldValue: itemValue.isNew ? null : itemValue.value,
+    });
 
     setItemValue(undefined);
   };
@@ -44,7 +41,7 @@ const SetComponent: React.FC<Props> = (props) => {
 
   const handleMemberDelete = (value: string) => {
     setItemValue(undefined);
-    removeSetMember(key, value);
+    delKeyMember(key, value);
   };
 
   const handleMemberEdit = (item: string) => {

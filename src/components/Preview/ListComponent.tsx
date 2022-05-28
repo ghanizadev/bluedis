@@ -5,11 +5,7 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import {
-  addListMember,
-  alterListMember,
-  removeListMember,
-} from "../../services/mainProcess";
+import { alterKey, delKeyMember } from "../../services/mainProcess";
 import { t } from "../../i18n";
 
 import AddListMember from "./AddListMember";
@@ -30,15 +26,13 @@ const ListComponent: React.FC<Props> = (props) => {
   const handleAddOpen = () => {
     setItemValue({ value: t`New value here...`, index: -1 });
   };
-  const handleItemSubmit = (value: string, index: number) => {
-    if (index === -1) addListMember(key, value);
-    else alterListMember(key, value, index);
-
+  const handleItemSubmit = (value: string, index?: number) => {
+    alterKey(key, [value], { position: "tail", index });
     setItemValue(undefined);
   };
 
   const handleItemDelete = (value: string, index: number) => {
-    removeListMember(key, index);
+    delKeyMember(key, index);
     setItemValue(undefined);
   };
 

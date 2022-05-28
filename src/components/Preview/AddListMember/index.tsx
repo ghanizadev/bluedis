@@ -12,7 +12,7 @@ import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
 import { t } from "../../../i18n";
 
 type Props = {
-  onSubmit: (value: string, index: number) => void;
+  onSubmit: (value: string, index?: number) => void;
   onDelete: (value: string, index: number) => void;
   onClose: () => void;
   value: { value: string; index: number };
@@ -28,8 +28,10 @@ const AddListMember: React.FC<Props> = (props) => {
   };
 
   const handleSave = () => {
-    if (textAreaRef.current?.value)
-      onSubmit(textAreaRef.current.value, value?.index ?? -1);
+    if (!textAreaRef.current?.value) return;
+
+    if (value?.index >= 0) onSubmit(textAreaRef.current.value, value?.index);
+    else onSubmit(textAreaRef.current.value);
   };
   const handleItemCopy = () => {
     if (value && textAreaRef.current) {

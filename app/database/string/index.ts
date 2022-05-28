@@ -3,7 +3,7 @@ import Redis from "ioredis";
 import { Item, ItemType, KeyManager, StringType } from "../database.dto";
 
 export class StringManager implements KeyManager<StringType> {
-  constructor(public redis: Redis) {}
+  constructor(public redis = new Redis({ lazyConnect: true })) {}
 
   public async set(key: string, value: StringType): Promise<Item<StringType>> {
     await this.redis.set(key, value);
@@ -26,6 +26,10 @@ export class StringManager implements KeyManager<StringType> {
     key: string,
     indexOrName: number | string
   ): Promise<Item<StringType>> {
-    return Promise.resolve(undefined);
+    return this.get(key);
+  }
+
+  public async create(key: string): Promise<Item<StringType>> {
+    return this.set(key, "value");
   }
 }

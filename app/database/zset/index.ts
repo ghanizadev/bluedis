@@ -9,7 +9,7 @@ import {
 } from "../database.dto";
 
 export class ZSetManager implements KeyManager<ZSetType> {
-  constructor(public redis: Redis) {}
+  constructor(public redis = new Redis({ lazyConnect: true })) {}
 
   private marshall(range: string[]): ZSetType {
     const value: ZSetType = [];
@@ -39,7 +39,10 @@ export class ZSetManager implements KeyManager<ZSetType> {
     update?: KeyUpdate
   ): Promise<Item<ZSetType>> {
     const args = this.unmarshall(value);
-    await this.redis.zadd(key, ...args);
+
+    if (update.oldValue) await this.redis.zrem(key, update.oldValue);
+    await this.redis.zadd(key, "NX", ...args);
+
     return this.get(key);
   }
 
@@ -58,5 +61,9 @@ export class ZSetManager implements KeyManager<ZSetType> {
   public async del(key: string, name: string): Promise<Item<ZSetType>> {
     await this.redis.zrem(key, name);
     return this.get(key);
+  }
+
+  public async create(key: string): Promise<Item<ZSetType>> {
+    return this.set(key, [{ score: "100", value: "value" }]);
   }
 }

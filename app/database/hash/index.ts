@@ -3,7 +3,7 @@ import Redis from "ioredis";
 import { Item, ItemType, KeyManager, HashType } from "../database.dto";
 
 export class HashManager implements KeyManager<HashType> {
-  constructor(public redis: Redis) {}
+  constructor(public redis = new Redis({ lazyConnect: true })) {}
 
   private unmarshall(input: HashType): string[] {
     return Object.entries(input).reduce(
@@ -34,5 +34,9 @@ export class HashManager implements KeyManager<HashType> {
   public async del(key: string, indexOrName: string): Promise<Item<HashType>> {
     await this.redis.hdel(key, indexOrName);
     return this.get(key);
+  }
+
+  public async create(key: string): Promise<Item<HashType>> {
+    return this.set(key, { key: "value" });
   }
 }

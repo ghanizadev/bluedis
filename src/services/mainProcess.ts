@@ -24,12 +24,12 @@ export const fullscreen = () => {
 };
 
 export const deleteKey = (key: string[]) => {
-  services.send("deleteKey", key);
+  services.send("remove", key);
 };
 
 export const updateData = () => {
-  const cursor = store.getState().query.cursor;
-  services.send("update", cursor);
+  const query = store.getState().query;
+  services.send("update", query);
 };
 
 export const getDBCount = () => {
@@ -37,63 +37,15 @@ export const getDBCount = () => {
 };
 
 export const addKey = (key: string, type: string, ttl: number | string) => {
-  services.send("addKey", key, type, ttl);
+  services.send("add", key, type, ttl);
 };
 
-export const alterString = (key: string, value: string) => {
-  services.send("alterString", key, value);
+export const alterKey = (key: string, value: any, update?: any) => {
+  services.send("alter", key, value, update);
 };
 
-export const addListMember = (key: string, value: string) => {
-  services.send("addListMember", key, value);
-};
-
-export const removeListMember = (key: string, index: number) => {
-  services.send("removeListMember", key, index);
-};
-
-export const alterListMember = (key: string, value: string, index: number) => {
-  services.send("alterListMember", key, value, index);
-};
-
-export const addHashMember = (key: string, value: { [type: string]: any }) => {
-  services.send("addHashMember", key, value);
-};
-
-export const alterHashMember = (
-  key: string,
-  value: { [type: string]: any }
-) => {
-  services.send("alterHashMember", key, value);
-};
-
-export const removeHashMember = (key: string, value: string) => {
-  services.send("removeHashMember", key, value);
-};
-
-export const addSetMember = (key: string, value: string) => {
-  services.send("addSetMember", key, value);
-};
-
-export const alterSetMember = (key: string, old: string, value: string) => {
-  services.send("removeSetMember", key, old);
-  services.send("addSetMember", key, value);
-};
-
-export const removeSetMember = (key: string, value: string) => {
-  services.send("removeSetMember", key, value);
-};
-
-export const addZSetMember = (key: string, value: string, score: string) => {
-  services.send("addZSetMember", key, value, score);
-};
-
-export const removeZSetMember = (key: string, value: string) => {
-  services.send("removeZSetMember", key, value);
-};
-
-export const alterZSetMember = (key: string, value: string, score: string) => {
-  services.send("alterZSetMember", key, value, score);
+export const delKeyMember = (key: string, indexOrName: number | string) => {
+  services.send("del", key, indexOrName);
 };
 
 export const selectDatabase = (index: number) => {
@@ -106,10 +58,6 @@ export const find = (match: string, cursor: number) => {
 
 export const loadMore = (match: string, cursor: number) => {
   services.send("loadMore", match, cursor);
-};
-
-export const findByKey = (key: string) => {
-  services.send("findByKey", key);
 };
 
 export const updatePreview = (key: string) => {
@@ -133,7 +81,7 @@ export const saveFavorites = (favorites: any) => {
 };
 
 export const executeCommand = (command: string) => {
-  services.send("executeCommand", command);
+  services.send("execute", command);
 };
 
 export const exportItems = (items: string[]) => {
@@ -200,6 +148,8 @@ services.receive("keyRemoved", (event: any, key: string[]) => {
 });
 
 services.receive("data", (event: any, data: { docs: ItemType[] } & Query) => {
+  console.log(data);
+
   store.dispatch(actions.setQuery(data));
   store.dispatch(actions.setData(data.docs));
   store.dispatch(actions.setConnected(true));
@@ -227,16 +177,8 @@ services.receive("dataPreview", (event: any, doc: any) => {
   store.dispatch(actions.setPreview(doc));
 });
 
-services.receive("exportedItems", (event: any, response: { docs: any[] }) => {
-  console.log({ response });
-  const items = response.docs.reduce(
-    (prev, curr) => ({ ...prev, [curr.key]: curr.value }),
-    {}
-  );
-
-  const string = JSON.stringify(items, null, 2);
-
-  const blob = new Blob([Buffer.from(string, "utf-8")], {
+services.receive("exportedItems", (event: any, ...parts: any[]) => {
+  const blob = new Blob(parts, {
     type: "application/json;charset=utf-8",
   });
   const a = document.createElement("a");

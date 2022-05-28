@@ -27,6 +27,9 @@ const Close = styled.button`
   border: none;
   margin-left: 3px;
   color: ${(props) => props.theme.text};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   &:hover {
     color: tomato;
