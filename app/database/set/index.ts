@@ -24,12 +24,11 @@ export class SetManager implements KeyManager<SetType> {
 
   public async get(key: string): Promise<Item<SetType>> {
     const value = await this.redis.smembers(key);
-    const ttl = await this.redis.pttl(key);
 
     return {
       key,
       value,
-      ttl,
+      ttl: -1,
       type: ItemType.SET,
     };
   }

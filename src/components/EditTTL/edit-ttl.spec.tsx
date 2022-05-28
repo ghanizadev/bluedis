@@ -122,7 +122,7 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("setTTL", "some:key", 500);
+    expect(sendSpy).toHaveBeenCalledWith("setTTL", "some:key", 500, false);
   });
 
   it("Should add absolute TTL", () => {
@@ -159,7 +159,12 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("setTTL", "some:other:key", now);
+    expect(sendSpy).toHaveBeenCalledWith(
+      "setTTL",
+      "some:other:key",
+      new Date(now).getTime(),
+      true
+    );
   });
 
   it("Should add remove TTL", () => {
@@ -188,7 +193,12 @@ describe("<EditTTL />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("removeTTL", "some:other:key");
+    expect(sendSpy).toHaveBeenCalledWith(
+      "setTTL",
+      "some:other:key",
+      -1,
+      undefined
+    );
   });
 
   it("Should display 'not set' when does not have TTL", () => {

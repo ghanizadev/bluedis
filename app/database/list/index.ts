@@ -25,12 +25,11 @@ export class ListManager implements KeyManager<ListType> {
 
   public async get(key: string): Promise<Item<ListType>> {
     const value = await this.redis.lrange(key, 0, -1);
-    const ttl = await this.redis.pttl(key);
 
     return {
       key,
       value,
-      ttl,
+      ttl: -1,
       type: ItemType.LIST,
     };
   }

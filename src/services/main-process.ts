@@ -34,8 +34,13 @@ export const getDBCount = () => {
   services.send("getCountDB");
 };
 
-export const addKey = (key: string, type: string, ttl: number | string) => {
-  services.send("add", key, type, ttl);
+export const addKey = (
+  key: string,
+  type: string,
+  ttl: number,
+  ttlAbsolute: boolean
+) => {
+  services.send("add", key, type, ttl, ttlAbsolute);
 };
 
 export const alterKey = (key: string, value: any, update?: any) => {
@@ -62,12 +67,8 @@ export const updatePreview = (key: string) => {
   services.send("updatePreview", key);
 };
 
-export const setTTL = (key: string, ttl: number | string) => {
-  services.send("setTTL", key, ttl);
-};
-
-export const removeTTL = (key: string) => {
-  services.send("removeTTL", key);
+export const setTTL = (key: string, ttl: number, absolute?: boolean) => {
+  services.send("setTTL", key, ttl, absolute);
 };
 
 export const savePreferences = (preferences: any) => {

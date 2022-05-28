@@ -58,10 +58,10 @@ ipcMain.on("execute", async (event, command: string) => {
   }
 });
 
-ipcMain.on("add", async (event, key, type, ttl) => {
+ipcMain.on("add", async (event, key, type, ttl, ttlAbsolute) => {
   const doc = await manager.createKey(key, type);
 
-  if (ttl > 0) await manager.setTTL(key, ttl);
+  if (ttl > 0) await manager.setTTL(key, ttl, ttlAbsolute);
 
   event.sender.send("keyAdded", doc);
 });
@@ -76,8 +76,8 @@ ipcMain.on("del", async (event, key, indexOrName: string) => {
   event.sender.send("dataPreview", doc);
 });
 
-ipcMain.on("setTTL", async (event, key, ttl) => {
-  await manager.setTTL(key, ttl);
+ipcMain.on("setTTL", async (event, key, ttl, absoluteTTl) => {
+  await manager.setTTL(key, ttl, absoluteTTl);
   const doc = await manager.getKey(key);
   event.sender.send("dataPreview", doc);
 });

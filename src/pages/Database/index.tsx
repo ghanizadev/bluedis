@@ -70,10 +70,11 @@ const Home = () => {
   const handleAddConfirm = (
     type: "set" | "zset" | "hash" | "string" | "list",
     key: string,
-    ttl: number | string
+    ttl: number,
+    ttlAbsolute: boolean
   ) => {
+    addKey(key, type, ttl, ttlAbsolute);
     setAddItem(false);
-    addKey(key, type, ttl);
   };
 
   React.useEffect(() => {

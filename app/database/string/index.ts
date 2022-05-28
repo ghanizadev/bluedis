@@ -12,12 +12,11 @@ export class StringManager implements KeyManager<StringType> {
 
   public async get(key: string): Promise<Item<StringType>> {
     const value = (await this.redis.get(key)) ?? "";
-    const ttl = await this.redis.pttl(key);
 
     return {
       key,
       value,
-      ttl,
+      ttl: -1,
       type: ItemType.STRING,
     };
   }

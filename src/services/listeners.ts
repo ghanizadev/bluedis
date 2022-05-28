@@ -63,7 +63,7 @@ services.receive("license", (event: any, license: string) => {
   store.dispatch(actions.updateLicense(license));
 });
 
-services.receive("commandReply", (event: any, reply: string) => {
+services.receive("commandReply", (event: any, reply: string[]) => {
   store.dispatch(actions.updateSTDOUT(reply));
 });
 

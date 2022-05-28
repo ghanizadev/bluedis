@@ -21,12 +21,11 @@ export class HashManager implements KeyManager<HashType> {
 
   public async get(key: string): Promise<Item<HashType>> {
     const value = await this.redis.hgetall(key);
-    const ttl = await this.redis.pttl(key);
 
     return {
       key,
       value,
-      ttl,
+      ttl: -1,
       type: ItemType.HASH,
     };
   }

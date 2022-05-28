@@ -23,11 +23,11 @@
 - [ ] Add support to export to CSV;
 - [ ] Quick setup for AWS, Azure, Redis Labs...;
 - [ ] Support to clusters;
-- [ ] Add webpack;
 - [x] AddListMember and AlterListMember can be merger into one;
 - [ ] Rename files;
-- [ ] Add Connect page - split from Database page;
-- [ ] Refresh after updating a key;
-- [ ] Split database manager by key types;
+- [x] Add Connect page - split from Database page;
+- [x] Refresh after updating a key;
+- [x] Split database manager by key types;
 - [ ] Add type to preview dashboard
 - [ ] Make preview scale according to screen size;
+- [ ] Add info tab;

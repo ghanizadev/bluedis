@@ -48,12 +48,11 @@ export class ZSetManager implements KeyManager<ZSetType> {
 
   public async get(key: string): Promise<Item<ZSetType>> {
     const range = await this.redis.zrange(key, 0, -1, "WITHSCORES");
-    const ttl = await this.redis.pttl(key);
 
     return {
       key,
       value: this.marshall(range),
-      ttl,
+      ttl: -1,
       type: ItemType.ZSET,
     };
   }

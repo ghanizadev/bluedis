@@ -12,7 +12,7 @@ export class CommandManager {
 
     if (!c) throw new Error("Command not found");
 
-    return this.redis.call(
+    const response = await this.redis.call(
       c,
       ...command
         .slice(c.length)
@@ -20,5 +20,9 @@ export class CommandManager {
         .split(" ")
         .filter((i) => i !== "")
     );
+
+    if (typeof response !== "string")
+      return ["Response could not be displayed"];
+    return response.split("\n");
   }
 }

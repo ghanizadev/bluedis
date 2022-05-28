@@ -45,9 +45,20 @@ export class Manager {
     return (await this.redis.ping()) === "PONG";
   }
 
-  public async setTTL(key: string, ttl: number) {
+  public async setTTL(key: string, ttl: number, absolute?: boolean) {
+    console.log({ key, ttl, absolute });
     if (ttl < 0) await this.redis.persist(key);
-    await this.redis.pexpire(key, ttl);
+    else {
+      if (absolute) await this.redis.pexpireat(key, ttl);
+      else await this.redis.pexpire(key, ttl);
+    }
+  }
+
+  public async getTTL(key: string) {
+    const ttl = await this.redis.pttl(key);
+
+    if (ttl > 0) return ttl + Date.now();
+    return ttl;
   }
 
   public async remove(key: string[]) {
@@ -102,7 +113,8 @@ export class Manager {
   }
 
   public async getKey(key: string) {
-    return this.switchType(key, "", "get");
+    const result = await this.switchType(key, "", "get");
+    return { ...result, ttl: await this.getTTL(key) };
   }
 
   public async setKey(key: string, payload: any, update?: KeyUpdate) {
@@ -137,7 +149,9 @@ export class Manager {
       case "hash":
         return this.hashManager[callback].call(this.hashManager, key, ...args);
       default:
-        throw new Error("not implemented");
+        throw new Error(
+          `The key ${key} does not exist or it is already expired`
+        );
     }
   }
 }
