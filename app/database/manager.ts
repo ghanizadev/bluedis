@@ -9,7 +9,7 @@ import { AnyItem, KeyUpdate, SearchResult } from "./database.dto";
 import { CommandManager } from "./command";
 
 export class Manager {
-  private redis?: Redis;
+  private redis = new Redis({ lazyConnect: true });
 
   constructor(
     private readonly zsetManager = new ZSetManager(),
@@ -39,6 +39,10 @@ export class Manager {
 
   public async disconnect() {
     this.redis.disconnect();
+  }
+
+  public async isConnected() {
+    return (await this.redis.ping()) === "PONG";
   }
 
   public async setTTL(key: string, ttl: number) {

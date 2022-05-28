@@ -1,9 +1,9 @@
 import { RedisMemoryServer } from "redis-memory-server";
 
-import DatabaseManager from "./index";
+import { Manager } from "./manager";
 
 describe("Database", () => {
-  const database = new DatabaseManager();
+  const manager = new Manager();
   const redisServer = new RedisMemoryServer();
   let host: string;
   let port: number;
@@ -18,9 +18,9 @@ describe("Database", () => {
   });
 
   it("Should start", async () => {
-    await database.connect(host, port);
+    await manager.connect(`redis://${host}:${port}`);
 
-    expect(database).toBeDefined();
-    expect(await database.isConnected()).toBe(true);
+    expect(manager).toBeDefined();
+    expect(await manager.isConnected()).toBe(true);
   });
 });
