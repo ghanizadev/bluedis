@@ -40,8 +40,12 @@ export class ListManager implements KeyManager<ListType> {
     value: ListType,
     payload: KeyUpdate
   ): Promise<Item<ListType>> {
-    if (payload.index) await this.redis.lset(key, payload.index, value.pop());
-    else {
+    if (payload.index) {
+      const item = value.pop();
+
+      if (!item) throw new Error("Impossible to replace an empty list");
+      await this.redis.lset(key, payload.index, item);
+    } else {
       if (payload.position === "tail") await this.redis.rpush(key, ...value);
       else await this.redis.lpush(key, ...value);
     }

@@ -100,9 +100,10 @@ describe("<SetComponent />", () => {
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
     expect(sendSpy).toHaveBeenCalledWith(
-      "addSetMember",
+      "alter",
       "set:key",
-      "new member value"
+      ["new member value"],
+      { oldValue: null }
     );
   });
 
@@ -133,12 +134,12 @@ describe("<SetComponent />", () => {
       save.click();
     });
 
-    expect(sendSpy).toHaveBeenCalledTimes(2);
-    expect(sendSpy).toHaveBeenCalledWith("removeSetMember", "set:key", "first");
+    expect(sendSpy).toHaveBeenCalledTimes(1);
     expect(sendSpy).toHaveBeenCalledWith(
-      "addSetMember",
+      "alter",
       "set:key",
-      "new other member value"
+      ["new other member value"],
+      { oldValue: "first" }
     );
   });
 
@@ -189,6 +190,6 @@ describe("<SetComponent />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("removeSetMember", "set:key", "third");
+    expect(sendSpy).toHaveBeenCalledWith("del", "set:key", "third");
   });
 });

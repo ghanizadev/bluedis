@@ -77,9 +77,10 @@ describe("<ListComponent />", () => {
     expect(title).toBeNull();
     expect(sendSpy).toHaveBeenCalledTimes(1);
     expect(sendSpy).toHaveBeenCalledWith(
-      "addListMember",
+      "alter",
       "list:key",
-      "new other value"
+      ["new other value"],
+      { position: "tail" }
     );
   });
 
@@ -114,12 +115,10 @@ describe("<ListComponent />", () => {
     const title = container.querySelector('[data-testid="add-modal-title"]');
     expect(title).toBeNull();
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith(
-      "alterListMember",
-      "list:key",
-      "new value",
-      0
-    );
+    expect(sendSpy).toHaveBeenCalledWith("alter", "list:key", ["new value"], {
+      index: 0,
+      position: "tail",
+    });
   });
 
   it("Should remove a property", () => {
@@ -148,7 +147,7 @@ describe("<ListComponent />", () => {
     const title = container.querySelector('[data-testid="add-modal-title"]');
     expect(title).toBeNull();
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("removeListMember", "list:key", 0);
+    expect(sendSpy).toHaveBeenCalledWith("del", "list:key", 0);
   });
 
   it("Should copy list item", () => {

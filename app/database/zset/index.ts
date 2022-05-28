@@ -40,7 +40,7 @@ export class ZSetManager implements KeyManager<ZSetType> {
   ): Promise<Item<ZSetType>> {
     const args = this.unmarshall(value);
 
-    if (update.oldValue) await this.redis.zrem(key, update.oldValue);
+    if (update?.oldValue) await this.redis.zrem(key, update?.oldValue);
     await this.redis.zadd(key, "NX", ...args);
 
     return this.get(key);

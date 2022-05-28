@@ -82,7 +82,7 @@ describe("<Search />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("executeCommand", "del");
+    expect(sendSpy).toHaveBeenCalledWith("execute", "del");
   });
 
   it("Should refresh terminal", () => {
@@ -104,7 +104,12 @@ describe("<Search />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("update", 0);
+    expect(sendSpy).toHaveBeenCalledWith("update", {
+      count: 0,
+      cursor: 0,
+      done: false,
+      input: "*",
+    });
   });
 
   it("Should clear terminal", () => {

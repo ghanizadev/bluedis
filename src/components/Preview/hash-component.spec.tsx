@@ -171,9 +171,14 @@ describe("<HashComponent />", () => {
 
     expect(addTitle).toBeNull();
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("addHashMember", "some:key", {
-      firstKey: "new prop value",
-    });
+    expect(sendSpy).toHaveBeenCalledWith(
+      "alter",
+      "some:key",
+      {
+        firstKey: "new prop value",
+      },
+      undefined
+    );
   });
 
   it("Should create a property ", () => {
@@ -208,9 +213,14 @@ describe("<HashComponent />", () => {
 
     expect(addTitle).toBeNull();
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("addHashMember", "some:key", {
-      "new:prop:key": "new prop value",
-    });
+    expect(sendSpy).toHaveBeenCalledWith(
+      "alter",
+      "some:key",
+      {
+        "new:prop:key": "new prop value",
+      },
+      undefined
+    );
   });
 
   it("Should remove a property ", () => {
@@ -243,11 +253,7 @@ describe("<HashComponent />", () => {
 
     expect(addTitle).toBeNull();
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith(
-      "removeHashMember",
-      "some:key",
-      "firstKey"
-    );
+    expect(sendSpy).toHaveBeenCalledWith("del", "some:key", "firstKey");
   });
 
   it("Should copy a property ", () => {

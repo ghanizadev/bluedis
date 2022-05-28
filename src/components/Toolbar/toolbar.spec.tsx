@@ -167,7 +167,7 @@ describe("<Toolbar />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("deleteKey", ["new:string"]);
+    expect(sendSpy).toHaveBeenCalledWith("remove", ["new:string"]);
     expect(store.getState().selected).toEqual([]);
 
     actionSpy.mockClear();
