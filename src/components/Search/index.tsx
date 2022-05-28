@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import Button from "../Button";
 import Dropdown from "../Dropdown";
-import { find, selectDatabase } from "../../services/mainProcess";
+import { find, selectDatabase } from "../../services/main-process";
 import { t } from "../../i18n";
 import { InputAlt } from "../Input";
 

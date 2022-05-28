@@ -2,7 +2,7 @@ import React from "react";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
 
-import { connect, saveFavorites } from "../../services/mainProcess";
+import { connect, saveFavorites } from "../../services/main-process";
 import { actions, store } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { Connection } from "../../redux/Types/Connection";

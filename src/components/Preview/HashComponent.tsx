@@ -5,7 +5,7 @@ import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableData } from "../common/PreviewTableData";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { HashType, Item } from "../../redux/Types/Item";
-import { alterKey, delKeyMember } from "../../services/mainProcess";
+import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddHashItem from "./AddHashItem";

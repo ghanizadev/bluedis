@@ -10,7 +10,7 @@ import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import { Input } from "../Input";
 import Toggle from "../Toggle";
-import * as services from "../../services/mainProcess";
+import * as services from "../../services/main-process";
 import { t } from "../../i18n";
 
 const Row = styled.div`

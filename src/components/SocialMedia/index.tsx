@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-import { openLink } from "../../services/mainProcess";
+import { openLink } from "../../services/main-process";
 import { ReactComponent as Instagram } from "../../assets/instagram.svg";
 import { ReactComponent as Github } from "../../assets/github.svg";
 import { ReactComponent as Facebook } from "../../assets/facebook.svg";

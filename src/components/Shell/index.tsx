@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { executeCommand } from "../../services/mainProcess";
+import { executeCommand } from "../../services/main-process";
 
 import { command } from "./comands";
 import availableCommands from "./availableCommands.json";

@@ -3,7 +3,7 @@ import React, { FC } from "react";
 import { ReactComponent as MinimizeIcon } from "../../assets/minus.svg";
 import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
 import { ReactComponent as CloseIcon } from "../../assets/close.svg";
-import { close, maximize, minimize } from "../../services/mainProcess";
+import { close, maximize, minimize } from "../../services/main-process";
 
 import { Title } from "./Title";
 import { ButtonWrapper } from "./ButtonWrapper";

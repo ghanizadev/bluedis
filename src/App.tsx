@@ -10,7 +10,7 @@ import Help from "./pages/Help";
 import Settings from "./pages/Settings";
 import Sidebar from "./components/Sidebar";
 import { GlobalStyles } from "./theme/globalStyles";
-import { getPreferences } from "./services/mainProcess";
+import { getPreferences } from "./services/main-process";
 import ErrorMessage from "./components/ErrorMessage";
 import ConfirmationMessage from "./components/ConfirmationMessage";
 import EditTTL from "./components/EditTTL";

@@ -7,7 +7,7 @@ import {
   disconnect,
   exportItems,
   saveFavorites,
-} from "../../services/mainProcess";
+} from "../../services/main-process";
 import { actions, store } from "../../redux/store";
 import { ReactComponent as AddIcon } from "../../assets/plus.svg";
 import { ReactComponent as RefreshIcon } from "../../assets/refresh.svg";

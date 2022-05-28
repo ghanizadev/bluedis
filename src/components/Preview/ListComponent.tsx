@@ -5,7 +5,7 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { alterKey, delKeyMember } from "../../services/mainProcess";
+import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddListMember from "./AddListMember";

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { alterKey, delKeyMember } from "../../services/mainProcess";
+import { alterKey, delKeyMember } from "../../services/main-process";
 import { Item, SetType } from "../../redux/Types/Item";
 import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";

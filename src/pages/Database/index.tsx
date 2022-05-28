@@ -13,7 +13,7 @@ import {
   getDBCount,
   updateData,
   updatePreview,
-} from "../../services/mainProcess";
+} from "../../services/main-process";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";

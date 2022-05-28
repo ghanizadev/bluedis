@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import { Item, StringType } from "../../redux/Types/Item";
 import { t } from "../../i18n";
-import { alterKey } from "../../services/mainProcess";
+import { alterKey } from "../../services/main-process";
 
 import { PreviewActions } from "./preview-actions";
 

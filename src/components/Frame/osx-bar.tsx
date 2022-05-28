@@ -9,7 +9,7 @@ import {
   fullscreen,
   maximize,
   minimize,
-} from "../../services/mainProcess";
+} from "../../services/main-process";
 import { useBlur } from "../../shared/hooks/use-blur.hook";
 
 import { Title } from "./Title";

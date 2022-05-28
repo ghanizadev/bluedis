@@ -8,7 +8,7 @@ import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
 import { ReactComponent as TTLIcon } from "../../../assets/clock.svg";
 import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
 import { ReactComponent as SaveIcon } from "../../../assets/save.svg";
-import { deleteKey } from "../../../services/mainProcess";
+import { deleteKey } from "../../../services/main-process";
 import { ItemType } from "../../../redux/Types/Item";
 import { actions } from "../../../redux/store";
 
