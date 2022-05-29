@@ -5,7 +5,7 @@
     "name": "Jean Felipe de Melo",
     "email": "jf.melo6@gmail.com"
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "keywords": [
     "redis",
     "gui",
@@ -27,12 +27,13 @@
       "packagerConfig": {
         "icon": "./assets/icon.ico",
         "appBundleId": "com.ghanizadev.bluedis",
-        "appVersion": "0.2.0",
+        "appVersion": "0.2.1",
         "dir": "./app",
         "name": "Bluedis",
         "out": "bundle",
         "appCategoryType": "public.app-category.developer-tools",
-        "darwinDarkModeSupport": true
+        "darwinDarkModeSupport": true,
+        "executableName": "bluedis"
       },
       "makers": [
         {

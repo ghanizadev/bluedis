@@ -1,7 +1,7 @@
 name: bluedis
 title: Bluedis
 base: core18
-version: '0.2.0'
+version: '0.2.1'
 architectures: [amd64, i386]
 summary: An elegant Redis interface
 description: |
