@@ -39,7 +39,8 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "platforms": [
-            "darwin"
+            "darwin",
+            "win32"
           ],
           "config": {
             "name": "Bluedis",
