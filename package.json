@@ -37,6 +37,24 @@
       },
       "makers": [
         {
+          "name": "@electron-forge/maker-wix",
+          "config": {
+            "language": 1033,
+            "manufacturer": "ghanizadev Ltd. EOOD",
+            "appUserModelId": "com.ghanizadev.bluedis",
+            "description": "A modern Redis client",
+            "name": "Bluedis",
+            "upgradeCode": "fa953509-7af1-4fae-8ae5-bd1c8c228498",
+            "version": "0.2.1",
+            "ui": {
+              "images": {
+                "banner": "assets/template/banner_493x58.jpg",
+                "background": "assets/template/background_493x312.jpg"
+              }
+            }
+          }
+        },
+        {
           "name": "@electron-forge/maker-squirrel",
           "platforms": [
             "darwin",
@@ -65,7 +83,6 @@
     }
   },
   "dependencies": {
-    "@electron-forge/core": "^6.0.0-beta.63",
     "@reduxjs/toolkit": "^1.8.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.0.1",
@@ -117,10 +134,12 @@
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.63",
+    "@electron-forge/core": "^6.0.0-beta.63",
     "@electron-forge/maker-deb": "^6.0.0-beta.63",
     "@electron-forge/maker-rpm": "^6.0.0-beta.63",
     "@electron-forge/maker-snap": "^6.0.0-beta.63",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
+    "@electron-forge/maker-wix": "^6.0.0-beta.63",
     "@electron-forge/maker-zip": "^6.0.0-beta.63",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
