@@ -23,64 +23,7 @@
   "main": "dist/main.js",
   "homepage": "./",
   "config": {
-    "forge": {
-      "packagerConfig": {
-        "icon": "./assets/icon.ico",
-        "appBundleId": "com.ghanizadev.bluedis",
-        "appVersion": "0.2.1",
-        "dir": "./app",
-        "name": "Bluedis",
-        "out": "bundle",
-        "appCategoryType": "public.app-category.developer-tools",
-        "darwinDarkModeSupport": true,
-        "executableName": "bluedis"
-      },
-      "makers": [
-        {
-          "name": "@electron-forge/maker-wix",
-          "config": {
-            "language": 1033,
-            "manufacturer": "ghanizadev Ltd. EOOD",
-            "appUserModelId": "com.ghanizadev.bluedis",
-            "description": "A modern Redis client",
-            "name": "Bluedis",
-            "upgradeCode": "fa953509-7af1-4fae-8ae5-bd1c8c228498",
-            "version": "0.2.1",
-            "ui": {
-              "images": {
-                "banner": "assets/template/banner_493x58.jpg",
-                "background": "assets/template/background_493x312.jpg"
-              }
-            }
-          }
-        },
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "platforms": [
-            "darwin",
-            "win32"
-          ],
-          "config": {
-            "name": "Bluedis",
-            "description": "A modern Redis client",
-            "icon": "../assets/icon.ico"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "config": {},
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {
-            "description": "A modern Redis client"
-          }
-        }
-      ]
-    }
+    "forge": "forge.config.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.1",
@@ -162,6 +105,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "exe-icon-extractor": "^1.0.8",
     "gulp": "^4.0.2",
     "husky": "^8.0.1",
     "jest": "^28.1.0",
