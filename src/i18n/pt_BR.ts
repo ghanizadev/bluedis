@@ -75,6 +75,7 @@ const translation: LangType = {
   savekey: "Salvar chave",
   score: "Nota",
   search: "Procurar",
+  searching: "procurando",
   settings: "Configurações",
   setttl: "Editar TTL",
   showingkeys: (count: number) => `exibindo ${count} chaves - `,

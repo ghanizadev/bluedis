@@ -139,7 +139,7 @@ ipcMain.on("initial", async (event) => {
 });
 
 ipcMain.on("find", async (event, match: string, cursor: number) => {
-  const result = await manager.find(match, cursor, 100);
+  const result = await manager.find(match, cursor, 100); //TODO Remove hardcoded limit
   event.sender.send("data", result);
 });
 
@@ -162,4 +162,16 @@ ipcMain.on("exportItems", async (event, items) => {
 
   const string = JSON.stringify(docs, null, 2);
   event.sender.send("exportedItems", Buffer.from(string, "utf-8"));
+});
+
+ipcMain.on("findKeys", async (event, match: string, cursor: number) => {
+  const onData = (data: any) => {
+    event.sender.send("pushData", data);
+  };
+
+  const onFinish = () => {
+    event.sender.send("searchFinish");
+  };
+
+  await manager.findKeys(match, cursor, onData, onFinish, 100); //TODO Remove hardcoded limit
 });

@@ -52,6 +52,18 @@ services.receive("data", (event: any, data: { docs: ItemType[] } & Query) => {
 });
 
 services.receive(
+  "pushData",
+  (event: any, data: { docs: ItemType[] } & Query) => {
+    store.dispatch(actions.setQuery(data));
+    store.dispatch(actions.pushData(data.docs));
+  }
+);
+
+services.receive("searchFinish", (event: any) => {
+  store.dispatch(actions.setSearching(false));
+});
+
+services.receive(
   "loadedData",
   (event: any, data: { docs: ItemType[] } & Query) => {
     store.dispatch(actions.setQuery(data));

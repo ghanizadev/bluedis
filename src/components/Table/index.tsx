@@ -10,6 +10,7 @@ import { loadMore } from "../../services/main-process";
 import { Query } from "../../redux/Types/Query";
 import { t } from "../../i18n";
 import { useLoading } from "../../shared/hooks/use-loading.hook";
+import Spinner from "../Loading/Spinner";
 
 import { Type } from "./Type";
 import { Data } from "./Data";
@@ -52,6 +53,13 @@ const LoadMore = styled.div`
   }
 `;
 
+const Searching = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 type Props = {
   data: ItemType[];
   onItemEdit?: (item: ItemType) => void;
@@ -65,6 +73,7 @@ const Table: React.FC<Props> = (props) => {
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
+  const isSearching = useSelector<State, boolean>((state) => state.isSearching);
 
   const handleItemEdit = (item: ItemType) => {
     loading(true);
@@ -147,21 +156,28 @@ const Table: React.FC<Props> = (props) => {
           })}
         </tbody>
       </TableContainer>
-      <LoadMore>
-        <span>
-          {query.done && t`showing all ${currentCount} keys`}
-          {!query.done && t`showing ${currentCount} keys - `}
-          {query.cursor !== 0 && (
-            <button
-              disabled={query.cursor === 0}
-              onClick={handleLoadMore}
-              data-testid={"database-table-load-more"}
-            >
-              {t`load more`}
-            </button>
-          )}
-        </span>
-      </LoadMore>
+      {isSearching ? (
+        <Searching>
+          <Spinner size={0.5} />
+          {t`searching`}...
+        </Searching>
+      ) : (
+        <LoadMore>
+          <span>
+            {query.done && t`showing all ${currentCount} keys`}
+            {!query.done && t`showing ${currentCount} keys - `}
+            {query.cursor !== 0 && (
+              <button
+                disabled={query.cursor === 0}
+                onClick={handleLoadMore}
+                data-testid={"database-table-load-more"}
+              >
+                {t`load more`}
+              </button>
+            )}
+          </span>
+        </LoadMore>
+      )}
     </Container>
   );
 };
