@@ -79,6 +79,7 @@ const translation: LangType = {
   settings: "Configurações",
   setttl: "Editar TTL",
   showingkeys: (count: number) => `exibindo ${count} chaves - `,
+  showingallkeys: (count: number) => `exibindo todas ${count} chaves`,
   type: "Tipo",
   usetls: "Usar TLS",
   value: "Valor",

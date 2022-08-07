@@ -36,6 +36,7 @@
   "scripts": {
     "build": "npx gulp build",
     "build:electron": "tsc --project tsconfig.app.json",
+    "build:react": "cross-env NODE_ENV=production CI=true BUILD_PATH=./build react-scripts build",
     "dev:electron": "cross-env NODE_ENV=development electron-forge start",
     "dev:react": "cross-env NODE_ENV=development BROWSER=none react-scripts start",
     "lint": "eslint .",

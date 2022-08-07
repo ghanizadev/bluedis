@@ -59,7 +59,7 @@ services.receive(
   }
 );
 
-services.receive("searchFinish", (event: any) => {
+services.receive("searchFinish", () => {
   store.dispatch(actions.setSearching(false));
 });
 
