@@ -43,7 +43,7 @@ const setEnv = (env = 'development') => {
 
 const copy = async () => {
   if(OS_NAME === 'Windows')
-    await execAsync('powershell.exe cp -Recurse build -Destination dist/app');
+    await execAsync('powershell.exe Copy-Item build -Destination dist/app -Recurse -Force');
   else
     await execAsync('mv build dist/app');
 }
@@ -94,6 +94,7 @@ const pack = async () => {
   switch(process.env.SNAP_ARCH)  {
     case "amd64":
       arg = " --x64"
+      
       break;
     case "i386":
       arg = " --ia32";
