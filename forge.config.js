@@ -25,6 +25,7 @@ module.exports = {
         name: "Bluedis",
         upgradeCode: "fa953509-7af1-4fae-8ae5-bd1c8c228498",
         version: "0.2.1",
+        appIconPath: './assets/icon.ico',
         ui: {
           images: {
             banner: path.resolve(__dirname, "assets", "template", "banner_493x58.jpg"),
