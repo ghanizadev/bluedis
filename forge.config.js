@@ -5,7 +5,7 @@ module.exports = {
   packagerConfig: {
     icon: "./assets/icon.ico",
     appBundleId: "com.ghanizadev.bluedis",
-    appVersion: "0.2.1",
+    appVersion: "0.2.2",
     dir: "./app",
     name: "Bluedis",
     out: "bundle",
@@ -24,7 +24,7 @@ module.exports = {
         description: "A modern Redis client",
         name: "Bluedis",
         upgradeCode: "fa953509-7af1-4fae-8ae5-bd1c8c228498",
-        version: "0.2.1",
+        version: "0.2.2",
         appIconPath: './assets/icon.ico',
         ui: {
           images: {
