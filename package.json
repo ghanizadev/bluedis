@@ -26,18 +26,12 @@
     "forge": "forge.config.js"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.8.3",
+    "dotenv": "^16.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.1.0",
     "ioredis": "^5.2.2",
     "nanoid": "^3.3.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-redux": "^8.0.1",
-    "react-scripts": "^5.0.1",
-    "styled-components": "^5.3.5",
-    "update-electron-app": "^2.0.1",
-    "web-vitals": "^2.1.4"
+    "update-electron-app": "^2.0.1"
   },
   "scripts": {
     "build": "npx gulp build",
@@ -84,6 +78,7 @@
     "@electron-forge/maker-squirrel": "^6.0.0-beta.65",
     "@electron-forge/maker-wix": "^6.0.0-beta.65",
     "@electron-forge/maker-zip": "^6.0.0-beta.65",
+    "@reduxjs/toolkit": "^1.8.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.4.2",
@@ -112,11 +107,17 @@
     "jest-styled-components": "^7.0.8",
     "modclean": "^3.0.0-beta.1",
     "prettier": "2.6.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.0.2",
+    "react-scripts": "^5.0.1",
     "react-test-renderer": "^18.2.0",
     "redis-memory-server": "^0.5.0",
     "redux-mock-store": "^1.5.4",
+    "styled-components": "^5.3.5",
     "ts-jest": "^28.0.7",
     "ts-node": "^10.9.1",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "web-vitals": "^2.1.4"
   }
 }
