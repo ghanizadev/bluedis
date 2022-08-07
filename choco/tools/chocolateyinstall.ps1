@@ -1,7 +1,7 @@
 ﻿$ErrorActionPreference = 'Stop';
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://github.com/ghanizadev/bluedis/releases/download/v0.2.1/Bluedis.Setup.0.2.1-ia32.exe'
-$url64      = 'https://github.com/ghanizadev/bluedis/releases/download/v0.2.1/Bluedis.Setup.0.2.1.exe'
+$url        = 'https://github.com/ghanizadev/bluedis/releases/download/v0.2.2/Bluedis.Setup.0.2.2-ia32.exe'
+$url64      = 'https://github.com/ghanizadev/bluedis/releases/download/v0.2.2/Bluedis.Setup.0.2.2.exe'
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName

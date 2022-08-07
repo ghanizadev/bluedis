@@ -71,7 +71,7 @@ const Help = () => {
           <GhanizadevIcon src={`${process.env.PUBLIC_URL}/logo_blue.png`} />
           <div>
             <h2>
-              Bluedis <small>v0.2.1</small>
+              Bluedis <small>v0.2.2</small>
             </h2>
             <p>ghanizadev ltd.</p>
             <Link onClick={handleOpenLink("https://ghanizadev.com")}>
