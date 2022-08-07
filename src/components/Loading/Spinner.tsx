@@ -63,9 +63,9 @@ const Ellipsis = styled.div`
   }
 `;
 
-const Spinner: React.FC = () => {
+const Spinner: React.FC<{ size?: number }> = ({ size }) => {
   return (
-    <Ellipsis>
+    <Ellipsis style={{ transform: `scale(${size ?? 1})` }}>
       <div />
       <div />
       <div />

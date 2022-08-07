@@ -18,6 +18,7 @@ import { Region } from "./Types/Region";
 const initialState: State = {
   currentTotalDocs: 0,
   isLoading: false,
+  isSearching: false,
   data: [],
   selected: [],
   currentPage: "database",
@@ -167,6 +168,9 @@ const slice = createSlice({
     },
     setCount: (state, action: PayloadAction<number>) => {
       state.currentTotalDocs = action.payload;
+    },
+    setSearching: (state, action: PayloadAction<boolean>) => {
+      state.isSearching = action.payload;
     },
   },
 });

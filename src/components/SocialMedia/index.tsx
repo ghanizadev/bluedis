@@ -2,17 +2,11 @@ import React from "react";
 import styled from "styled-components";
 
 import { openLink } from "../../services/main-process";
-import { ReactComponent as Instagram } from "../../assets/instagram.svg";
 import { ReactComponent as Github } from "../../assets/github.svg";
-import { ReactComponent as Facebook } from "../../assets/facebook.svg";
 import { ReactComponent as Linkedin } from "../../assets/linkedin.svg";
-import { ReactComponent as Twitter } from "../../assets/twitter.svg";
 
 const GITHUB = "https://github.com/ghanizadev/bluedis";
-const INSTAGRAM = "https://www.instagram.com/ghnzdev";
-const TWITTER = "https://twitter.com/ghanizadev";
 const LINKEDIN = "https://www.linkedin.com/in/ghanizadev/";
-const FACEBOOK = "https://www.facebook.com/ghnzdev";
 
 const Container = styled.div`
   display: flex;
@@ -56,15 +50,6 @@ const SocialMedia: React.FC = () => {
       </Button>
       <Button data-testid={"links-github"} onClick={handleClick(GITHUB)}>
         <Github />
-      </Button>
-      <Button data-testid={"links-facebook"} onClick={handleClick(FACEBOOK)}>
-        <Facebook />
-      </Button>
-      <Button data-testid={"links-instagram"} onClick={handleClick(INSTAGRAM)}>
-        <Instagram />
-      </Button>
-      <Button data-testid={"links-twitter"} onClick={handleClick(TWITTER)}>
-        <Twitter />
       </Button>
     </Container>
   );

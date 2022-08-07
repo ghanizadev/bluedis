@@ -9,6 +9,7 @@ import { Query } from "./Query";
 export type State = {
   connected: boolean;
   isLoading: boolean;
+  isSearching: boolean;
   data: ItemType[];
   preview?: ItemType;
   editTTL?: ItemType;

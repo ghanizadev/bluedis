@@ -59,6 +59,12 @@ export const find = (match: string, cursor: number) => {
   services.send("find", match, cursor);
 };
 
+export const findKeys = (match: string, cursor: number) => {
+  store.dispatch(actions.setSearching(true));
+  store.dispatch(actions.setData([]));
+  services.send("findKeys", match, cursor);
+};
+
 export const loadMore = (match: string, cursor: number) => {
   services.send("loadMore", match, cursor);
 };
