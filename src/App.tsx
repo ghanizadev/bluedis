@@ -41,14 +41,11 @@ const App = () => {
           }}
         >
           <Sidebar />
-          {!isConnected ? (
-            <Connect />
-          ) : (
-            <>
-              {currentPage === "database" && <Database />}
-              {/* TODO add message debugger */}
-            </>
-          )}
+          <>
+            {["database"].includes(currentPage) && !isConnected && <Connect />}
+            {isConnected && currentPage === "database" && <Database />}
+            {/* TODO add message debugger */}
+          </>
           {currentPage === "settings" && <Settings />}
           {currentPage === "help" && <Help />}
         </div>

@@ -46,7 +46,7 @@ describe("<Search />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("find", "my search", 0);
+    expect(sendSpy).toHaveBeenCalledWith("findKeys", "my search", 0);
   });
 
   it("Should search by pressing enter", () => {
@@ -64,7 +64,7 @@ describe("<Search />", () => {
     });
 
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(sendSpy).toHaveBeenCalledWith("find", "my other search", 0);
+    expect(sendSpy).toHaveBeenCalledWith("findKeys", "my other search", 0);
   });
 
   it("Should change dropdown", () => {

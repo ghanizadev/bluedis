@@ -1,7 +1,7 @@
 name: bluedis
 title: Bluedis
 base: core18
-version: '0.2.0'
+version: '0.2.2'
 architectures: [amd64, i386]
 summary: An elegant Redis interface
 description: |
@@ -18,7 +18,7 @@ icon: snap/local/icon.png
 
 apps:
   bluedis:
-    command: bin/Bluedis --no-sandbox
+    command: bin/bluedis --no-sandbox
     extensions: [gnome-3-34]
     plugs:
     - browser-support

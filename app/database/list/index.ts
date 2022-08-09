@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { v4 } from "uuid";
+import { nanoid } from "nanoid";
 
 import {
   Item,
@@ -58,7 +58,7 @@ export class ListManager implements KeyManager<ListType> {
     let toBeRemoved = indexOrName;
 
     if (typeof indexOrName === "number") {
-      toBeRemoved = v4();
+      toBeRemoved = nanoid();
       await this.redis.lset(key, indexOrName, toBeRemoved);
     }
 

@@ -100,6 +100,53 @@ export class Manager {
     };
   }
 
+  public async findKeys(
+    match: string,
+    cursor = 0,
+    onData: (data: SearchResult) => void,
+    onFinish: () => void,
+    limit = Number.MAX_SAFE_INTEGER
+  ): Promise<void> {
+    let newCursor = cursor > 0 ? cursor : -1;
+    let count = 0;
+
+    while (newCursor !== 0 && count <= limit) {
+      if (newCursor === -1) newCursor = 0;
+
+      const [replyCursor, items] = await this.redis.scan(
+        newCursor,
+        "MATCH",
+        match,
+        "COUNT",
+        10
+      );
+      newCursor = +replyCursor;
+      if (items.length) {
+        const data = await Promise.all<AnyItem>(
+          items.map(this.getKey.bind(this))
+        );
+        onData({
+          cursor: newCursor,
+          docs: data,
+          input: match,
+          count: data.length,
+          done: newCursor === 0,
+        });
+        count += items.length;
+      }
+    }
+
+    onData({
+      cursor: newCursor,
+      docs: [],
+      input: match,
+      count: 0,
+      done: count < limit,
+    });
+
+    onFinish();
+  }
+
   public async count() {
     return this.redis.dbsize();
   }

@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import Button from "../Button";
 import Dropdown from "../Dropdown";
-import { find, selectDatabase } from "../../services/main-process";
+import { findKeys, selectDatabase } from "../../services/main-process";
 import { t } from "../../i18n";
 import { InputAlt } from "../Input";
 
@@ -36,12 +36,12 @@ const Search = () => {
 
   const handleKeyListener = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      find(match || "*", 0);
+      findKeys(match || "*", 0);
     }
   };
 
   const handleSearch = () => {
-    find(match || "*", 0);
+    findKeys(match || "*", 0);
   };
 
   const handleDatabaseChange = (item: string) => {
