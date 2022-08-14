@@ -34,10 +34,10 @@ impl Database {
         Ok(c.get_connection()?)
     }
 
-    pub fn check_connection(&mut self) -> Result<bool, String> {
-        let mut connection = self.get_connection().unwrap();
+    pub fn check_connection(&mut self) -> Result<bool, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
         let command = redis::cmd("PING");
-        let result: String = command.query(&mut connection).unwrap();
+        let result = command.query::<String>(&mut connection)?;
         let mut is_connected = false;
 
         if result == "PONG" {
@@ -140,8 +140,6 @@ impl Database {
                 let key = self.handle(k.as_str(), "get", None, Some(vec![]))?;
 
                 if let Some(s) = key {
-                    println!("ok key");
-
                     callback(s.clone());
                     response.push(s.clone());
                     count += 1;

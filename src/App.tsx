@@ -1,67 +1,72 @@
-import {useEffect, useState} from 'react'
-import { listen, emit } from '@tauri-apps/api/event'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React from "react";
+import {useDispatch, useSelector} from "react-redux";
+import { ThemeProvider } from "styled-components";
 
-const invoke = (window as any).__TAURI__.invoke;
+import Frame from "./components/Frame";
+import Database from "./pages/Database";
+import { State } from "./redux/Types/State";
+import { Page } from "./redux/Types/Page";
+import Help from "./pages/Help";
+import Settings from "./pages/Settings";
+import Sidebar from "./components/Sidebar";
+import { GlobalStyles } from "./theme/globalStyles";
+// import { getPreferences } from "./services/main-process";
+import ErrorMessage from "./components/ErrorMessage";
+import ConfirmationMessage from "./components/ConfirmationMessage";
+import EditTTL from "./components/EditTTL";
+import Loading from "./components/Loading";
+import { Appearance } from "./redux/Types/Appearance";
+import Connect from "./pages/connect";
+import {defaultAppearanceSettings, DarkTheme} from "./theme";
+import {actions} from "./redux/store";
 
-function App() {
-  const [count, setCount] = useState(0);
-  const [response, setResponse] = useState<string>();
+const App = () => {
+  const currentPage = useSelector<State, Page>((state) => state.currentPage);
+  const isConnected = useSelector<State, boolean>((state) => state.connected);
+  const appearance = useSelector<State, Appearance>(
+    (state) => state.settings.appearance
+  );
+  const dispatch = useDispatch();
 
-  const handler = async () => {
-      // const data = await invoke('find_keys', { cStr: 'redis://localhost:6379', pattern: '*' });
-      // console.log({ data });
-      // if(typeof created !== 'string') setResponse(created.value);
-      emit('find-keys', { pattern: "*", cstr: 'redis://localhost:6379' })
-  }
-
-  useEffect(() => {
-      if(!(window as any).callback_loaded){
-          (window as any).callback_loaded = true;
-
-          listen('data', (event) => {
-              console.log("data", event.payload);
+  React.useEffect(() => {
+      dispatch(
+          actions.updatePreferences({
+            appearance: {
+              ...defaultAppearanceSettings,
+              ...DarkTheme
+            },
           })
-              .then(unlisten => {
-                  (window as any).callbacks = Array.isArray((window as any).callbacks) ? [...(window as any).callbacks, unlisten] : [unlisten];
-              })
-      }
-
-      return () => {
-          if((window as any).callbacks && Array.isArray((window as any).callbacks)) {
-              (window as any).callbacks.forEach((cb) => cb());
-          }
-      }
+        );
   }, []);
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <button onClick={handler}>
-          response is {response}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
-}
+    <ThemeProvider theme={appearance}>
+      <Frame>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            flexDirection: "row",
+          }}
+        >
+          <Sidebar />
+          <>
+            {["database"].includes(currentPage) && !isConnected && <Connect />}
+            {isConnected && currentPage === "database" && <Database />}
+            {/* TODO add message debugger */}
+          </>
+          {currentPage === "settings" && <Settings />}
+          {currentPage === "help" && <Help />}
+        </div>
+      </Frame>
+      <GlobalStyles />
+      <EditTTL />
+      <ErrorMessage />
+      <ConfirmationMessage />
+      <Loading />
+    </ThemeProvider>
+  );
+};
 
-export default App
+export default App;
