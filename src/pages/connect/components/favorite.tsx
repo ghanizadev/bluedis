@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import styled from "styled-components";
 
-import { ReactComponent as CloseIcon } from "../../../assets/close.svg";
+import CloseIcon from "../../../assets/Close";
 import { Connection } from "../../../redux/Types/Connection";
 
 const Container = styled.li`

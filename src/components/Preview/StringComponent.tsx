@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import { Item, StringType } from "../../redux/Types/Item";
 import { t } from "../../i18n";
-import { alterKey } from "../../services/main-process";
+// import { alterKey } from "../../services/main-process";
 
 import { PreviewActions } from "./preview-actions";
 
@@ -25,7 +25,7 @@ const StringComponent: React.FC<Props> = (props) => {
   const [saved, setSaved] = React.useState(false);
 
   const handleDocumentSave = () => {
-    alterKey(key, itemValue);
+    // alterKey(key, itemValue);
     clearTimeout(saveTimeout);
     setSaved(true);
 

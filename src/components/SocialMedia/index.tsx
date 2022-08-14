@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
-import { openLink } from "../../services/main-process";
-import { ReactComponent as Github } from "../../assets/github.svg";
-import { ReactComponent as Linkedin } from "../../assets/linkedin.svg";
+// import { openLink } from "../../services/main-process";
+import Github from "../../assets/Github";
+import Linkedin from "../../assets/Linkedin";
 
 const GITHUB = "https://github.com/ghanizadev/bluedis";
 const LINKEDIN = "https://www.linkedin.com/in/ghanizadev/";
@@ -39,7 +39,7 @@ const SocialMedia: React.FC = () => {
   const handleClick = (url: string) => {
     return (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      openLink(url);
+      // openLink(url);
     };
   };
 

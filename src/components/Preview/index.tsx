@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 
-import { ReactComponent as CloseIcon } from "../../assets/close.svg";
+import CloseIcon from "../../assets/Close";
 import { State } from "../../redux/Types/State";
 import {
   HashType,

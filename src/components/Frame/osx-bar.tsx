@@ -1,15 +1,15 @@
 import React, { FC, useState } from "react";
 import styled from "styled-components";
 
-import { ReactComponent as CloseIcon } from "../../assets/close.svg";
-import { ReactComponent as MinimizeIcon } from "../../assets/minimize.svg";
-import { ReactComponent as MaximizeIcon } from "../../assets/maximize.svg";
-import {
-  close,
-  fullscreen,
-  maximize,
-  minimize,
-} from "../../services/main-process";
+import CloseIcon from "../../assets/Close";
+import MinimizeIcon from "../../assets/Minimize";
+import MaximizeIcon from "../../assets/Maximize";
+// import {
+//   close,
+//   fullscreen,
+//   maximize,
+//   minimize,
+// } from "../../services/main-process";
 import { useBlur } from "../../shared/hooks/use-blur.hook";
 
 import { Title } from "./Title";
@@ -42,19 +42,19 @@ export const OSXBar: FC<{ title?: string }> = ({ title }) => {
   const { isBlurred } = useBlur();
 
   const handleClose = () => {
-    close();
+    // close();
   };
 
   const handleMinimize = () => {
-    minimize();
+    // minimize();
   };
 
   const handleFullscreen = () => {
-    fullscreen();
+    // fullscreen();
   };
 
   const handleMaximize = () => {
-    maximize();
+    // maximize();
   };
 
   return (

@@ -1,9 +1,9 @@
 import { actions, store } from "../../redux/store";
-import { updateData } from "../../services/main-process";
+// import { updateData } from "../../services/main-process";
 
 export const command: { [key: string]: () => void } = {
   clear: () => store.dispatch(actions.clearSTDOUT()),
-  refresh: () => updateData(),
+  refresh: () => {/*updateData()*/},
   exit: () => {
     store.dispatch(actions.clearSTDOUT());
     store.dispatch(actions.setTerminal(false));

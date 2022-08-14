@@ -10,7 +10,7 @@ import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import { Input } from "../Input";
 import Toggle from "../Toggle";
-import * as services from "../../services/main-process";
+// import * as services from "../../services/main-process";
 import { t } from "../../i18n";
 
 const Row = styled.div`
@@ -38,13 +38,13 @@ const EditTTL: React.FC = () => {
 
   const handleConfirm = () => {
     if (!item) return;
-    services.setTTL(item.key, ttl, ttlAbsolute);
+    // services.setTTL(item.key, ttl, ttlAbsolute);
     dispatch(actions.setEditTTL(undefined));
   };
 
   const handleRemove = () => {
     if (!item) return;
-    services.setTTL(item.key, -1);
+    // services.setTTL(item.key, -1);
     dispatch(actions.setEditTTL(undefined));
   };
 

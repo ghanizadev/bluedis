@@ -8,8 +8,8 @@ import { MessageButtonWrapper } from "../../common/MessageButtonWrapper";
 import { TextArea } from "../../TextArea";
 import { PreviewActions } from "../../common/PreviewActions";
 import { PreviewActionButton } from "../../common/PreviewActionButton";
-import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
-import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
+import RemoveIcon from "../../../assets/Trash";
+import CopyIcon from "../../../assets/Clipboard";
 import { t } from "../../../i18n";
 
 const Input = styled.input`
@@ -82,14 +82,14 @@ const AddOrderedItem: React.FC<Props> = (props) => {
             data-testid={"add-item-modal-copy"}
             onClick={handleItemCopy}
           >
-            <CopyIcon title={t`Copy as JSON`} />
+            <CopyIcon xlinkTitle={t`Copy as JSON`} />
           </PreviewActionButton>
           <PreviewActionButton
             data-testid={"add-item-modal-remove"}
             remove
             onClick={handleItemRemove}
           >
-            <RemoveIcon title={t`Remove property`} />
+            <RemoveIcon xlinkTitle={t`Remove property`} />
           </PreviewActionButton>
         </PreviewActions>
         <MessageButtonWrapper>

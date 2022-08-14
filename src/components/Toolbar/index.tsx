@@ -2,20 +2,20 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { State } from "../../redux/Types/State";
-import {
-  deleteKey,
-  disconnect,
-  exportItems,
-  saveFavorites,
-} from "../../services/main-process";
+// import {
+//   deleteKey,
+//   disconnect,
+//   exportItems,
+//   saveFavorites,
+// } from "../../services/main-process";
 import { actions, store } from "../../redux/store";
-import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-import { ReactComponent as RefreshIcon } from "../../assets/refresh.svg";
-import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
-import { ReactComponent as DownloadIcon } from "../../assets/download.svg";
-import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
-import { ReactComponent as FavoriteIcon } from "../../assets/star.svg";
-import { ReactComponent as TerminalIcon } from "../../assets/terminal.svg";
+import AddIcon from "../../assets/Plus";
+import RefreshIcon from "../../assets/Refresh";
+import RemoveIcon from "../../assets/Trash";
+import DownloadIcon from "../../assets/Download";
+import DisconnectIcon from "../../assets/LogOut";
+import FavoriteIcon from "../../assets/Star";
+import TerminalIcon from "../../assets/Terminal";
 import { Connection } from "../../redux/Types/Connection";
 import { t } from "../../i18n";
 
@@ -54,7 +54,7 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleDownloadSelected = () => {
-    exportItems(selected);
+    // exportItems(selected);
   };
 
   const handleDeleteSelected = () => {
@@ -69,7 +69,7 @@ const Toolbar: React.FC<Props> = (props) => {
         message,
         title,
         onConfirm: () => {
-          deleteKey(selected);
+          // deleteKey(selected);
           dispatch(actions.clearSelection());
         },
       })
@@ -77,7 +77,7 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleDisconnect = () => {
-    disconnect();
+    // disconnect();
   };
 
   const handleTerminal = () => {
@@ -94,7 +94,7 @@ const Toolbar: React.FC<Props> = (props) => {
       dispatch(actions.currentConnection({ ...currentConnection, name }));
 
       const updated = store.getState();
-      saveFavorites(updated.favorites);
+      // saveFavorites(updated.favorites);
     }
     setNewName(false);
   };

@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { t } from "../../i18n";
 import { State } from "../../redux/Types/State";
-import { openLink } from "../../services/main-process";
+// import { openLink } from "../../services/main-process";
 
 const Container = styled.div`
   width: 100%;
@@ -59,7 +59,7 @@ const Help = () => {
 
   const handleOpenLink = (link: string) => {
     return () => {
-      openLink(link);
+      // openLink(link);
     };
   };
 
@@ -68,7 +68,7 @@ const Help = () => {
       <h1>{t`Help`}</h1>
       <Content>
         <Header>
-          <GhanizadevIcon src={`${process.env.PUBLIC_URL}/logo_blue.png`} />
+          <GhanizadevIcon src={`/logo_blue.png`} />
           <div>
             <h2>
               Bluedis <small>v0.2.2</small>

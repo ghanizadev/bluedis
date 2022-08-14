@@ -3,12 +3,12 @@ import { useDispatch } from "react-redux";
 
 import { PreviewActionButton } from "../../common/PreviewActionButton";
 import { t } from "../../../i18n";
-import { ReactComponent as AddIcon } from "../../../assets/plus.svg";
-import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
-import { ReactComponent as TTLIcon } from "../../../assets/clock.svg";
-import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
-import { ReactComponent as SaveIcon } from "../../../assets/save.svg";
-import { deleteKey } from "../../../services/main-process";
+import AddIcon from "../../../assets/Plus";
+import CopyIcon from "../../../assets/Clipboard";
+import TTLIcon from "../../../assets/Clock";
+import RemoveIcon from "../../../assets/Trash";
+import SaveIcon from "../../../assets/Save";
+// import { deleteKey } from "../../../services/main-process";
 import { ItemType } from "../../../redux/Types/Item";
 import { actions } from "../../../redux/store";
 
@@ -39,7 +39,7 @@ export const PreviewActions: FC<PreviewActionsProps> = (props) => {
 
     timeout = setTimeout(() => {
       setDeleting(false);
-      deleteKey([item.key]);
+      // deleteKey([item.key]);
     }, 1000);
   };
 

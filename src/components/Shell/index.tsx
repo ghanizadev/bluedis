@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { executeCommand } from "../../services/main-process";
+// import { executeCommand } from "../../services/main-process";
 
 import { command } from "./comands";
 import availableCommands from "./availableCommands.json";
@@ -77,7 +77,7 @@ const Shell: React.FC = () => {
         availableCommands.filter((v) => value.toLowerCase().startsWith(v))
           .length > 0
       ) {
-        executeCommand(value);
+        // executeCommand(value);
       } else {
         dispatch(actions.updateSTDOUT(`> Command not recognized: ${value}`));
       }

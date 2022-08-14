@@ -5,7 +5,7 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { alterKey, delKeyMember } from "../../services/main-process";
+// import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddListMember from "./AddListMember";
@@ -27,12 +27,12 @@ const ListComponent: React.FC<Props> = (props) => {
     setItemValue({ value: t`New value here...`, index: -1 });
   };
   const handleItemSubmit = (value: string, index?: number) => {
-    alterKey(key, [value], { position: "tail", index });
+    // alterKey(key, [value], { position: "tail", index });
     setItemValue(undefined);
   };
 
   const handleItemDelete = (value: string, index: number) => {
-    delKeyMember(key, index);
+    // delKeyMember(key, index);
     setItemValue(undefined);
   };
 

@@ -1,11 +1,14 @@
-const receive = window.electron?.receive ?? (() => ({}));
-const send = window.electron?.send ?? (() => ({}));
-const invoke = window.electron?.invoke ?? (() => ({}));
-const shell = window.electron?.shell ?? { openExternal: () => ({}) };
+interface IService {
+  invoke: (event: string, args: { [key: string]: string | number | boolean }) => void;
+}
 
-export default {
-  receive,
-  send,
-  invoke,
-  shell,
+const services: IService = {
+  // receive: () => {},
+  // send: () => {},
+  invoke: window.__TAURI__.invoke,
+  // shell: () => {},
 };
+
+
+export default services;
+

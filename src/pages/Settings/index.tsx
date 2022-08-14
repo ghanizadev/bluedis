@@ -7,7 +7,7 @@ import Toggle from "../../components/Toggle";
 import { State } from "../../redux/Types/State";
 import { Settings as ISettings } from "../../redux/Types/Settings";
 import { actions, store } from "../../redux/store";
-import { savePreferences, wipeData } from "../../services/main-process";
+// import { savePreferences, wipeData } from "../../services/main-process";
 import Button from "../../components/Button";
 import { DarkTheme, LightTheme } from "../../theme";
 import { t } from "../../i18n";
@@ -27,7 +27,7 @@ const Settings = () => {
 
   const saveChanges = () => {
     const settings = store.getState().settings;
-    savePreferences(settings);
+    // savePreferences(settings);
   };
 
   const handleDarkModeChange = () => {
@@ -98,7 +98,7 @@ const Settings = () => {
         title: t`Confirmation`,
         message: t`Do you really want to wipe all stored data? This includes all your preferences and favorites`,
         onConfirm: () => {
-          wipeData();
+          // wipeData();
         },
       })
     );

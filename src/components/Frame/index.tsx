@@ -70,12 +70,12 @@ const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
 
   return (
     <Background data-testid="frame">
-      {window.electron.platform === "darwin" && (
-        <OSXBar title={`Bluedis ${host}${name}`} />
-      )}
-      {window.electron.platform !== "darwin" && (
-        <Win32Bar title={`Bluedis ${host}${name}`} />
-      )}
+      {/*{window.electron.platform === "darwin" && (*/}
+      {/*  <OSXBar title={`Bluedis ${host}${name}`} />*/}
+      {/*)}*/}
+      {/*{window.electron.platform !== "darwin" && (*/}
+      {/*  <Win32Bar title={`Bluedis ${host}${name}`} />*/}
+      {/*)}*/}
       <WorkingArea>{props.children}</WorkingArea>
     </Background>
   );

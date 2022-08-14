@@ -8,7 +8,7 @@ import {
 import { Appearance } from "./Types/Appearance";
 import { Confirmation } from "./Types/Confirmation";
 import { Connection } from "./Types/Connection";
-import { Error } from "./Types/Error";
+import { IError } from "./Types/IError";
 import { ItemType } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
@@ -116,7 +116,7 @@ const slice = createSlice({
     updateLicense: (state, action: PayloadAction<string>) => {
       state.settings.license = action.payload;
     },
-    setError: (state, action: PayloadAction<Error | undefined>) => {
+    setError: (state, action: PayloadAction<IError | undefined>) => {
       state.error = action.payload;
     },
     setConfirmation: (

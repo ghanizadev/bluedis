@@ -1,9 +1,9 @@
 import React, { FC } from "react";
 
-import { ReactComponent as MinimizeIcon } from "../../assets/minus.svg";
-import { ReactComponent as MaximizeIcon } from "../../assets/square.svg";
-import { ReactComponent as CloseIcon } from "../../assets/close.svg";
-import { close, maximize, minimize } from "../../services/main-process";
+import MinimizeIcon from "../../assets/Minus";
+import MaximizeIcon from "../../assets/Square";
+import CloseIcon from "../../assets/Close";
+// import { close, maximize, minimize } from "../../services/main-process";
 
 import { Title } from "./Title";
 import { ButtonWrapper } from "./ButtonWrapper";
@@ -13,22 +13,22 @@ import { Bar } from "./Bar";
 
 export const Win32Bar: FC<{ title?: string }> = ({ title }) => {
   const handleClose = () => {
-    close();
+    // close();
   };
 
   const handleMinimize = () => {
-    minimize();
+    // minimize();
   };
 
   const handleMaximize = () => {
-    maximize();
+    // maximize();
   };
 
   return (
     <Bar data-testid={"win32-bar"}>
       <div style={{ display: "flex", flex: 1 }}>
         <img
-          src={process.env.PUBLIC_URL + "/icon.png"}
+          src={"/icon.png"}
           alt=""
           style={{ objectFit: "contain", width: 18, height: 18 }}
         />

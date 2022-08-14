@@ -2,7 +2,6 @@ import React from "react";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
 
-import { connect, saveFavorites } from "../../services/main-process";
 import { actions, store } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { Connection } from "../../redux/Types/Connection";
@@ -17,34 +16,76 @@ import { LoginButton } from "./components/login-button";
 import { Recent } from "./components/recent";
 import { ListWrapper } from "./components/list-wrapper";
 import { ConnectionList } from "./components/connection-list";
+import {invoke} from "@tauri-apps/api";
+import {FindKeysResponse} from "../../services/find-keys-response.interface";
+import {ConnectionResponse} from "../../services/connection-response.interface";
 
 const Connect = () => {
-  const [connection, setConnection] = React.useState({
+  const [connection, setConnection] = React.useState<Connection>({
     host: "localhost",
     port: "6379",
     password: "",
     tls: false,
+    id: "new-connection",
   });
   const favorites = useSelector<State, Connection[]>(
     (state) => state.favorites
   );
   const dispatch = useDispatch();
 
+  const connect = async (conn: Connection) => {
+    dispatch(actions.setLoading(true));
+
+    let connectionString = `redis${conn.tls ? 's': ''}://${conn.password ? `:${conn.password}@`:''}${conn.host}:${conn.port}`;
+
+    let connect = await invoke<ConnectionResponse>('authenticate', { cstr: connectionString });
+
+    if(connect.Error || !connect.Success) {
+      dispatch(actions.setLoading(false));
+      dispatch(actions.setError({
+        title: "Error",
+        message: !connect.Success ? "Failed to login, check you credentials and internet connection" : (connect.Error ?? "Internal error")
+      }))
+
+      return;
+    }
+
+    const data  = await invoke<FindKeysResponse>("find_keys", { cstr: connectionString, pattern: "*" })
+
+    if(data.Error) {
+      dispatch(actions.setLoading(false));
+      dispatch(actions.setError({
+        title: "Error",
+        message: data.Error
+      }))
+
+      return;
+    }
+
+    dispatch(actions.setData(data.Response!.Collection.map(item => ({
+      value: item.value,
+      type: item.key_type,
+      key: item.key,
+      ttl: item.ttl,
+    }))));
+
+    dispatch(actions.setConnected(true));
+    dispatch(actions.currentConnection({ ...conn, id: nanoid(8) }));
+    dispatch(actions.setLoading(false));
+  }
+
   const handleRemoveFromHistory = (connection: Connection) => {
     dispatch(actions.removeFavorite(connection.id));
     const updated = store.getState();
-    saveFavorites(updated.favorites);
+    // saveFavorites(updated.favorites);
   };
 
-  const handleConnectFromHistory = (connection: Connection) => {
-    dispatch(actions.currentConnection(connection));
-    connect(connection);
+  const handleConnectFromHistory = async (conn: Connection) => {
+    return connect(conn);
   };
 
-  const handleConnect = () => {
-    dispatch(actions.currentConnection({ ...connection, id: nanoid(8) }));
-    dispatch(actions.setLoading(true));
-    connect(connection);
+  const handleConnect = async () => {
+    return connect(connection);
   };
 
   const handleHostChange = (e: React.ChangeEvent<HTMLInputElement>) => {

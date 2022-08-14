@@ -8,12 +8,12 @@ import { ItemType } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-import {
-  addKey,
-  getDBCount,
-  updateData,
-  updatePreview,
-} from "../../services/main-process";
+// import {
+//   addKey,
+//   getDBCount,
+//   updateData,
+//   updatePreview,
+// } from "../../services/main-process";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
@@ -48,7 +48,7 @@ const Home = () => {
       return;
     }
 
-    updatePreview(item.key);
+    // updatePreview(item.key);
   };
 
   const handlePreviewClose = () => {
@@ -56,7 +56,7 @@ const Home = () => {
   };
 
   const handleRefresh = () => {
-    updateData();
+    // updateData();
   };
 
   const handleAddCancel = () => {
@@ -73,12 +73,12 @@ const Home = () => {
     ttl: number,
     ttlAbsolute: boolean
   ) => {
-    addKey(key, type, ttl, ttlAbsolute);
+    // addKey(key, type, ttl, ttlAbsolute);
     setAddItem(false);
   };
 
   React.useEffect(() => {
-    connected && getDBCount();
+    // connected && getDBCount();
   }, [data, connected]);
 
   return (

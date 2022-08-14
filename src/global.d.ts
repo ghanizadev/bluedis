@@ -1,6 +1,7 @@
 declare global {
   interface Window {
-    electron: any;
+    ipc: any;
+    __TAURI__: any;
   }
 }
 

@@ -1,10 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ReactComponent as DatabaseIcon } from "../../assets/database.svg";
-import { ReactComponent as SettingsIcon } from "../../assets/settings.svg";
-import { ReactComponent as HelpIcon } from "../../assets/help.svg";
-import { ReactComponent as MenuIcon } from "../../assets/menu.svg";
+import DatabaseIcon from "../../assets/Database";
+import SettingsIcon from "../../assets/Settings";
+import HelpIcon from "../../assets/Help";
+import  MenuIcon from "../../assets/Menu";
 import { Page } from "../../redux/Types/Page";
 import { actions } from "../../redux/store";
 import { t } from "../../i18n";

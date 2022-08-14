@@ -5,7 +5,7 @@ import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableData } from "../common/PreviewTableData";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { HashType, Item } from "../../redux/Types/Item";
-import { alterKey, delKeyMember } from "../../services/main-process";
+// import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddHashItem from "./AddHashItem";
@@ -25,12 +25,12 @@ const HashComponent: React.FC<Props> = (props) => {
     setItemValue({ key: "", value: "", new: true });
   };
   const handleItemSubmit = (item: { key: string; value: string }) => {
-    alterKey(key, { [item.key]: item.value });
+    // alterKey(key, { [item.key]: item.value });
     setItemValue(undefined);
   };
 
   const handleItemDelete = (item: { key: string; value: string }) => {
-    delKeyMember(key, item.key);
+    // delKeyMember(key, item.key);
     setItemValue(undefined);
   };
 

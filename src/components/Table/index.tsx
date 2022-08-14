@@ -6,7 +6,7 @@ import Checkbox from "../Checkbox";
 import { ItemType } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { loadMore } from "../../services/main-process";
+// import { loadMore } from "../../services/main-process";
 import { Query } from "../../redux/Types/Query";
 import { t } from "../../i18n";
 import { useLoading } from "../../shared/hooks/use-loading.hook";
@@ -90,7 +90,7 @@ const Table: React.FC<Props> = (props) => {
   };
 
   const handleLoadMore = useCallback(() => {
-    loadMore(query.input, query.cursor);
+    // loadMore(query.input, query.cursor);
   }, [query]);
 
   return (

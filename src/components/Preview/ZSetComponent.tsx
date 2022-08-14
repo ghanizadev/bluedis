@@ -5,7 +5,7 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { alterKey, delKeyMember } from "../../services/main-process";
+// import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddOrderedItem from "./AddOrderedItem";
@@ -29,12 +29,12 @@ const ZSetComponent: React.FC<Props> = (props) => {
     newValue: string,
     score: string
   ) => {
-    alterKey(key, [{ score, value: newValue }], { oldValue });
+    // alterKey(key, [{ score, value: newValue }], { oldValue });
     setItemValue(undefined);
   };
 
   const handleItemDelete = (item: { score: string; value: string }) => {
-    delKeyMember(key, item.value);
+    // delKeyMember(key, item.value);
     setItemValue(undefined);
   };
 
