@@ -1,7 +1,11 @@
 use crate::database::{Database, Key};
 
-pub fn get(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
-    let mut connection = db.get_connection();
+pub fn get(
+    mut db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut connection = db.get_connection()?;
 
     let mut command = redis::cmd("GET");
     command.arg(key);
@@ -12,17 +16,23 @@ pub fn get(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, 
 
     Ok(Some(Key {
         key: key.to_string(),
-        value: command.query::<String>(&mut connection).unwrap(),
+        value: command.query::<String>(&mut connection)?,
         is_new: false,
         ttl: db.get_ttl(key),
-        key_type: "string".into()
+        key_type: "string".into(),
     }))
 }
 
-pub fn set(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
-    let mut connection = db.get_connection();
+pub fn set(
+    mut db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut connection = db.get_connection()?;
 
-    let exists = redis::cmd("SET").arg(key).query::<String>(&mut connection).unwrap();
+    let exists = redis::cmd("SET")
+        .arg(key)
+        .query::<String>(&mut connection)?;
     let mut command = redis::cmd("SET");
     command.arg(key);
 
@@ -32,15 +42,19 @@ pub fn set(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, 
 
     Ok(Some(Key {
         key: key.to_string(),
-        value: command.query::<String>(&mut connection).unwrap(),
+        value: command.query::<String>(&mut connection)?,
         is_new: exists.is_empty(),
         ttl: db.get_ttl(key),
-        key_type: "string".into()
+        key_type: "string".into(),
     }))
 }
 
-pub fn del(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
-    let mut connection = db.get_connection();
+pub fn del(
+    mut db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut connection = db.get_connection()?;
 
     let mut command = redis::cmd("DEL");
     command.arg(key);
@@ -49,11 +63,15 @@ pub fn del(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, 
         command.arg(arg);
     }
 
-    command.query::<()>(&mut connection).unwrap();
+    command.query::<()>(&mut connection)?;
     Ok(None)
 }
 
-pub fn create(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
+pub fn create(
+    mut db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
     let mut new_args: Vec<&str> = vec![];
 
     new_args.push("value");

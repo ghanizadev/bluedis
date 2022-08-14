@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
+import { listen, emit } from '@tauri-apps/api/event'
 import reactLogo from './assets/react.svg'
 import './App.css'
 
@@ -9,10 +10,30 @@ function App() {
   const [response, setResponse] = useState<string>();
 
   const handler = async () => {
-      const created = await invoke('create_zset', { cStr: 'redis://localhost:6379', key: 'new zset key' });
-      console.log(created);
-      setResponse(created.value);
+      // const data = await invoke('find_keys', { cStr: 'redis://localhost:6379', pattern: '*' });
+      // console.log({ data });
+      // if(typeof created !== 'string') setResponse(created.value);
+      emit('find-keys', { pattern: "*", cstr: 'redis://localhost:6379' })
   }
+
+  useEffect(() => {
+      if(!(window as any).callback_loaded){
+          (window as any).callback_loaded = true;
+
+          listen('data', (event) => {
+              console.log("data", event.payload);
+          })
+              .then(unlisten => {
+                  (window as any).callbacks = Array.isArray((window as any).callbacks) ? [...(window as any).callbacks, unlisten] : [unlisten];
+              })
+      }
+
+      return () => {
+          if((window as any).callbacks && Array.isArray((window as any).callbacks)) {
+              (window as any).callbacks.forEach((cb) => cb());
+          }
+      }
+  }, []);
 
   return (
     <div className="App">

@@ -1,37 +1,82 @@
 #![cfg_attr(
-  all(not(debug_assertions), target_os = "windows"),
-  windows_subsystem = "windows"
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
 )]
 
 mod database;
 use crate::database::{Database, Key};
+use serde::{Deserialize, Serialize};
+use tauri::{Event, Manager, Window};
 
-#[tauri::command]
-fn set_key(c_str: &str, key: &str, value: &str) {
-  let mut db = Database::new(Some(c_str.to_string()));
-  db.set_key(key, value);
+#[derive(Serialize, Deserialize)]
+enum Response {
+    Single(Option<Key>),
+    Collection(Vec<Key>),
+}
+
+#[derive(Serialize, Deserialize)]
+enum DatabaseResponse {
+    Response(Response),
+    Error(String),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct FindKeys {
+    cstr: String,
+    pattern: Option<String>,
 }
 
 #[tauri::command]
-fn get_key(c_str: &str, key: &str) -> String {
-  let mut db = Database::new(Some(c_str.to_string()));
-  db.get_key::<String>(key).unwrap()
-}
-
-#[tauri::command]
-fn create_zset(c_str: &str, key: &str) -> Option<Key> {
-    let mut db = Database::new(Some(c_str.to_string()));
+fn create_zset(c_str: &str, key: &str) -> DatabaseResponse {
+    let mut db = Database::new(c_str.to_string());
     let args: Vec<&str> = vec![];
-    db.handle(key, "create", Some("zset".into()), Some(args)).unwrap()
+    let result = db.handle(key, "create", Some("zset".into()), Some(args));
+
+    match result {
+        Ok(data) => DatabaseResponse::Response(Response::Single(data)),
+        Err(err) => DatabaseResponse::Error(format!("Failed to create ZSET, reason: {:?}", err)),
+    }
+}
+
+#[tauri::command]
+fn find_keys(cstr: String, pattern: String) -> DatabaseResponse {
+    let mut db = Database::new(cstr);
+    let result = db.find_keys(pattern, 0, None, |key| {});
+
+    match result {
+        Ok(data) => DatabaseResponse::Response(Response::Collection(data)),
+        Err(err) => DatabaseResponse::Error(format!("Failed to find keys, reason: {:?}", err)),
+    }
 }
 
 fn main() {
-  tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![
-        set_key,
-        get_key,
-        create_zset,
-    ])
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    tauri::Builder::default()
+        .setup(|app| {
+            let main_window = app.get_window("main").unwrap();
+
+            main_window
+                .clone()
+                .listen("find-keys", move |event: Event| {
+                    let payload = event.payload().unwrap();
+                    let value = serde_json::from_str::<FindKeys>(payload).unwrap();
+
+                    let mut db = Database::new(value.cstr);
+                    let pattern = match value.pattern {
+                        Some(v) => v,
+                        _ => "*".to_string(),
+                    };
+
+                    let _ = db.find_keys(pattern, 0, None, |key| {
+                        main_window
+                            .clone()
+                            .emit::<Vec<Key>>("data", vec![key])
+                            .expect("TODO: panic message");
+                    });
+                });
+
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![create_zset, find_keys])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }

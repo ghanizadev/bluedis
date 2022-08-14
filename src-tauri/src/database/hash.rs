@@ -1,25 +1,30 @@
 use crate::database::{Database, Key};
 use serde_json::{json, Value};
 
-fn marshall(data: Vec<String>) -> String {
+fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {
     let mut result: Value = json![{}];
     let mut i = 0;
 
     while i < data.len() {
         if i % 2 != 1 {
-            result[data[i].to_string()] = data[i + 1].to_string().parse().unwrap();
+            result[data[i].to_string()] = data[i + 1].to_string().parse()?;
         }
 
         i += 1;
     }
 
-    serde_json::to_string::<Value>(&result).unwrap_or("".into())
+    let response = serde_json::to_string::<Value>(&result)?;
+
+    Ok(response)
 }
 
-fn unmarshall(data: String) -> Vec<String> {
+fn unmarshall(data: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let value = json!(data);
     let mut result: Vec<String> = vec![];
-    let vector = value.as_array().unwrap();
+    let vector = match value.as_array() {
+        Some(v) => v.clone(),
+        None => vec![] as Vec<Value>,
+    };
     let mut i = 0;
 
     while i < vector.len() {
@@ -31,27 +36,35 @@ fn unmarshall(data: String) -> Vec<String> {
         i += 1;
     }
 
-    result
+    Ok(result)
 }
 
-pub fn get(mut db: Database, key: &str, _args: Vec<&str>) -> Result<Option<Key>, String> {
-    let mut connection = db.get_connection();
+pub fn get(
+    mut db: Database,
+    key: &str,
+    _args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut connection = db.get_connection()?;
     let mut command = redis::cmd("HGETALL");
     command.arg(key);
 
-    let result = command.query::<Vec<String>>(&mut connection).unwrap();
+    let result = command.query::<Vec<String>>(&mut connection)?;
 
     Ok(Some(Key {
         key: key.into(),
-        value: marshall(result),
+        value: marshall(result)?,
         is_new: false,
         ttl: db.get_ttl(key),
         key_type: "hash".into(),
     }))
 }
 
-pub fn set(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
-    let mut connection = db.get_connection();
+pub fn set(
+    mut db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut connection = db.get_connection()?;
     let data = unmarshall(args[0].to_string());
     let mut command = redis::cmd("HSET");
 
@@ -61,23 +74,31 @@ pub fn set(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, 
         command.arg(arg);
     }
 
-    command.query::<()>(&mut connection).unwrap();
+    command.query::<()>(&mut connection)?;
 
     get(db, key, args)
 }
 
-pub fn del(mut db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
-    let mut connection = db.get_connection();
+pub fn del(
+    mut db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut connection = db.get_connection()?;
     let index_or_name = args[0];
     let mut command = redis::cmd("HDEL");
     command.arg(key);
     command.arg(index_or_name);
 
-    command.query::<()>(&mut connection).unwrap();
+    command.query::<()>(&mut connection)?;
 
     Ok(None)
 }
 
-pub fn create(db: Database, key: &str, args: Vec<&str>) -> Result<Option<Key>, String> {
+pub fn create(
+    db: Database,
+    key: &str,
+    args: Vec<&str>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
     set(db, key, vec!["newProp", "new value"])
 }
