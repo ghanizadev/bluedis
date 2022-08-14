@@ -1,62 +1,46 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { ThemeProvider } from "styled-components";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import './App.css'
 
-import Frame from "./components/Frame";
-import Database from "./pages/Database";
-import { State } from "./redux/Types/State";
-import { Page } from "./redux/Types/Page";
-import Help from "./pages/Help";
-import Settings from "./pages/Settings";
-import Sidebar from "./components/Sidebar";
-import { GlobalStyles } from "./theme/globalStyles";
-import { getPreferences } from "./services/main-process";
-import ErrorMessage from "./components/ErrorMessage";
-import ConfirmationMessage from "./components/ConfirmationMessage";
-import EditTTL from "./components/EditTTL";
-import Loading from "./components/Loading";
-import { Appearance } from "./redux/Types/Appearance";
-import Connect from "./pages/connect";
+const invoke = (window as any).__TAURI__.invoke;
 
-const App = () => {
-  const currentPage = useSelector<State, Page>((state) => state.currentPage);
-  const isConnected = useSelector<State, boolean>((state) => state.connected);
-  const appearance = useSelector<State, Appearance>(
-    (state) => state.settings.appearance
-  );
+function App() {
+  const [count, setCount] = useState(0);
+  const [response, setResponse] = useState<string>();
 
-  React.useEffect(() => {
-    getPreferences();
-  }, []);
+  const handler = async () => {
+      const created = await invoke('create_zset', { cStr: 'redis://localhost:6379', key: 'new zset key' });
+      console.log(created);
+      setResponse(created.value);
+  }
 
   return (
-    <ThemeProvider theme={appearance}>
-      <Frame>
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "row",
-          }}
-        >
-          <Sidebar />
-          <>
-            {["database"].includes(currentPage) && !isConnected && <Connect />}
-            {isConnected && currentPage === "database" && <Database />}
-            {/* TODO add message debugger */}
-          </>
-          {currentPage === "settings" && <Settings />}
-          {currentPage === "help" && <Help />}
-        </div>
-      </Frame>
-      <GlobalStyles />
-      <EditTTL />
-      <ErrorMessage />
-      <ConfirmationMessage />
-      <Loading />
-    </ThemeProvider>
-  );
-};
+    <div className="App">
+      <div>
+        <a href="https://vitejs.dev" target="_blank">
+          <img src="/vite.svg" className="logo" alt="Vite logo" />
+        </a>
+        <a href="https://reactjs.org" target="_blank">
+          <img src={reactLogo} className="logo react" alt="React logo" />
+        </a>
+      </div>
+      <h1>Vite + React</h1>
+      <div className="card">
+        <button onClick={() => setCount((count) => count + 1)}>
+          count is {count}
+        </button>
+        <button onClick={handler}>
+          response is {response}
+        </button>
+        <p>
+          Edit <code>src/App.tsx</code> and save to test HMR
+        </p>
+      </div>
+      <p className="read-the-docs">
+        Click on the Vite and React logos to learn more
+      </p>
+    </div>
+  )
+}
 
-export default App;
+export default App
