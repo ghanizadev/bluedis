@@ -1,10 +1,14 @@
+pub mod commands;
 mod hash;
 mod list;
 mod set;
 mod string;
 mod zset;
 
-use redis::{Client, Commands, Connection, FromRedisValue};
+use redis::{
+    parse_redis_url, Client, Commands, Connection, ConnectionAddr, ConnectionInfo, FromRedisValue,
+    RedisConnectionInfo,
+};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -20,17 +24,50 @@ pub struct Key {
 #[derive(Default, Clone, Debug)]
 pub struct Database {
     conn_str: String,
+    host: String,
+    password: String,
+    port: u16,
+    tls: bool,
+    db_index: i64,
 }
 
 impl Database {
     pub fn new(connection_str: String) -> Database {
+        let url = parse_redis_url(connection_str.as_str()).expect("");
+
         Database {
             conn_str: connection_str.clone(),
+            host: url.host_str().unwrap_or("localhost").to_string(),
+            password: url.password().unwrap_or("").to_string(),
+            port: url.port().unwrap_or(6379),
+            tls: url.scheme() == "rediss",
+            db_index: 0,
         }
     }
 
     pub fn get_connection(&mut self) -> Result<Connection, Box<dyn std::error::Error>> {
-        let c = Client::open(self.conn_str.clone())?;
+        let c_info = ConnectionInfo {
+            redis: RedisConnectionInfo {
+                db: self.db_index,
+                password: if self.password.is_empty() {
+                    None
+                } else {
+                    Some(self.password.clone())
+                },
+                username: None,
+            },
+            addr: if self.tls {
+                ConnectionAddr::TcpTls {
+                    host: self.host.clone(),
+                    port: self.port,
+                    insecure: true,
+                }
+            } else {
+                ConnectionAddr::Tcp(self.host.clone(), self.port)
+            },
+        };
+
+        let c = Client::open(c_info)?;
         Ok(c.get_connection()?)
     }
 
@@ -100,22 +137,18 @@ impl Database {
         }
     }
 
-    //@TODO Implement find
-    pub fn find(&self) {}
-
-    //@TODO Implement find keys
-    pub fn find_keys<F: Fn(Key)>(
+    pub fn find_keys<F: Fn(Option<Key>, i32)>(
         &mut self,
         pattern: String,
         cursor: i32,
         limit: Option<u32>,
         callback: F,
-    ) -> Result<Vec<Key>, Box<dyn std::error::Error>> {
+    ) -> Result<(Vec<Key>, i32), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
 
         let mut new_cursor = if cursor > 0 { cursor } else { -1 };
         let mut count: u32 = 0;
-        let l = limit.unwrap_or(10);
+        let l = limit.unwrap_or(100);
         let mut response: Vec<Key> = vec![];
 
         while new_cursor != 0 && count <= l {
@@ -128,7 +161,7 @@ impl Database {
             command.arg("MATCH");
             command.arg(pattern.clone());
             command.arg("COUNT");
-            command.arg("10");
+            command.arg(l);
 
             let (c, r) = command.query::<(String, Vec<String>)>(&mut connection)?;
             new_cursor = match c.parse::<i32>() {
@@ -137,17 +170,25 @@ impl Database {
             };
 
             for k in r {
-                let key = self.handle(k.as_str(), "get", None, Some(vec![]))?;
+                let key = self.handle_with_connection(
+                    &mut connection,
+                    k.as_str(),
+                    "get",
+                    None,
+                    Some(vec![]),
+                )?;
 
                 if let Some(s) = key {
-                    callback(s.clone());
+                    callback(Some(s.clone()), new_cursor);
                     response.push(s.clone());
                     count += 1;
                 }
             }
         }
 
-        Ok(response)
+        callback(None, new_cursor);
+
+        Ok((response, new_cursor))
     }
 
     pub fn count(&mut self) -> Result<usize, Box<dyn std::error::Error>> {
@@ -158,17 +199,25 @@ impl Database {
         Ok(count?)
     }
 
-    pub fn select_db(&mut self, index: u16) {
-        let mut connection = self.get_connection().unwrap();
+    pub fn select_db(&mut self, index: i64) -> Result<(), Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
         redis::cmd("SELECTDB")
             .arg(index)
-            .query::<()>(&mut connection)
-            .expect("failed to select db");
+            .query::<()>(&mut connection)?;
+
+        self.db_index = index;
+
+        Ok(())
     }
 
-    pub fn rem_key(&mut self, key: &str) {
-        let mut connection = self.get_connection().unwrap();
-        connection.del::<&str, ()>(key).unwrap();
+    pub fn rm_keys(&mut self, keys: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+
+        for key in keys {
+            connection.del::<&str, ()>(key)?;
+        }
+
+        Ok(())
     }
 
     pub fn command<T: FromRedisValue>(&mut self, comm: &str, args: Option<Vec<&str>>) -> T {
@@ -292,6 +341,43 @@ impl Database {
         }
     }
 
+    // pub fn handle(
+    //     &mut self,
+    //     key: &str,
+    //     action: &str,
+    //     key_type: Option<String>,
+    //     args: Option<Vec<&str>>,
+    // ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    //     let mut connection = self.get_connection()?;
+    //     let kt = match key_type {
+    //         None => redis::cmd("TYPE")
+    //             .arg(key)
+    //             .query::<String>(&mut connection)?,
+    //         Some(k_type) => k_type,
+    //     };
+    //     let local_args = match args {
+    //         None => {
+    //             vec![]
+    //         }
+    //         Some(a) => a,
+    //     };
+    //
+    //     match kt.as_str() {
+    //         "string" => self.switch_string(key, action, local_args),
+    //         "set" => self.switch_set(key, action, local_args),
+    //         "zset" => self.switch_zset(key, action, local_args),
+    //         "list" => self.switch_list(key, action, local_args),
+    //         "hash" => self.switch_hash(key, action, local_args),
+    //         _ => {
+    //             let error = Box::<dyn std::error::Error>::from(format!(
+    //                 "The key {} does not exist or it is already expired",
+    //                 key
+    //             ));
+    //             Err(error)
+    //         }
+    //     }
+    // }
+
     pub fn handle(
         &mut self,
         key: &str,
@@ -300,10 +386,19 @@ impl Database {
         args: Option<Vec<&str>>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
+        self.handle_with_connection(&mut connection, key, action, key_type, args.clone())
+    }
+
+    fn handle_with_connection(
+        &mut self,
+        connection: &mut Connection,
+        key: &str,
+        action: &str,
+        key_type: Option<String>,
+        args: Option<Vec<&str>>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
         let kt = match key_type {
-            None => redis::cmd("TYPE")
-                .arg(key)
-                .query::<String>(&mut connection)?,
+            None => redis::cmd("TYPE").arg(key).query::<String>(connection)?,
             Some(k_type) => k_type,
         };
         let local_args = match args {

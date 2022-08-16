@@ -10,7 +10,7 @@ export interface ColorSchema {
 
 export interface AppearenceSettings {
   fontFamily: string;
-  fontSize: string;
+  fontSize: number;
 }
 
 export const DarkTheme: ColorSchema = {
@@ -35,5 +35,5 @@ export const LightTheme: ColorSchema = {
 
 export const defaultAppearanceSettings: AppearenceSettings = {
   fontFamily: "JetBrains Mono",
-  fontSize: "10pt",
+  fontSize: 10,
 };

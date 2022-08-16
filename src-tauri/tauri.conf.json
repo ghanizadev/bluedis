@@ -8,12 +8,35 @@
     "withGlobalTauri": true
   },
   "package": {
-    "productName": "bluedis",
+    "productName": "Bluedis",
     "version": "0.2.3"
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "window": {
+        "center": true,
+        "close": true,
+        "hide": true,
+        "maximize": true,
+        "minimize": true,
+        "setFocus": true,
+        "show": true,
+        "unmaximize": true,
+        "unminimize": true,
+        "setTitle": true,
+        "requestUserAttention": true,
+        "startDragging": true,
+        "setFullscreen": true
+      },
+      "os": {
+        "all": true
+      },
+      "fs": {
+        "createDir": true,
+        "readDir": true,
+        "readFile": true,
+        "writeFile": true
+      }
     },
     "bundle": {
       "active": true,
@@ -62,7 +85,10 @@
         "height": 600,
         "resizable": true,
         "title": "Bluedis",
-        "width": 800
+        "width": 800,
+        "decorations": false,
+        "minHeight": 600,
+        "minWidth": 800
       }
     ]
   }

@@ -1,4 +1,4 @@
 export interface ConnectionResponse {
-    Success?: boolean;
-    Error?: string;
+  Success?: boolean;
+  Error?: string;
 }

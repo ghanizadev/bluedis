@@ -18,7 +18,9 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ErrorMessage = () => {
-  const message = useSelector<State, IError | undefined>((state) => state.error);
+  const message = useSelector<State, IError | undefined>(
+    (state) => state.error
+  );
   const dispatch = useDispatch();
 
   const handleClose = () => {

@@ -1,39 +1,30 @@
 use crate::database::{Database, Key};
-use serde_json::{json, Value};
+use serde_json::{Map, Value};
 
 fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {
-    let mut result: Value = json![{}];
+    let mut map = Map::new();
     let mut i = 0;
 
     while i < data.len() {
-        if i % 2 != 1 {
-            result[data[i].to_string()] = data[i + 1].to_string().parse()?;
+        if i % 2 == 0 {
+            map.insert(data[i].clone(), Value::String(data[i + 1].clone()));
         }
 
         i += 1;
     }
 
-    let response = serde_json::to_string::<Value>(&result)?;
+    let response = serde_json::to_string::<Map<String, Value>>(&map)?;
 
     Ok(response)
 }
 
 fn unmarshall(data: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let value = json!(data);
+    let value = serde_json::from_str::<Map<String, Value>>(&data)?;
     let mut result: Vec<String> = vec![];
-    let vector = match value.as_array() {
-        Some(v) => v.clone(),
-        None => vec![] as Vec<Value>,
-    };
-    let mut i = 0;
 
-    while i < vector.len() {
-        if i % 2 != 1 {
-            result.push(vector[i].to_string());
-            result.push(vector[i + 1].to_string());
-        }
-
-        i += 1;
+    for (key, value) in value.iter() {
+        result.push(key.clone());
+        result.push(value.to_string());
     }
 
     Ok(result)
@@ -98,7 +89,7 @@ pub fn del(
 pub fn create(
     db: Database,
     key: &str,
-    args: Vec<&str>,
+    _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
     set(db, key, vec!["newProp", "new value"])
 }
