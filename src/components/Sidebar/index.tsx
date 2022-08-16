@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DatabaseIcon from "../../assets/Database";
 import SettingsIcon from "../../assets/Settings";
 import HelpIcon from "../../assets/Help";
-import  MenuIcon from "../../assets/Menu";
+import MenuIcon from "../../assets/Menu";
 import { Page } from "../../redux/Types/Page";
 import { actions } from "../../redux/store";
 import { t } from "../../i18n";

@@ -17,6 +17,12 @@ import { actions } from "../../redux/store";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
+import { invoke } from "@tauri-apps/api";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { Connection } from "../../redux/Types/Connection";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { Query } from "../../redux/Types/Query";
 
 const Content = styled.div`
   width: 100%;
@@ -37,26 +43,63 @@ const Home = () => {
     (state) => state.preview
   );
   const connected = useSelector<State, boolean>((state) => state.connected);
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
+  const lastQuery = useSelector<State, Query>((state) => state.query);
 
   const [addItem, setAddItem] = React.useState(false);
 
   const dispatch = useDispatch();
 
-  const handlePreview = (item: ItemType) => {
+  const handlePreview = async (item: ItemType) => {
     if (preview === item) {
       dispatch(actions.setPreview(undefined));
       return;
     }
 
-    // updatePreview(item.key);
+    let cstr = parseConnectionString(connection!);
+    let response = await invoke<FindKeyResponse>("handle", {
+      cstr,
+      key: item.key,
+      action: "get",
+      keyType: "",
+      args: [],
+    });
+
+    if (response.Error) throw new Error("key not found or expired");
+
+    let { key: rawKey } = response.Response!.Single!;
+
+    dispatch(actions.setPreview(parseKey(rawKey)));
   };
 
   const handlePreviewClose = () => {
     dispatch(actions.setPreview(undefined));
   };
 
-  const handleRefresh = () => {
-    // updateData();
+  const handleRefresh = async () => {
+    let cstr = parseConnectionString(connection!);
+    let response = await invoke<FindKeyResponse>("find_keys", {
+      cstr,
+      pattern: lastQuery.input,
+      cursor: lastQuery.cursor ?? 0,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: "Failed refresh, check your connection",
+        })
+      );
+
+      return;
+    }
+
+    const { keys, cursor } = response.Response!.Collection;
+    dispatch(actions.setData(keys.map(parseKey)));
+    dispatch(actions.setQuery({ ...lastQuery, cursor, done: cursor === 0 }));
   };
 
   const handleAddCancel = () => {
@@ -67,18 +110,35 @@ const Home = () => {
     setAddItem(true);
   };
 
-  const handleAddConfirm = (
+  const handleAddConfirm = async (
     type: "set" | "zset" | "hash" | "string" | "list",
     key: string,
     ttl: number,
     ttlAbsolute: boolean
   ) => {
-    // addKey(key, type, ttl, ttlAbsolute);
+    let cstr = parseConnectionString(connection!);
+    await invoke("handle", {
+      cstr,
+      keyType: type,
+      key,
+      ttl,
+      args: ["nova chave"],
+    });
     setAddItem(false);
   };
 
   React.useEffect(() => {
-    // connected && getDBCount();
+    if (!connected || !connection) return;
+
+    let cstr = parseConnectionString(connection);
+    invoke<{ Count?: number; Error?: string }>("db_count", { cstr }).then(
+      (response) => {
+        console.log({ response });
+        if (response.Count) {
+          dispatch(actions.setCount(response.Count));
+        }
+      }
+    );
   }, [data, connected]);
 
   return (

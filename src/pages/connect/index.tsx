@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,9 +16,11 @@ import { LoginButton } from "./components/login-button";
 import { Recent } from "./components/recent";
 import { ListWrapper } from "./components/list-wrapper";
 import { ConnectionList } from "./components/connection-list";
-import {invoke} from "@tauri-apps/api";
-import {FindKeysResponse} from "../../services/find-keys-response.interface";
-import {ConnectionResponse} from "../../services/connection-response.interface";
+import { invoke } from "@tauri-apps/api";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { ConnectionResponse } from "../../services/connection-response.interface";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 const Connect = () => {
   const [connection, setConnection] = React.useState<Connection>({
@@ -36,48 +38,92 @@ const Connect = () => {
   const connect = async (conn: Connection) => {
     dispatch(actions.setLoading(true));
 
-    let connectionString = `redis${conn.tls ? 's': ''}://${conn.password ? `:${conn.password}@`:''}${conn.host}:${conn.port}`;
+    let connectionString = parseConnectionString(conn);
 
-    let connect = await invoke<ConnectionResponse>('authenticate', { cstr: connectionString });
+    let connect = await invoke<ConnectionResponse>("authenticate", {
+      cstr: connectionString,
+    });
 
-    if(connect.Error || !connect.Success) {
+    if (connect.Error || !connect.Success) {
       dispatch(actions.setLoading(false));
-      dispatch(actions.setError({
-        title: "Error",
-        message: !connect.Success ? "Failed to login, check you credentials and internet connection" : (connect.Error ?? "Internal error")
-      }))
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: !connect.Success
+            ? "Failed to login, check your credentials and internet connection"
+            : connect.Error ?? "Internal error",
+        })
+      );
+
+      console.error(connect.Error)
 
       return;
     }
 
-    const data  = await invoke<FindKeysResponse>("find_keys", { cstr: connectionString, pattern: "*" })
+    const data = await invoke<FindKeyResponse>("find_keys", {
+      cstr: connectionString,
+      pattern: "*",
+      cursor: 0,
+    });
+    const count = await invoke<{ Error?: string; Count?: number }>("db_count", {
+      cstr: connectionString,
+    });
 
-    if(data.Error) {
+    if (data.Error || count.Error) {
       dispatch(actions.setLoading(false));
-      dispatch(actions.setError({
-        title: "Error",
-        message: data.Error
-      }))
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: data.Error ?? count.Error ?? "Failed to fetch keys",
+        })
+      );
 
       return;
     }
 
-    dispatch(actions.setData(data.Response!.Collection.map(item => ({
-      value: item.value,
-      type: item.key_type,
-      key: item.key,
-      ttl: item.ttl,
-    }))));
+    const { keys, cursor } = data.Response!.Collection;
+    dispatch(actions.setData(keys.map(parseKey)));
 
     dispatch(actions.setConnected(true));
     dispatch(actions.currentConnection({ ...conn, id: nanoid(8) }));
     dispatch(actions.setLoading(false));
-  }
+    dispatch(
+      actions.setQuery({
+        input: "*",
+        cursor,
+        done: cursor === 0,
+        count: count.Count ?? keys.length,
+      })
+    );
+  };
 
-  const handleRemoveFromHistory = (connection: Connection) => {
+  const updateFavorites = async (favorites: Connection[]) => {
+    await Promise.all(
+      favorites.map(async (fav) => {
+        let resp = await invoke<any>("save_favorite", {
+          fav: { ...fav, port: +fav.port },
+        });
+
+        if (resp.Error)
+          dispatch(
+            actions.setError({
+              title: "Error",
+              message: resp.Error,
+            })
+          );
+      })
+    );
+  };
+
+  const handleRemoveFromHistory = async (connection: Connection) => {
     dispatch(actions.removeFavorite(connection.id));
-    const updated = store.getState();
-    // saveFavorites(updated.favorites);
+    const resp = await invoke<{ Error?: string }>("del_favorite", { id: connection.id });
+
+    if(resp.Error)
+      dispatch(actions.setError({
+        title: "Error",
+        message: resp.Error,
+      }))
   };
 
   const handleConnectFromHistory = async (conn: Connection) => {
@@ -89,7 +135,13 @@ const Connect = () => {
   };
 
   const handleHostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConnection({ ...connection, host: e.target.value });
+    try {
+      const url = new URL(e.target.value);
+
+      setConnection({...connection, host: url.hostname, port: url.port, password: url.password, tls: url.protocol.startsWith('rediss')})
+    } catch(err) {
+      setConnection({ ...connection, host: e.target.value });
+    }
   };
   const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, port: e.target.value });
@@ -101,6 +153,10 @@ const Connect = () => {
     setConnection({ ...connection, tls: e.target.checked });
   };
 
+  useEffect(() => {
+    updateFavorites(favorites);
+  }, [favorites]);
+
   return (
     <>
       <Container>
@@ -111,7 +167,7 @@ const Connect = () => {
               {t`Host`}:
               <br />
               <input
-                defaultValue={connection.host}
+                value={connection.host}
                 onChange={handleHostChange}
               />
             </label>
@@ -119,17 +175,17 @@ const Connect = () => {
               {t`Port`}:
               <br />
               <input
-                defaultValue={connection.port}
+                value={connection.port}
                 onChange={handlePortChange}
               />
             </label>
             <label>
               {t`Password`}:
               <br />
-              <input type="password" onChange={handlePasswordChange} />
+              <input type="password" value={connection.password} onChange={handlePasswordChange} />
             </label>
             <label>
-              <input type="checkbox" onChange={handleTLSChange} /> {t`Use TLS`}
+              <input type="checkbox" checked={connection.tls} onChange={handleTLSChange} /> {t`Use TLS`}
             </label>
             <LoginButton onClick={handleConnect}>{t`Connect`}</LoginButton>
           </Form>

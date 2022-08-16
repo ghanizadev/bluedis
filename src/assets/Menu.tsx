@@ -1,5 +1,5 @@
 import * as React from "react";
-import {FC, SVGProps} from "react";
+import { FC, SVGProps } from "react";
 
 const SvgMenu: FC<SVGProps<SVGSVGElement>> = (props) => (
   <svg

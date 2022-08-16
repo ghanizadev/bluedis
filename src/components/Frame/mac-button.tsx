@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const MacButton = styled.button<{ color: string }>`
+export const MacButton = styled.button<{
+  color: string;
+  image: string;
+  hover?: boolean;
+}>`
   width: 14px;
   height: 14px;
 
@@ -13,7 +17,12 @@ export const MacButton = styled.button<{ color: string }>`
   align-items: center;
   justify-content: center;
 
-  & svg {
-    color: #333;
-  }
+  ${(props) => {
+    if (props.hover)
+      return `
+            background-image: url("/${props.image}.svg");
+            background-position: center;
+            background-repeat: no-repeat;
+          `;
+  }}
 `;

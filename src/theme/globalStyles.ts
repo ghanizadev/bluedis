@@ -6,7 +6,7 @@ export const GlobalStyles = createGlobalStyle<{
   theme: AppearenceSettings & ColorSchema;
 }>`
   html, body, #root {
-    font-size: ${(props) => props.theme.fontSize};
+    font-size: ${(props) => props.theme.fontSize}pt;
     font-family: ${(props) => props.theme.fontFamily};
   } 
 
@@ -15,6 +15,10 @@ export const GlobalStyles = createGlobalStyle<{
     margin: 0;
     box-sizing: border-box;
     font-family: inherit;
+  }
+  
+  div, span, p, svg, section {
+    user-select: none;
   }
 
   *:focus {

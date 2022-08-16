@@ -1,4 +1,4 @@
-import {FC, SVGProps} from "react";
+import { FC, SVGProps } from "react";
 
 const SvgTrash: FC<SVGProps<SVGSVGElement>> = (props) => (
   <svg

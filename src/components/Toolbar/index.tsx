@@ -2,12 +2,6 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { State } from "../../redux/Types/State";
-// import {
-//   deleteKey,
-//   disconnect,
-//   exportItems,
-//   saveFavorites,
-// } from "../../services/main-process";
 import { actions, store } from "../../redux/store";
 import AddIcon from "../../assets/Plus";
 import RefreshIcon from "../../assets/Refresh";
@@ -24,6 +18,8 @@ import { LastRefresh } from "./LastRefresh";
 import PickName from "./PickName";
 import { Separator } from "./Separator";
 import { SquareButton } from "./SquareButton";
+import { invoke } from "@tauri-apps/api";
+import {parseConnectionString} from "../../shared/helpers/parse-connection-string.helper";
 
 type Props = {
   onRefresh: () => void;
@@ -68,16 +64,20 @@ const Toolbar: React.FC<Props> = (props) => {
       actions.setConfirmation({
         message,
         title,
-        onConfirm: () => {
-          // deleteKey(selected);
-          dispatch(actions.clearSelection());
+        onConfirm: async () => {
+          await invoke("rm_keys", { cstr: parseConnectionString(currentConnection!), keys: selected }).then(() => {
+            dispatch(actions.clearSelection());
+          });
+
+          handleRefresh();
         },
       })
     );
   };
 
   const handleDisconnect = () => {
-    // disconnect();
+    dispatch(actions.setConnected(false));
+    dispatch(actions.resetTerminal());
   };
 
   const handleTerminal = () => {
@@ -88,13 +88,28 @@ const Toolbar: React.FC<Props> = (props) => {
     setNewName(true);
   };
 
-  const handleNewFavoriteName = (name: string) => {
+  const handleNewFavoriteName = async (name: string) => {
     if (currentConnection) {
       dispatch(actions.addFavorite({ ...currentConnection, name }));
       dispatch(actions.currentConnection({ ...currentConnection, name }));
 
       const updated = store.getState();
-      // saveFavorites(updated.favorites);
+
+      await Promise.all(
+        updated.favorites.map(async (fav) => {
+          let resp = await invoke<any>("save_favorite", {
+            fav: { ...fav, port: +fav.port },
+          });
+
+          if (resp.Error)
+            dispatch(
+              actions.setError({
+                title: "Error",
+                message: resp.Error,
+              })
+            );
+        })
+      );
     }
     setNewName(false);
   };

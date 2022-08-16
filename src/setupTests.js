@@ -3,6 +3,6 @@ global.electron = {
   send: () => ({}),
   receive: () => ({}),
   shell: {
-    openExternal: () => ({})
+    openExternal: () => ({}),
   },
-}
+};

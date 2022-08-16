@@ -26,13 +26,15 @@ export const Win32Bar: FC<{ title?: string }> = ({ title }) => {
 
   return (
     <Bar data-testid={"win32-bar"}>
-      <div style={{ display: "flex", flex: 1 }}>
+      <div data-tauri-drag-region={true} style={{ display: "flex", flex: 1 }}>
         <img
           src={"/icon.png"}
           alt=""
           style={{ objectFit: "contain", width: 18, height: 18 }}
         />
-        <Title data-testid={"frame-titlebar"}>{title}</Title>
+        <Title data-tauri-drag-region={true} data-testid={"frame-titlebar"}>
+          {title}
+        </Title>
       </div>
       <ButtonWrapper>
         <Resize data-testid="frame-minimize" onClick={handleMinimize}>

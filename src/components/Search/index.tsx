@@ -3,9 +3,14 @@ import styled from "styled-components";
 
 import Button from "../Button";
 import Dropdown from "../Dropdown";
-// import { findKeys, selectDatabase } from "../../services/main-process";
 import { t } from "../../i18n";
 import { InputAlt } from "../Input";
+import {invoke} from "@tauri-apps/api";
+import {parseConnectionString} from "../../shared/helpers/parse-connection-string.helper";
+import {useSelector} from "react-redux";
+import {Connection} from "../../redux/Types/Connection";
+import {State} from "../../redux/Types/State";
+import {emit} from "@tauri-apps/api/event";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -29,25 +34,25 @@ const Search = () => {
     { value: 4, name: "DB 4" },
     { value: 5, name: "DB 5" },
   ];
+  const connection = useSelector<State, Connection | undefined>(state => state.connection);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMatch(e.target.value ?? "*");
   };
 
-  const handleKeyListener = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyListener = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      // findKeys(match || "*", 0);
+      await emit('find-keys', { cstr: parseConnectionString(connection!), pattern: match ?? '*', cursor: 0 });
     }
   };
 
-  const handleSearch = () => {
-    // findKeys(match || "*", 0);
+  const handleSearch = async () => {
+    await emit('find-keys', { cstr: parseConnectionString(connection!), pattern: match ?? '*', cursor: 0 });
   };
 
-  const handleDatabaseChange = (item: string) => {
+  const handleDatabaseChange = async (item: string) => {
     const db = databases.find((db) => db.name === item);
-
-    // if (db) selectDatabase(db.value);
+    await invoke('select_db', { cstr: parseConnectionString(connection!), dbIndex: db });
   };
 
   return (

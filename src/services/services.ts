@@ -1,5 +1,8 @@
 interface IService {
-  invoke: (event: string, args: { [key: string]: string | number | boolean }) => void;
+  invoke: (
+    event: string,
+    args: { [key: string]: string | number | boolean }
+  ) => void;
 }
 
 const services: IService = {
@@ -9,6 +12,4 @@ const services: IService = {
   // shell: () => {},
 };
 
-
 export default services;
-
