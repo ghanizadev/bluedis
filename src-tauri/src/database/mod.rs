@@ -385,7 +385,7 @@ impl Database {
         let key_type = key_type_cmd.query::<String>(&mut connection)?;
 
         match key_type.as_str() {
-            "set" => set::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "set" => set::get(&mut connection, key.as_str()),
             "zset" => zset::get(&mut connection, key.as_str()),
             "hash" => hash::get(self.clone(), &mut connection, key.as_str(), vec![]),
             "list" => list::get(self.clone(), &mut connection, key.as_str(), vec![]),
@@ -446,7 +446,7 @@ impl Database {
         }
     }
 
-    pub async fn set_zset_member(
+    pub async fn add_zset_member(
         &self,
         key: String,
         value: Option<ZSetKey>,
@@ -455,7 +455,7 @@ impl Database {
         let mut connection = self.get_connection()?;
 
         if let Some(v) = value {
-            return zset::set_zset_member(&mut connection, key, v, old_value);
+            return zset::add_zset_member(&mut connection, key, v, old_value);
         };
 
         Ok(None)
@@ -470,19 +470,22 @@ impl Database {
         zset::del_zset_member(&mut connection, key, value)
     }
 
-    pub fn command<T: FromRedisValue>(&mut self, comm: &str, args: Option<Vec<&str>>) -> T {
-        let mut connection = self.get_connection().unwrap();
-        let mut command = redis::cmd(comm);
+    pub async fn add_set_member(
+        &self,
+        key: String,
+        value: String,
+        replace: Option<String>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        set::add_set_member(&mut connection, key, value, replace)
+    }
 
-        match args {
-            None => {}
-            Some(a) => {
-                for arg in a {
-                    command.arg::<&str>(arg);
-                }
-            }
-        }
-
-        command.query::<T>(&mut connection).unwrap()
+    pub async fn del_set_member(
+        &self,
+        key: String,
+        value: String,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        set::del_set_member(&mut connection, key, value)
     }
 }

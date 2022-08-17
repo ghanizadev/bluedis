@@ -44,7 +44,7 @@ const ZSetComponent: React.FC<Props> = (props) => {
     const cstr = parseConnectionString(connection!);
     let response = await invoke<FindKeyResponse>("alter_zset", {
       cstr,
-      action: "set_member",
+      action: "add_member",
       key,
       value: { score: +score, value: newValue },
       oldValue,

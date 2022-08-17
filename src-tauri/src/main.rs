@@ -65,6 +65,7 @@ async fn main() {
             database::commands::create_key,
             database::commands::get_key,
             database::commands::alter_zset,
+            database::commands::alter_set,
             persistence::commands::save_preference,
             persistence::commands::load_preference,
             persistence::commands::get_favorite,

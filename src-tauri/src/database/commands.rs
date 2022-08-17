@@ -158,7 +158,34 @@ pub async fn alter_zset(
             }
             Err(err) => DatabaseResponse::Error(format!("Failed delete member, reason: {:?}", err)),
         },
-        "set_member" => match db.set_zset_member(key, value, old_value).await {
+        "add_member" => match db.add_zset_member(key, value, old_value).await {
+            Ok(key) => {
+                DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+            }
+            Err(err) => DatabaseResponse::Error(format!("Failed alter member, reason: {:?}", err)),
+        },
+        _ => DatabaseResponse::Error(format!("Invalid action, reason: {:?}", &action)),
+    }
+}
+
+#[tauri::command]
+pub async fn alter_set(
+    cstr: String,
+    action: String,
+    key: String,
+    value: String,
+    replace: Option<String>,
+) -> DatabaseResponse {
+    let db = Database::new(cstr);
+
+    match action.as_str() {
+        "del_member" => match db.del_set_member(key, value).await {
+            Ok(key) => {
+                DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+            }
+            Err(err) => DatabaseResponse::Error(format!("Failed delete member, reason: {:?}", err)),
+        },
+        "add_member" => match db.add_set_member(key, value, replace).await {
             Ok(key) => {
                 DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
             }
