@@ -1,17 +1,18 @@
 use crate::database::{Database, Key};
+use redis::Connection;
 
 pub fn get(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
     let mut command = redis::cmd("LRANGE");
     command.arg(key);
     command.arg("0");
     command.arg("-1");
 
-    let result = command.query::<Vec<String>>(&mut connection)?;
+    let result = command.query::<Vec<String>>(connection)?;
 
     Ok(Some(Key {
         key: key.into(),
@@ -24,10 +25,10 @@ pub fn get(
 
 pub fn set(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
     let mut command = redis::cmd("RPUSH");
 
     //@TODO validate second arg (index 1) to see if it is an update instead
@@ -38,17 +39,17 @@ pub fn set(
         command.arg(arg);
     }
 
-    command.query::<()>(&mut connection)?;
+    command.query::<()>(connection)?;
 
-    get(db, key, vec![])
+    get(db, connection, key, vec![])
 }
 
 pub fn del(
-    mut db: Database,
+    mut _db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
     let to_remove = args[0];
     let mut command = redis::cmd("LREM");
 
@@ -56,15 +57,16 @@ pub fn del(
     command.arg("1");
     command.arg(to_remove);
 
-    command.query::<()>(&mut connection)?;
+    command.query::<()>(connection)?;
 
     Ok(None)
 }
 
 pub fn create(
     db: Database,
+    connection: &mut Connection,
     key: &str,
     _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    set(db, key, vec!["new list item"])
+    set(db, connection, key, vec!["new list item"])
 }

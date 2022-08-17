@@ -1,12 +1,12 @@
 use crate::database::{Database, Key};
+use redis::Connection;
 
 pub fn get(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
     let mut command = redis::cmd("SMEMBERS");
     command.arg(key);
 
@@ -14,7 +14,7 @@ pub fn get(
         command.arg(arg);
     }
 
-    let value = command.query::<Vec<String>>(&mut connection)?;
+    let value = command.query::<Vec<String>>(connection)?;
 
     Ok(Some(Key {
         key: key.to_string(),
@@ -27,11 +27,10 @@ pub fn get(
 
 pub fn set(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
     let mut command = redis::cmd("SADD");
     command.arg(key);
 
@@ -45,7 +44,7 @@ pub fn set(
 
     Ok(Some(Key {
         key: key.to_string(),
-        value: command.query::<String>(&mut connection)?,
+        value: command.query::<String>(connection)?,
         is_new: true,
         ttl: db.get_ttl(key),
         key_type: "set".into(),
@@ -54,11 +53,10 @@ pub fn set(
 
 pub fn del(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
     let mut command = redis::cmd("SREM");
     command.arg(key);
 
@@ -66,13 +64,14 @@ pub fn del(
         command.arg(arg);
     }
 
-    command.query::<()>(&mut connection)?;
+    command.query::<()>(connection)?;
 
     Ok(None)
 }
 
 pub fn create(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
@@ -83,5 +82,5 @@ pub fn create(
         local_args.push(arg);
     }
 
-    set(db, key, local_args)
+    set(db, connection, key, local_args)
 }

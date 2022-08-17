@@ -1,4 +1,5 @@
 use crate::database::{Database, Key};
+use redis::Connection;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
@@ -41,18 +42,17 @@ fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
 
 pub fn get(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
     let mut command = redis::cmd("ZRANGE");
     command.arg(key);
     command.arg("0");
     command.arg("-1");
     command.arg("WITHSCORES");
 
-    let result = command.query::<Vec<String>>(&mut connection)?;
+    let result = command.query::<Vec<String>>(connection)?;
 
     Ok(Some(Key {
         key: key.to_string(),
@@ -65,10 +65,10 @@ pub fn get(
 
 pub fn set(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
     // let data = unmarshall(args[0].to_string())?;
 
     let mut command = redis::cmd("ZADD");
@@ -84,34 +84,35 @@ pub fn set(
         redis::cmd("ZREM")
             .arg(key)
             .arg(old)
-            .query::<()>(&mut connection)?;
+            .query::<()>(connection)?;
     }
 
-    command.query::<()>(&mut connection)?;
+    command.query::<()>(connection)?;
 
-    get(db, key, vec![])
+    get(db, connection, key, vec![])
 }
 
 pub fn del(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
     let old = args[0].to_string();
 
     redis::cmd("ZREM")
         .arg(key)
         .arg(old)
-        .query::<()>(&mut connection)?;
+        .query::<()>(connection)?;
 
     Ok(None)
 }
 
 pub fn create(
     db: Database,
+    connection: &mut Connection,
     key: &str,
     _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    set(db, key, vec!["100", "new zset value"])
+    set(db, connection, key, vec!["100", "new zset value"])
 }
