@@ -6,6 +6,14 @@ import { t } from "../../i18n";
 // import { alterKey } from "../../services/main-process";
 
 import { PreviewActions } from "./preview-actions";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { invoke } from "@tauri-apps/api";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { actions } from "../../redux/store";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { useDispatch, useSelector } from "react-redux";
+import { Connection } from "../../redux/Types/Connection";
+import { State } from "../../redux/Types/State";
 
 const TextArea = styled.textarea`
   resize: none;
@@ -25,9 +33,34 @@ const StringComponent: React.FC<Props> = (props) => {
   const { key, value, ttl } = props.item;
   const [itemValue, setItemValue] = React.useState("");
   const [saved, setSaved] = React.useState(false);
+  const dispatch = useDispatch();
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
 
-  const handleDocumentSave = () => {
-    // alterKey(key, itemValue);
+  const handleDocumentSave = async () => {
+    const cstr = parseConnectionString(connection!);
+    let response = await invoke<FindKeyResponse>("alter_string", {
+      cstr,
+      key,
+      value: itemValue,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+
+    dispatch(actions.setPreview(parseKey(data.key)));
+
     clearTimeout(saveTimeout);
     setSaved(true);
 

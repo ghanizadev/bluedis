@@ -221,3 +221,15 @@ pub async fn alter_list(
         _ => DatabaseResponse::Error(format!("Invalid action, reason: {:?}", &action)),
     }
 }
+
+#[tauri::command]
+pub async fn alter_string(cstr: String, key: String, value: String) -> DatabaseResponse {
+    let db = Database::new(cstr);
+
+    match db.update_string(key, value).await {
+        Ok(key) => {
+            DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+        }
+        Err(err) => DatabaseResponse::Error(format!("Failed alter member, reason: {:?}", err)),
+    }
+}

@@ -389,7 +389,7 @@ impl Database {
             "zset" => zset::get(&mut connection, key.as_str()),
             "hash" => hash::get(self.clone(), &mut connection, key.as_str(), vec![]),
             "list" => list::get(&mut connection, key.as_str()),
-            "string" => string::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "string" => string::get(&mut connection, key),
             _ => {
                 let error = Box::<dyn std::error::Error>::from("The key could not be found");
                 Err(error)
@@ -458,5 +458,14 @@ impl Database {
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
         list::del_list_member(&mut connection, key, value, index)
+    }
+
+    pub async fn update_string(
+        &self,
+        key: String,
+        value: String,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        string::update_string(&mut connection, key, value)
     }
 }
