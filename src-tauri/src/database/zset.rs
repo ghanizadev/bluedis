@@ -106,7 +106,7 @@ pub fn del_zset_member(
     get(connection, &key)
 }
 
-pub fn set_zset_member(
+pub fn add_zset_member(
     connection: &mut Connection,
     key: String,
     value: ZSetKey,

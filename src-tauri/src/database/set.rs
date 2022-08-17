@@ -1,27 +1,28 @@
 use crate::database::{Database, Key};
+use crate::helper::get_timestamp;
 use redis::Connection;
 
 pub fn get(
-    mut db: Database,
     connection: &mut Connection,
     key: &str,
-    args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("SMEMBERS");
-    command.arg(key);
+    let mut command = redis::pipe();
 
-    for arg in args {
-        command.arg(arg);
-    }
+    command.cmd("SMEMBERS").arg(key);
+    command.cmd("PTTL").arg(&key);
 
-    let value = command.query::<Vec<String>>(connection)?;
+    let (value, pttl) = command.query::<(Vec<String>, i64)>(connection)?;
 
     Ok(Some(Key {
         key: key.to_string(),
         value: serde_json::to_string(&value).expect("Failed to serialize"),
         is_new: true,
-        ttl: db.get_ttl(key)?,
         key_type: "set".into(),
+        ttl: if pttl >= 0 {
+            pttl + get_timestamp()
+        } else {
+            pttl
+        },
     }))
 }
 
@@ -69,18 +70,32 @@ pub fn del(
     Ok(None)
 }
 
-pub fn create(
-    mut db: Database,
+pub fn del_set_member(
     connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
+    key: String,
+    value: String,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut local_args: Vec<&str> = vec![];
-    local_args.push("new set value");
+    let mut pipeline = redis::pipe();
+    pipeline.cmd("SREM").arg(&key).arg(&value).ignore();
+    pipeline.query::<()>(connection)?;
 
-    for arg in args {
-        local_args.push(arg);
+    get(connection, &key)
+}
+
+pub fn add_set_member(
+    connection: &mut Connection,
+    key: String,
+    value: String,
+    replace: Option<String>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut pipeline = redis::pipe();
+
+    if let Some(r) = replace {
+        pipeline.cmd("SREM").arg(&key).arg(r).ignore();
     }
 
-    set(db, connection, key, local_args)
+    pipeline.cmd("SADD").arg(&key).arg(value).ignore();
+    pipeline.query::<()>(connection)?;
+
+    get(connection, &key)
 }
