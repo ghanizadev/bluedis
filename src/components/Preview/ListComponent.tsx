@@ -5,11 +5,18 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-// import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddListMember from "./AddListMember";
 import { PreviewActions } from "./preview-actions";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { invoke } from "@tauri-apps/api";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { actions } from "../../redux/store";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { useDispatch, useSelector } from "react-redux";
+import { Connection } from "../../redux/Types/Connection";
+import { State } from "../../redux/Types/State";
 
 type Props = {
   item: Item<ListType>;
@@ -22,17 +29,66 @@ const ListComponent: React.FC<Props> = (props) => {
     value: string;
     index: number;
   }>();
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
+  const dispatch = useDispatch();
 
   const handleAddOpen = () => {
     setItemValue({ value: t`New value here...`, index: -1 });
   };
-  const handleItemSubmit = (value: string, index?: number) => {
-    // alterKey(key, [value], { position: "tail", index });
+  const handleItemSubmit = async (value: string, index?: number) => {
+    const cstr = parseConnectionString(connection!);
+
+    let response = await invoke<FindKeyResponse>("alter_list", {
+      cstr,
+      action: "add_member",
+      key,
+      value,
+      replace: index,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+
+    dispatch(actions.setPreview(parseKey(data.key)));
     setItemValue(undefined);
   };
 
-  const handleItemDelete = (value: string, index: number) => {
-    // delKeyMember(key, index);
+  const handleItemDelete = async (value: string, index: number) => {
+    const cstr = parseConnectionString(connection!);
+    let response = await invoke<FindKeyResponse>("alter_list", {
+      cstr,
+      action: "del_member",
+      key,
+      value,
+      index,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+
+    dispatch(actions.setPreview(parseKey(data.key)));
     setItemValue(undefined);
   };
 

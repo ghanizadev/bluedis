@@ -1,47 +1,30 @@
 use crate::database::{Database, Key};
+use crate::helper::get_timestamp;
 use redis::Connection;
+use uuid::Uuid;
 
 pub fn get(
-    mut db: Database,
     connection: &mut Connection,
     key: &str,
-    _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("LRANGE");
-    command.arg(key);
-    command.arg("0");
-    command.arg("-1");
+    let mut pipeline = redis::pipe();
 
-    let result = command.query::<Vec<String>>(connection)?;
+    pipeline.cmd("LRANGE").arg(key).arg(0).arg(-1);
+    pipeline.cmd("PTTL").arg(&key);
+
+    let (result, pttl) = pipeline.query::<(Vec<String>, i64)>(connection)?;
 
     Ok(Some(Key {
         key: key.into(),
         value: serde_json::to_string(&result).unwrap_or_else(|_| "".into()),
         is_new: false,
-        ttl: db.get_ttl(key)?,
         key_type: "list".into(),
+        ttl: if pttl >= 0 {
+            pttl + get_timestamp()
+        } else {
+            pttl
+        },
     }))
-}
-
-pub fn set(
-    mut db: Database,
-    connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
-) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("RPUSH");
-
-    //@TODO validate second arg (index 1) to see if it is an update instead
-
-    command.arg(key);
-
-    for arg in args {
-        command.arg(arg);
-    }
-
-    command.query::<()>(connection)?;
-
-    get(db, connection, key, vec![])
 }
 
 pub fn del(
@@ -62,11 +45,52 @@ pub fn del(
     Ok(None)
 }
 
-pub fn create(
-    db: Database,
+pub fn add_list_member(
     connection: &mut Connection,
-    key: &str,
-    _args: Vec<&str>,
+    key: String,
+    value: String,
+    replace: Option<u64>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    set(db, connection, key, vec!["new list item"])
+    let mut pipeline = redis::pipe();
+
+    if let Some(r) = replace {
+        pipeline.cmd("LSET").arg(&key).arg(r).arg(&value);
+    } else {
+        pipeline.cmd("LPUSH").arg(&key).arg(&value);
+    }
+
+    pipeline.query::<()>(connection)?;
+
+    get(connection, &key)
+}
+
+pub fn del_list_member(
+    connection: &mut Connection,
+    key: String,
+    value: String,
+    index: Option<u64>,
+) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+    let mut pipeline = redis::pipe();
+
+    if let Some(i) = index {
+        let to_remove = Uuid::new_v4();
+
+        pipeline
+            .cmd("LSET")
+            .arg(&key)
+            .arg(i)
+            .arg(to_remove.to_string());
+
+        pipeline
+            .cmd("LREM")
+            .arg(&key)
+            .arg(1)
+            .arg(to_remove.to_string());
+    } else {
+        pipeline.cmd("LREM").arg(&key).arg(1).arg(&value);
+    }
+
+    pipeline.query::<()>(connection)?;
+
+    get(connection, &key)
 }

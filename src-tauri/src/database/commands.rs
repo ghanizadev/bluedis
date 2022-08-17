@@ -1,7 +1,6 @@
 use crate::database::zset::ZSetKey;
 use crate::{Database, Key};
 use serde::{Deserialize, Serialize};
-use std::future::Future;
 
 #[derive(Serialize, Deserialize)]
 pub enum Response {
@@ -186,6 +185,34 @@ pub async fn alter_set(
             Err(err) => DatabaseResponse::Error(format!("Failed delete member, reason: {:?}", err)),
         },
         "add_member" => match db.add_set_member(key, value, replace).await {
+            Ok(key) => {
+                DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+            }
+            Err(err) => DatabaseResponse::Error(format!("Failed alter member, reason: {:?}", err)),
+        },
+        _ => DatabaseResponse::Error(format!("Invalid action, reason: {:?}", &action)),
+    }
+}
+
+#[tauri::command]
+pub async fn alter_list(
+    cstr: String,
+    action: String,
+    key: String,
+    value: String,
+    replace: Option<u64>,
+    index: Option<u64>,
+) -> DatabaseResponse {
+    let db = Database::new(cstr);
+
+    match action.as_str() {
+        "del_member" => match db.del_list_member(key, value, index).await {
+            Ok(key) => {
+                DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+            }
+            Err(err) => DatabaseResponse::Error(format!("Failed delete member, reason: {:?}", err)),
+        },
+        "add_member" => match db.add_list_member(key, value, replace).await {
             Ok(key) => {
                 DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
             }
