@@ -71,26 +71,6 @@ pub fn get(
     }))
 }
 
-pub fn set(
-    connection: &mut Connection,
-    key: &str,
-    value: &String,
-) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let data = unmarshall(value.to_string())?;
-
-    let mut command = redis::pipe();
-
-    command.cmd("ZADD").arg(key);
-
-    for datum in data {
-        command.arg(&datum);
-    }
-
-    command.query::<()>(connection)?;
-
-    get(connection, key)
-}
-
 pub fn del_zset_member(
     connection: &mut Connection,
     key: String,

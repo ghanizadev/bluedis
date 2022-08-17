@@ -26,50 +26,6 @@ pub fn get(
     }))
 }
 
-pub fn set(
-    mut db: Database,
-    connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
-) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("SADD");
-    command.arg(key);
-
-    if args.len() > 1 && args[1] == "true" {
-        //If the second argument is true
-    }
-
-    for arg in args {
-        command.arg(arg);
-    }
-
-    Ok(Some(Key {
-        key: key.to_string(),
-        value: command.query::<String>(connection)?,
-        is_new: true,
-        ttl: db.get_ttl(key)?,
-        key_type: "set".into(),
-    }))
-}
-
-pub fn del(
-    mut db: Database,
-    connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
-) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("SREM");
-    command.arg(key);
-
-    for arg in args {
-        command.arg(arg);
-    }
-
-    command.query::<()>(connection)?;
-
-    Ok(None)
-}
-
 pub fn del_set_member(
     connection: &mut Connection,
     key: String,

@@ -388,57 +388,8 @@ impl Database {
             "set" => set::get(&mut connection, key.as_str()),
             "zset" => zset::get(&mut connection, key.as_str()),
             "hash" => hash::get(self.clone(), &mut connection, key.as_str(), vec![]),
-            "list" => list::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "list" => list::get(&mut connection, key.as_str()),
             "string" => string::get(self.clone(), &mut connection, key.as_str(), vec![]),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from("The key could not be found");
-                Err(error)
-            }
-        }
-    }
-
-    pub async fn set_key(
-        &self,
-        key: String,
-        value: String,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
-
-        let mut pipeline = redis::pipe();
-
-        pipeline.cmd("TYPE");
-        pipeline.arg(&key);
-
-        pipeline.cmd("DEL").arg(&key).ignore();
-
-        let key_type = pipeline.query::<String>(&mut connection)?;
-
-        match key_type.as_str() {
-            "set" => set::set(
-                self.clone(),
-                &mut connection,
-                key.as_str(),
-                vec![value.as_str()],
-            ),
-            "zset" => zset::set(&mut connection, key.as_str(), &value),
-            "hash" => hash::set(
-                self.clone(),
-                &mut connection,
-                key.as_str(),
-                vec![value.as_str()],
-            ),
-            "list" => list::set(
-                self.clone(),
-                &mut connection,
-                key.as_str(),
-                vec![value.as_str()],
-            ),
-            "string" => string::set(
-                self.clone(),
-                &mut connection,
-                key.as_str(),
-                vec![value.as_str()],
-            ),
             _ => {
                 let error = Box::<dyn std::error::Error>::from("The key could not be found");
                 Err(error)
@@ -487,5 +438,25 @@ impl Database {
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
         set::del_set_member(&mut connection, key, value)
+    }
+
+    pub async fn add_list_member(
+        &self,
+        key: String,
+        value: String,
+        replace: Option<u64>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        list::add_list_member(&mut connection, key, value, replace)
+    }
+
+    pub async fn del_list_member(
+        &self,
+        key: String,
+        value: String,
+        index: Option<u64>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        list::del_list_member(&mut connection, key, value, index)
     }
 }
