@@ -1,8 +1,11 @@
+use crate::database::zset::ZSetKey;
 use crate::{Database, Key};
 use serde::{Deserialize, Serialize};
+use std::future::Future;
 
 #[derive(Serialize, Deserialize)]
 pub enum Response {
+    Created(Key),
     Single(FindSingleKeyResult),
     Collection(FindKeyCollectionResult),
 }
@@ -36,7 +39,7 @@ pub struct FindKey {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FindSingleKeyResult {
     key: Option<Key>,
-    cursor: i32,
+    cursor: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -61,32 +64,6 @@ pub async fn find_keys(cstr: String, pattern: String, cursor: u64) -> DatabaseRe
             println!("{:?}", err);
             DatabaseResponse::Error(format!("Failed to find keys, reason: {:?}", err))
         }
-    }
-}
-
-#[tauri::command]
-pub async fn handle(
-    cstr: String,
-    key: String,
-    action: String,
-    key_type: String,
-    args: Vec<String>,
-) -> DatabaseResponse {
-    let mut db = Database::new(cstr);
-    let k = if key_type.is_empty() {
-        None
-    } else {
-        Some(key_type)
-    };
-
-    let a: Vec<&str> = args.iter().map(AsRef::as_ref).collect();
-    let result = db.handle(key, action.as_str(), k, Some(a));
-
-    match result.await {
-        Ok(key) => {
-            DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
-        }
-        Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     }
 }
 
@@ -131,5 +108,62 @@ pub async fn select_db(cstr: String, db_index: i64) -> DatabaseResponse {
     match result {
         Ok(_) => DatabaseResponse::Empty(()),
         Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
+    }
+}
+
+#[tauri::command]
+pub async fn create_key(
+    cstr: String,
+    key_name: String,
+    key_type: String,
+    ttl: i64,
+    abs: bool,
+) -> DatabaseResponse {
+    let db = Database::new(cstr);
+    let result = db.create_key(key_name, key_type, ttl, abs);
+
+    match result.await {
+        Ok(key) => DatabaseResponse::Response(Response::Created(key)),
+        Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
+    }
+}
+
+#[tauri::command]
+pub async fn get_key(cstr: String, key: String) -> DatabaseResponse {
+    let db = Database::new(cstr);
+    let result = db.get_key(key);
+
+    match result.await {
+        Ok(key) => {
+            DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+        }
+        Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
+    }
+}
+
+#[tauri::command]
+pub async fn alter_zset(
+    cstr: String,
+    action: String,
+    key: String,
+    value: Option<ZSetKey>,
+    old_value: Option<String>,
+) -> DatabaseResponse {
+    let db = Database::new(cstr);
+
+    match action.as_str() {
+        "del_member" => match db.del_zset_member(key, old_value).await {
+            Ok(key) => {
+                DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+            }
+            Err(err) => DatabaseResponse::Error(format!("Failed delete member, reason: {:?}", err)),
+        },
+        "set_member" => match db.set_zset_member(key, value, old_value).await {
+            Ok(key) => {
+                DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+            }
+            Err(err) => DatabaseResponse::Error(format!("Failed alter member, reason: {:?}", err)),
+        },
+        _ => DatabaseResponse::Error(format!("Invalid action, reason: {:?}", &action)),
     }
 }

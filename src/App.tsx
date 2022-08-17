@@ -26,21 +26,7 @@ import { parseKey } from "./shared/helpers/parse-key.helper";
 
 listen<any>("data", (event) => {
   const { payload } = event;
-
-  console.log(payload);
-
-  if (payload.cursor === 0) {
-    store.dispatch(actions.setSearching(false));
-  } else {
-    const searching = store.getState().isSearching;
-
-    if (!searching) {
-      store.dispatch(actions.setData(payload.key.map(parseKey)));
-      store.dispatch(actions.setSearching(true));
-    }
-
-    store.dispatch(actions.pushData(payload.key.map(parseKey)));
-  }
+  store.dispatch(actions.pushData(payload.key.map(parseKey)));
 });
 
 const App = () => {

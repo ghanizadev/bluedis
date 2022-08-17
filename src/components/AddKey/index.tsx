@@ -76,7 +76,12 @@ const AddKey: React.FC<Props> = (props) => {
         <h3>{t`Add key`}</h3>
         <Row>
           <span>{t`Name`}: </span>
-          <Key onChange={handleKeyChange} data-testid={"add-key-name"} />
+          <Key
+            onChange={handleKeyChange}
+            spellCheck={false}
+            autoCapitalize={"off"}
+            data-testid={"add-key-name"}
+          />
         </Row>
         <Row>
           <span>{t`Type`}: </span>

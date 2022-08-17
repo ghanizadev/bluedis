@@ -46,7 +46,7 @@ pub fn get(
         key: key.into(),
         value: marshall(result)?,
         is_new: false,
-        ttl: db.get_ttl(key),
+        ttl: db.get_ttl(key)?,
         key_type: "hash".into(),
     }))
 }

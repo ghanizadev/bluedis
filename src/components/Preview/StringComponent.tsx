@@ -9,6 +9,8 @@ import { PreviewActions } from "./preview-actions";
 
 const TextArea = styled.textarea`
   resize: none;
+  padding: 8px;
+  border: none;
   background-color: ${(props) => props.theme.background};
   color: ${(props) => props.theme.text};
   flex: 1;
@@ -44,6 +46,8 @@ const StringComponent: React.FC<Props> = (props) => {
         data-testid={"string-textarea"}
         onChange={handleValueChange}
         defaultValue={value}
+        spellCheck={false}
+        autoCapitalize={"off"}
       />
       <div
         style={{

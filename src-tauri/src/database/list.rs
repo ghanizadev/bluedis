@@ -18,7 +18,7 @@ pub fn get(
         key: key.into(),
         value: serde_json::to_string(&result).unwrap_or_else(|_| "".into()),
         is_new: false,
-        ttl: db.get_ttl(key),
+        ttl: db.get_ttl(key)?,
         key_type: "list".into(),
     }))
 }

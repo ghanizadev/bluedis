@@ -59,12 +59,9 @@ const Home = () => {
     }
 
     let cstr = parseConnectionString(connection!);
-    let response = await invoke<FindKeyResponse>("handle", {
+    let response = await invoke<FindKeyResponse>("get_key", {
       cstr,
       key: item.key,
-      action: "get",
-      keyType: "",
-      args: [],
     });
 
     if (response.Error) throw new Error("key not found or expired");
@@ -117,13 +114,19 @@ const Home = () => {
     ttlAbsolute: boolean
   ) => {
     let cstr = parseConnectionString(connection!);
-    await invoke("handle", {
+
+    let response = await invoke<any>("create_key", {
       cstr,
+      keyName: key,
       keyType: type,
-      key,
       ttl,
-      args: ["nova chave"],
+      abs: ttlAbsolute,
     });
+
+    console.log(response);
+
+    dispatch(actions.setData([parseKey(response.Response.Created)]));
+
     setAddItem(false);
   };
 
@@ -133,7 +136,6 @@ const Home = () => {
     let cstr = parseConnectionString(connection);
     invoke<{ Count?: number; Error?: string }>("db_count", { cstr }).then(
       (response) => {
-        console.log({ response });
         if (response.Count) {
           dispatch(actions.setCount(response.Count));
         }

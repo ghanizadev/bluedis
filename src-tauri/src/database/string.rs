@@ -18,7 +18,7 @@ pub fn get(
         key: key.to_string(),
         value: command.query::<String>(connection)?,
         is_new: false,
-        ttl: db.get_ttl(key),
+        ttl: db.get_ttl(key)?,
         key_type: "string".into(),
     }))
 }
@@ -41,7 +41,7 @@ pub fn set(
         key: key.to_string(),
         value: command.query::<String>(connection)?,
         is_new: exists.is_empty(),
-        ttl: db.get_ttl(key),
+        ttl: db.get_ttl(key)?,
         key_type: "string".into(),
     }))
 }
