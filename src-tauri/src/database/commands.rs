@@ -30,7 +30,7 @@ pub enum CountResponse {
 pub struct FindKey {
     pub(crate) cstr: String,
     pub(crate) pattern: Option<String>,
-    pub(crate) cursor: Option<i32>,
+    pub(crate) cursor: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -42,22 +42,25 @@ pub struct FindSingleKeyResult {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FindKeyCollectionResult {
     keys: Vec<Key>,
-    cursor: i32,
+    cursor: u64,
 }
 
 #[tauri::command]
-pub async fn find_keys(cstr: String, pattern: String, cursor: i32) -> DatabaseResponse {
+pub async fn find_keys(cstr: String, pattern: String, cursor: u64) -> DatabaseResponse {
     let mut db = Database::new(cstr);
-    let result = db.find_keys(pattern, cursor, None, |_, _| {});
+    let result = db.find_keys(pattern, cursor, None);
 
-    match result {
+    match result.await {
         Ok((keys, cursor)) => {
             DatabaseResponse::Response(Response::Collection(FindKeyCollectionResult {
                 keys,
                 cursor,
             }))
         }
-        Err(err) => DatabaseResponse::Error(format!("Failed to find keys, reason: {:?}", err)),
+        Err(err) => {
+            println!("{:?}", err);
+            DatabaseResponse::Error(format!("Failed to find keys, reason: {:?}", err))
+        }
     }
 }
 
@@ -77,9 +80,9 @@ pub async fn handle(
     };
 
     let a: Vec<&str> = args.iter().map(AsRef::as_ref).collect();
-    let result = db.handle(key.as_str(), action.as_str(), k, Some(a));
+    let result = db.handle(key, action.as_str(), k, Some(a));
 
-    match result {
+    match result.await {
         Ok(key) => {
             DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
         }

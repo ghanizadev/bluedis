@@ -1,3 +1,5 @@
+#![feature(future_join)]
+#![feature(async_closure)]
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
@@ -12,7 +14,8 @@ use crate::persistence::{Persistence, Preference};
 use serde_json::{json, Value};
 use tauri::{Event, Manager};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     tauri::Builder::default()
         .setup(|app| {
             let main_window = app.get_window("main").unwrap();
@@ -34,13 +37,15 @@ fn main() {
                         _ => 0,
                     };
 
-                    let _ = db.find_keys(pattern, c, None, |key, cursor| {
+                    println!("invoked");
+
+                    let _ = db.search_keys(pattern, c, None, |key, cursor| {
                         main_window
                             .clone()
                             .emit::<Value>(
                                 "data",
                                 json!({
-                                    "key": vec![key],
+                                    "key": key,
                                     "cursor": cursor
                                 }),
                             )

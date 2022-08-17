@@ -1,12 +1,12 @@
 use crate::database::{Database, Key};
+use redis::Connection;
 
 pub fn get(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
     let mut command = redis::cmd("GET");
     command.arg(key);
 
@@ -16,7 +16,7 @@ pub fn get(
 
     Ok(Some(Key {
         key: key.to_string(),
-        value: command.query::<String>(&mut connection)?,
+        value: command.query::<String>(connection)?,
         is_new: false,
         ttl: db.get_ttl(key),
         key_type: "string".into(),
@@ -25,14 +25,11 @@ pub fn get(
 
 pub fn set(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
-    let exists = redis::cmd("SET")
-        .arg(key)
-        .query::<String>(&mut connection)?;
+    let exists = redis::cmd("SET").arg(key).query::<String>(connection)?;
     let mut command = redis::cmd("SET");
     command.arg(key);
 
@@ -42,7 +39,7 @@ pub fn set(
 
     Ok(Some(Key {
         key: key.to_string(),
-        value: command.query::<String>(&mut connection)?,
+        value: command.query::<String>(connection)?,
         is_new: exists.is_empty(),
         ttl: db.get_ttl(key),
         key_type: "string".into(),
@@ -51,11 +48,10 @@ pub fn set(
 
 pub fn del(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut connection = db.get_connection()?;
-
     let mut command = redis::cmd("DEL");
     command.arg(key);
 
@@ -63,12 +59,13 @@ pub fn del(
         command.arg(arg);
     }
 
-    command.query::<()>(&mut connection)?;
+    command.query::<()>(connection)?;
     Ok(None)
 }
 
 pub fn create(
     mut db: Database,
+    connection: &mut Connection,
     key: &str,
     args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
@@ -80,5 +77,5 @@ pub fn create(
         new_args.push(arg);
     }
 
-    set(db, key, new_args)
+    set(db, connection, key, new_args)
 }
