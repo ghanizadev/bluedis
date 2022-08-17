@@ -42,6 +42,8 @@ const App = () => {
       "load_preference"
     );
 
+    console.log({ settings });
+
     dispatch(
       actions.updatePreferences({
         appearance: {

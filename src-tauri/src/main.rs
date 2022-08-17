@@ -13,10 +13,15 @@ use crate::database::commands::FindKey;
 use crate::database::{Database, Key};
 use crate::persistence::{Persistence, Preference};
 use serde_json::{json, Value};
+use sys_locale::get_locale;
 use tauri::{Event, Manager};
 
 #[tokio::main]
 async fn main() {
+    let locale = get_locale().unwrap_or_else(|| String::from("en-US"));
+
+    println!("Locale: {:?}", locale);
+
     tauri::Builder::default()
         .setup(|app| {
             let main_window = app.get_window("main").unwrap();
@@ -74,6 +79,7 @@ async fn main() {
             persistence::commands::get_all_favorites,
             persistence::commands::save_favorite,
             persistence::commands::del_favorite,
+            persistence::commands::wipe_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

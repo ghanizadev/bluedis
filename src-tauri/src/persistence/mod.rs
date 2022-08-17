@@ -19,8 +19,8 @@ impl Preference {
         Preference {
             id: 0,
             dark_mode: false,
-            font_size: 12,
-            font_name: "Roboto".into(),
+            font_size: 10,
+            font_name: "JetBrains Mono".into(),
             language: 0,
         }
     }
@@ -74,21 +74,26 @@ impl Persistence {
     pub fn get_preferences(&self) -> Result<Preference, Box<dyn std::error::Error>> {
         let c = Connection::open(DBPATH)?;
 
-        let preference = c.query_row(
-            "SELECT id, dark_mode, font_name, font_size, language FROM main.preference",
-            [],
-            |row| {
-                Ok(Preference {
-                    id: row.get(0)?,
-                    dark_mode: row.get(1)?,
-                    font_name: row.get(2)?,
-                    font_size: row.get(3)?,
-                    language: row.get(4)?,
-                })
-            },
-        )?;
+        let preference = c
+            .query_row(
+                "SELECT id, dark_mode, font_name, font_size, language FROM main.preference",
+                [],
+                |row| {
+                    Ok(Preference {
+                        id: row.get(0)?,
+                        dark_mode: row.get(1)?,
+                        font_name: row.get(2)?,
+                        font_size: row.get(3)?,
+                        language: row.get(4)?,
+                    })
+                },
+            )
+            .optional()?;
 
-        Ok(preference)
+        match preference {
+            Some(p) => Ok(p),
+            _ => Ok(Preference::new()),
+        }
     }
 
     pub fn save_preferences(&self, pref: Preference) -> Result<(), Box<dyn std::error::Error>> {
