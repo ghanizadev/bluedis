@@ -5,6 +5,7 @@ mod set;
 mod string;
 mod zset;
 
+use crate::database::zset::ZSetKey;
 use futures::future::join_all;
 use redis::{
     parse_redis_url, Client, Commands, Connection, ConnectionAddr, ConnectionInfo, FromRedisValue,
@@ -14,13 +15,14 @@ use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 use std::thread::Thread;
 use std::time::{SystemTime, UNIX_EPOCH};
+use tauri::command;
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug)]
 pub struct Key {
     key: String,
     value: String,
     is_new: bool,
-    ttl: i32,
+    ttl: i64,
     key_type: String,
 }
 
@@ -87,7 +89,7 @@ impl Database {
         Ok(is_connected)
     }
 
-    pub fn set_ttl(&mut self, key: &str, ttl: i128, absolute: Option<bool>) {
+    pub fn set_ttl(&mut self, key: &str, ttl: i64, absolute: Option<bool>) {
         let mut connection = self.get_connection().unwrap();
 
         if ttl < 0 {
@@ -98,17 +100,17 @@ impl Database {
             match absolute {
                 None => {
                     connection
-                        .pexpire_at::<&str, i32>(key, ttl as usize)
+                        .pexpire_at::<&str, i64>(key, ttl as usize)
                         .expect("failed to set ttl");
                 }
                 Some(is_abs) => {
                     if is_abs {
                         connection
-                            .pexpire::<&str, i32>(key, ttl as usize)
+                            .pexpire::<&str, i64>(key, ttl as usize)
                             .expect("failed to set ttl");
                     } else {
                         connection
-                            .pexpire_at::<&str, i32>(key, ttl as usize)
+                            .pexpire_at::<&str, i64>(key, ttl as usize)
                             .expect("failed to set ttl");
                     }
                 }
@@ -116,41 +118,109 @@ impl Database {
         }
     }
 
-    pub fn get_ttl(&mut self, key: &str) -> i32 {
-        let mut connection = self.get_connection().unwrap();
-
-        let mut ttl = connection.ttl::<&str, i32>(key).expect("failed to fetch");
+    pub fn get_ttl(&mut self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        let ttl = redis::cmd("PTTL").arg(key).query::<i64>(&mut connection)?;
         let start = SystemTime::now();
         let now = start
             .duration_since(UNIX_EPOCH)
-            .expect("failed to fetch timesramp");
+            .expect("failed to fetch timestamp");
 
         if ttl > 0 {
-            ttl += now.as_millis() as i32;
-        }
-
-        ttl
-    }
-
-    pub fn remove(&mut self, keys: Vec<&str>) {
-        let mut connection = self.get_connection().unwrap();
-
-        for key in keys {
-            connection.del::<&str, ()>(key).expect("failed to delete");
+            Ok(now.as_millis() as i64 + ttl)
+        } else {
+            Ok(ttl)
         }
     }
 
-    pub async fn get_type(&self, key: String) -> Result<String, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection().unwrap();
+    pub async fn create_key(
+        &self,
+        key_name: String,
+        key_type: String,
+        ttl: i64,
+        abs: bool,
+    ) -> Result<Key, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        let mut pipeline = redis::pipe();
 
-        let mut command = redis::cmd("TYPE");
-        command.arg(key);
+        let expire_command = if abs { "PEXPIREAT" } else { "PEXPIRE" };
+        let mut value: String;
 
-        let k_type = command.query::<String>(&mut connection)?;
+        match key_type.as_str() {
+            "set" => {
+                pipeline
+                    .cmd("SADD")
+                    .arg(&key_name)
+                    .arg("new set value")
+                    .ignore();
 
-        println!("{:?}", &k_type);
+                value = "[\"new set value\"]".into();
+            }
+            "zset" => {
+                pipeline
+                    .cmd("ZADD")
+                    .arg(&key_name)
+                    .arg(100)
+                    .arg("new zset value")
+                    .ignore();
 
-        Ok(k_type)
+                value = "[{\"score\":100,\"value\":\"new zset value\"}]".into();
+            }
+            "list" => {
+                pipeline
+                    .cmd("RPUSH")
+                    .arg(&key_name)
+                    .arg("new list value")
+                    .ignore();
+
+                value = "[\"new list value\"]".into();
+            }
+            "hash" => {
+                pipeline
+                    .cmd("HSET")
+                    .arg(&key_name)
+                    .arg("key")
+                    .arg("new hash value")
+                    .ignore();
+
+                value = "{\"key\":\"new hash value\"}".into();
+            }
+            "string" => {
+                pipeline
+                    .cmd("SET")
+                    .arg(&key_name)
+                    .arg("new string value")
+                    .ignore();
+
+                value = "new string value".into();
+            }
+            _ => {
+                let error = Box::<dyn std::error::Error>::from(format!(
+                    "The key_type \"{}\" is not valid: \"set\", \"zset\", \"list\", \"hash\" or \"string\"",
+                    &key_type
+                ));
+
+                return Err(error);
+            }
+        }
+
+        if ttl > 0 {
+            pipeline
+                .cmd(expire_command)
+                .arg(&key_name)
+                .arg(ttl)
+                .ignore();
+        }
+
+        pipeline.query(&mut connection)?;
+
+        Ok(Key {
+            key: key_name,
+            ttl,
+            key_type,
+            value,
+            is_new: true,
+        })
     }
 
     pub fn search_keys<F: Fn(Vec<Key>, u64)>(
@@ -180,35 +250,37 @@ impl Database {
                 _ => new_cursor,
             };
 
-            let mut pipeline = redis::pipe();
+            if !keys.is_empty() {
+                let mut pipeline = redis::pipe();
 
-            for item in &keys {
-                pipeline.cmd("TYPE").arg(item);
-            }
+                for item in &keys {
+                    pipeline.cmd("TYPE").arg(item);
+                }
 
-            let mut response = vec![];
-            let key_types = pipeline.query::<Vec<String>>(&mut connection)?;
+                let mut response = vec![];
+                let key_types = pipeline.query::<Vec<String>>(&mut connection)?;
 
-            let mut i = 0;
+                let mut i = 0;
 
-            while i < keys.len() {
-                let key_type = key_types.get(i).unwrap_or(&"".to_string()).to_string();
-                let key = keys.get(i).unwrap_or(&"".to_string()).to_string();
+                while i < keys.len() {
+                    let key_type = key_types.get(i).unwrap_or(&"".to_string()).to_string();
+                    let key = keys.get(i).unwrap_or(&"".to_string()).to_string();
 
-                response.push(Key {
-                    key,
-                    key_type,
-                    is_new: false,
-                    ttl: -1,
-                    value: "[]".to_string(),
-                });
+                    response.push(Key {
+                        key,
+                        key_type,
+                        is_new: false,
+                        ttl: -1,
+                        value: "[]".to_string(),
+                    });
 
-                i += 1;
+                    i += 1;
+                }
+
+                callback(response, new_cursor);
             }
 
             done = new_cursor == 0 || keys.len() as u64 >= l;
-
-            callback(response, new_cursor);
         }
 
         Ok(())
@@ -301,12 +373,101 @@ impl Database {
 
     pub fn rm_keys(&mut self, keys: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
-
-        for key in keys {
-            connection.del::<&str, ()>(key)?;
-        }
-
+        connection.del::<Vec<&str>, ()>(keys)?;
         Ok(())
+    }
+
+    pub async fn get_key(&self, key: String) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        let mut key_type_cmd = redis::cmd("TYPE");
+        key_type_cmd.arg(&key);
+
+        let key_type = key_type_cmd.query::<String>(&mut connection)?;
+
+        match key_type.as_str() {
+            "set" => set::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "zset" => zset::get(&mut connection, key.as_str()),
+            "hash" => hash::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "list" => list::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "string" => string::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            _ => {
+                let error = Box::<dyn std::error::Error>::from("The key could not be found");
+                Err(error)
+            }
+        }
+    }
+
+    pub async fn set_key(
+        &self,
+        key: String,
+        value: String,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+
+        let mut pipeline = redis::pipe();
+
+        pipeline.cmd("TYPE");
+        pipeline.arg(&key);
+
+        pipeline.cmd("DEL").arg(&key).ignore();
+
+        let key_type = pipeline.query::<String>(&mut connection)?;
+
+        match key_type.as_str() {
+            "set" => set::set(
+                self.clone(),
+                &mut connection,
+                key.as_str(),
+                vec![value.as_str()],
+            ),
+            "zset" => zset::set(&mut connection, key.as_str(), &value),
+            "hash" => hash::set(
+                self.clone(),
+                &mut connection,
+                key.as_str(),
+                vec![value.as_str()],
+            ),
+            "list" => list::set(
+                self.clone(),
+                &mut connection,
+                key.as_str(),
+                vec![value.as_str()],
+            ),
+            "string" => string::set(
+                self.clone(),
+                &mut connection,
+                key.as_str(),
+                vec![value.as_str()],
+            ),
+            _ => {
+                let error = Box::<dyn std::error::Error>::from("The key could not be found");
+                Err(error)
+            }
+        }
+    }
+
+    pub async fn set_zset_member(
+        &self,
+        key: String,
+        value: Option<ZSetKey>,
+        old_value: Option<String>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+
+        if let Some(v) = value {
+            return zset::set_zset_member(&mut connection, key, v, old_value);
+        };
+
+        Ok(None)
+    }
+
+    pub async fn del_zset_member(
+        &self,
+        key: String,
+        value: Option<String>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        zset::del_zset_member(&mut connection, key, value)
     }
 
     pub fn command<T: FromRedisValue>(&mut self, comm: &str, args: Option<Vec<&str>>) -> T {
@@ -323,199 +484,5 @@ impl Database {
         }
 
         command.query::<T>(&mut connection).unwrap()
-    }
-
-    fn switch_string(
-        &mut self,
-        connection: &mut Connection,
-        key: &str,
-        action: &str,
-        args: Vec<&str>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        match action {
-            "get" => string::get(self.clone(), connection, key, args),
-            "set" => string::set(self.clone(), connection, key, args),
-            "del" => string::del(self.clone(), connection, key, args),
-            "create" => string::del(self.clone(), connection, key, args),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from(format!(
-                    "The action \"{}\" is not valid for the given type",
-                    action
-                ));
-                Err(error)
-            }
-        }
-    }
-
-    fn switch_set(
-        &mut self,
-        connection: &mut Connection,
-        key: &str,
-        action: &str,
-        args: Vec<&str>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        match action {
-            "get" => set::get(self.clone(), connection, key, args),
-            "set" => set::set(self.clone(), connection, key, args),
-            "del" => set::del(self.clone(), connection, key, args),
-            "create" => set::create(self.clone(), connection, key, args),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from(format!(
-                    "The action \"{}\" is not valid for the given type",
-                    action
-                ));
-                Err(error)
-            }
-        }
-    }
-
-    fn switch_zset(
-        &mut self,
-        connection: &mut Connection,
-        key: &str,
-        action: &str,
-        args: Vec<&str>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        match action {
-            "get" => zset::get(self.clone(), connection, key, args),
-            "set" => zset::set(self.clone(), connection, key, args),
-            "del" => zset::del(self.clone(), connection, key, args),
-            "create" => zset::create(self.clone(), connection, key, args),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from(format!(
-                    "The action \"{}\" is not valid for the given type",
-                    action
-                ));
-                Err(error)
-            }
-        }
-    }
-
-    fn switch_list(
-        &mut self,
-        connection: &mut Connection,
-        key: &str,
-        action: &str,
-        args: Vec<&str>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        match action {
-            "get" => list::get(self.clone(), connection, key, args),
-            "set" => list::set(self.clone(), connection, key, args),
-            "del" => list::del(self.clone(), connection, key, args),
-            "create" => list::create(self.clone(), connection, key, args),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from(format!(
-                    "The action \"{}\" is not valid for the given type",
-                    action
-                ));
-                Err(error)
-            }
-        }
-    }
-
-    fn switch_hash(
-        &mut self,
-        connection: &mut Connection,
-        key: &str,
-        action: &str,
-        args: Vec<&str>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        match action {
-            "get" => hash::get(self.clone(), connection, key, args),
-            "set" => hash::set(self.clone(), connection, key, args),
-            "del" => hash::del(self.clone(), connection, key, args),
-            "create" => hash::create(self.clone(), connection, key, args),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from(format!(
-                    "The action \"{}\" is not valid for the given type",
-                    action
-                ));
-                Err(error)
-            }
-        }
-    }
-
-    // pub fn handle(
-    //     &mut self,
-    //     key: &str,
-    //     action: &str,
-    //     key_type: Option<String>,
-    //     args: Option<Vec<&str>>,
-    // ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    //     let mut connection = self.get_connection()?;
-    //     let kt = match key_type {
-    //         None => redis::cmd("TYPE")
-    //             .arg(key)
-    //             .query::<String>(&mut connection)?,
-    //         Some(k_type) => k_type,
-    //     };
-    //     let local_args = match args {
-    //         None => {
-    //             vec![]
-    //         }
-    //         Some(a) => a,
-    //     };
-    //
-    //     match kt.as_str() {
-    //         "string" => self.switch_string(key, action, local_args),
-    //         "set" => self.switch_set(key, action, local_args),
-    //         "zset" => self.switch_zset(key, action, local_args),
-    //         "list" => self.switch_list(key, action, local_args),
-    //         "hash" => self.switch_hash(key, action, local_args),
-    //         _ => {
-    //             let error = Box::<dyn std::error::Error>::from(format!(
-    //                 "The key {} does not exist or it is already expired",
-    //                 key
-    //             ));
-    //             Err(error)
-    //         }
-    //     }
-    // }
-
-    pub async fn handle(
-        &mut self,
-        key: String,
-        action: &str,
-        key_type: Option<String>,
-        args: Option<Vec<&str>>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
-        self.handle_with_connection(&mut connection, key, action, key_type, args.clone())
-            .await
-    }
-
-    async fn handle_with_connection(
-        &mut self,
-        connection: &mut Connection,
-        key: String,
-        action: &str,
-        key_type: Option<String>,
-        args: Option<Vec<&str>>,
-    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let kt = match key_type {
-            None => redis::cmd("TYPE").arg(&key).query::<String>(connection)?,
-            Some(k_type) => k_type,
-        };
-        let local_args = match args {
-            None => {
-                vec![]
-            }
-            Some(a) => a,
-        };
-
-        match kt.as_str() {
-            "string" => self.switch_string(connection, &key.as_str(), action, local_args),
-            "set" => self.switch_set(connection, &key.as_str(), action, local_args),
-            "zset" => self.switch_zset(connection, &key.as_str(), action, local_args),
-            "list" => self.switch_list(connection, &key.as_str(), action, local_args),
-            "hash" => self.switch_hash(connection, &key.as_str(), action, local_args),
-            _ => {
-                let error = Box::<dyn std::error::Error>::from(format!(
-                    "The key {} does not exist or it is already expired",
-                    key
-                ));
-                Err(error)
-            }
-        }
     }
 }

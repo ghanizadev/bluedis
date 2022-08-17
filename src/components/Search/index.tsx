@@ -5,12 +5,14 @@ import Button from "../Button";
 import Dropdown from "../Dropdown";
 import { t } from "../../i18n";
 import { InputAlt } from "../Input";
-import {invoke} from "@tauri-apps/api";
-import {parseConnectionString} from "../../shared/helpers/parse-connection-string.helper";
-import {useSelector} from "react-redux";
-import {Connection} from "../../redux/Types/Connection";
-import {State} from "../../redux/Types/State";
-import {emit} from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { useDispatch, useSelector } from "react-redux";
+import { Connection } from "../../redux/Types/Connection";
+import { State } from "../../redux/Types/State";
+import { emit } from "@tauri-apps/api/event";
+import { actions, store } from "../../redux/store";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -34,25 +36,44 @@ const Search = () => {
     { value: 4, name: "DB 4" },
     { value: 5, name: "DB 5" },
   ];
-  const connection = useSelector<State, Connection | undefined>(state => state.connection);
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
+  const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMatch(e.target.value ?? "*");
   };
 
-  const handleKeyListener = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyListener = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Enter") {
-      await emit('find-keys', { cstr: parseConnectionString(connection!), pattern: match ?? '*', cursor: 0 });
+      await emit("find-keys", {
+        cstr: parseConnectionString(connection!),
+        pattern: match ?? "*",
+        cursor: 0,
+      });
     }
   };
 
   const handleSearch = async () => {
-    await emit('find-keys', { cstr: parseConnectionString(connection!), pattern: match ?? '*', cursor: 0 });
+    dispatch(actions.setSearching(true));
+    store.dispatch(actions.setData([]));
+    await emit("find-keys", {
+      cstr: parseConnectionString(connection!),
+      pattern: match ?? "*",
+      cursor: 0,
+    });
+    dispatch(actions.setSearching(false));
   };
 
   const handleDatabaseChange = async (item: string) => {
     const db = databases.find((db) => db.name === item);
-    await invoke('select_db', { cstr: parseConnectionString(connection!), dbIndex: db });
+    await invoke("select_db", {
+      cstr: parseConnectionString(connection!),
+      dbIndex: db,
+    });
   };
 
   return (

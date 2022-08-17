@@ -6,6 +6,7 @@
 )]
 
 mod database;
+mod helper;
 mod persistence;
 
 use crate::database::commands::FindKey;
@@ -57,11 +58,13 @@ async fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             database::commands::find_keys,
-            database::commands::handle,
             database::commands::rm_keys,
             database::commands::db_count,
             database::commands::authenticate,
             database::commands::select_db,
+            database::commands::create_key,
+            database::commands::get_key,
+            database::commands::alter_zset,
             persistence::commands::save_preference,
             persistence::commands::load_preference,
             persistence::commands::get_favorite,

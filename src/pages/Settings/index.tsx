@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import Dropdown from "../../components/Dropdown";
@@ -35,7 +35,6 @@ const Settings = () => {
       font_size: parseInt(s.appearance.fontSize),
       language: s.region.language,
     };
-    console.log(pref);
     await invoke("save_preference", { pref });
   };
 
@@ -103,8 +102,8 @@ const Settings = () => {
       actions.setConfirmation({
         title: t`Confirmation`,
         message: t`Do you really want to wipe all stored data? This includes all your preferences and favorites`,
-        onConfirm: () => {
-          invoke("wipe_data", {});
+        onConfirm: async () => {
+          await invoke("wipe_data", {});
         },
       })
     );

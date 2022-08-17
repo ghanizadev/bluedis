@@ -55,7 +55,7 @@ const Connect = () => {
         })
       );
 
-      console.error(connect.Error)
+      console.error(connect.Error);
 
       return;
     }
@@ -117,13 +117,17 @@ const Connect = () => {
 
   const handleRemoveFromHistory = async (connection: Connection) => {
     dispatch(actions.removeFavorite(connection.id));
-    const resp = await invoke<{ Error?: string }>("del_favorite", { id: connection.id });
+    const resp = await invoke<{ Error?: string }>("del_favorite", {
+      id: connection.id,
+    });
 
-    if(resp.Error)
-      dispatch(actions.setError({
-        title: "Error",
-        message: resp.Error,
-      }))
+    if (resp.Error)
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: resp.Error,
+        })
+      );
   };
 
   const handleConnectFromHistory = async (conn: Connection) => {
@@ -138,8 +142,14 @@ const Connect = () => {
     try {
       const url = new URL(e.target.value);
 
-      setConnection({...connection, host: url.hostname, port: url.port, password: url.password, tls: url.protocol.startsWith('rediss')})
-    } catch(err) {
+      setConnection({
+        ...connection,
+        host: url.hostname,
+        port: url.port,
+        password: url.password,
+        tls: url.protocol.startsWith("rediss"),
+      });
+    } catch (err) {
       setConnection({ ...connection, host: e.target.value });
     }
   };
@@ -169,6 +179,8 @@ const Connect = () => {
               <input
                 value={connection.host}
                 onChange={handleHostChange}
+                spellCheck={false}
+                autoCapitalize={"off"}
               />
             </label>
             <label>
@@ -177,15 +189,26 @@ const Connect = () => {
               <input
                 value={connection.port}
                 onChange={handlePortChange}
+                spellCheck={false}
+                autoCapitalize={"off"}
               />
             </label>
             <label>
               {t`Password`}:
               <br />
-              <input type="password" value={connection.password} onChange={handlePasswordChange} />
+              <input
+                type="password"
+                value={connection.password}
+                onChange={handlePasswordChange}
+              />
             </label>
             <label>
-              <input type="checkbox" checked={connection.tls} onChange={handleTLSChange} /> {t`Use TLS`}
+              <input
+                type="checkbox"
+                checked={connection.tls}
+                onChange={handleTLSChange}
+              />{" "}
+              {t`Use TLS`}
             </label>
             <LoginButton onClick={handleConnect}>{t`Connect`}</LoginButton>
           </Form>

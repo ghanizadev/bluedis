@@ -1,14 +1,15 @@
 use crate::database::{Database, Key};
+use crate::helper::get_timestamp;
 use redis::Connection;
 use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
-struct ZSetKey {
+pub struct ZSetKey {
     score: i64,
     value: String,
 }
 
-fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {
+pub fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {
     let mut i = 0;
     let mut result: Vec<ZSetKey> = vec![];
 
@@ -28,7 +29,7 @@ fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {
     Ok(response)
 }
 
-fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+pub fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let data: Vec<ZSetKey> = serde_json::from_str(&str)?;
     let mut result: Vec<String> = vec![];
 
@@ -41,78 +42,89 @@ fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
 }
 
 pub fn get(
-    mut db: Database,
     connection: &mut Connection,
     key: &str,
-    _args: Vec<&str>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("ZRANGE");
-    command.arg(key);
-    command.arg("0");
-    command.arg("-1");
-    command.arg("WITHSCORES");
+    let mut pipeline = redis::pipe();
 
-    let result = command.query::<Vec<String>>(connection)?;
+    pipeline
+        .cmd("ZRANGE")
+        .arg(key)
+        .arg("0")
+        .arg("-1")
+        .arg("WITHSCORES");
+
+    pipeline.cmd("PTTL").arg(key);
+
+    let (value, pttl) = pipeline.query::<(Vec<String>, i64)>(connection)?;
 
     Ok(Some(Key {
         key: key.to_string(),
-        value: marshall(result)?,
+        value: marshall(value)?,
         is_new: false,
         key_type: "zset".to_string(),
-        ttl: db.get_ttl(key),
+        ttl: if pttl >= 0 {
+            pttl + get_timestamp()
+        } else {
+            pttl
+        },
     }))
 }
 
 pub fn set(
-    mut db: Database,
     connection: &mut Connection,
     key: &str,
-    args: Vec<&str>,
+    value: &String,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    // let data = unmarshall(args[0].to_string())?;
+    let data = unmarshall(value.to_string())?;
 
-    let mut command = redis::cmd("ZADD");
-    command.arg(key);
-    // command.arg("NX");
+    let mut command = redis::pipe();
 
-    for value in args.clone() {
-        command.arg(value);
-    }
+    command.cmd("ZADD").arg(key);
 
-    if args.len() > 1 {
-        let old = args[1].to_string();
-        redis::cmd("ZREM")
-            .arg(key)
-            .arg(old)
-            .query::<()>(connection)?;
+    for datum in data {
+        command.arg(&datum);
     }
 
     command.query::<()>(connection)?;
 
-    get(db, connection, key, vec![])
+    get(connection, key)
 }
 
-pub fn del(
-    mut db: Database,
+pub fn del_zset_member(
     connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
+    key: String,
+    value: Option<String>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let old = args[0].to_string();
+    let mut command = redis::cmd("ZREM");
 
-    redis::cmd("ZREM")
-        .arg(key)
-        .arg(old)
-        .query::<()>(connection)?;
+    if let Some(v) = value {
+        command.arg(&key).arg(v);
+        command.query::<()>(connection)?;
+    }
 
-    Ok(None)
+    get(connection, &key)
 }
 
-pub fn create(
-    db: Database,
+pub fn set_zset_member(
     connection: &mut Connection,
-    key: &str,
-    _args: Vec<&str>,
+    key: String,
+    value: ZSetKey,
+    old_value: Option<String>,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    set(db, connection, key, vec!["100", "new zset value"])
+    let mut pipeline = redis::pipe();
+
+    if let Some(v) = old_value {
+        pipeline.cmd("ZREM").arg(&key).arg(v).ignore();
+    }
+
+    pipeline
+        .cmd("ZADD")
+        .arg(&key)
+        .arg(value.score)
+        .arg(value.value);
+
+    pipeline.query::<()>(connection)?;
+
+    get(connection, &key)
 }

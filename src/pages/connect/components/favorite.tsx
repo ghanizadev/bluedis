@@ -1,7 +1,6 @@
 import React, { FC } from "react";
 import styled from "styled-components";
 
-import CloseIcon from "../../../assets/Close";
 import { Connection } from "../../../redux/Types/Connection";
 
 const Container = styled.li`
@@ -36,15 +35,15 @@ const CloseButton = styled.button`
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  
+
   background-color: transparent;
   border: none;
-  
+
   height: 16px;
   width: 16px;
-  
+
   filter: invert(1);
-  
+
   &:hover {
     filter: invert(0);
     background-color: ${(props) => props.theme.innerText};

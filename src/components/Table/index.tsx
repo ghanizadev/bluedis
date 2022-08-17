@@ -16,6 +16,11 @@ import { Type } from "./Type";
 import { Data } from "./Data";
 import { Header } from "./Header";
 import { Container } from "./Container";
+import { invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { Connection } from "../../redux/Types/Connection";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 const Row = styled.tr`
   height: 32px;
@@ -74,6 +79,9 @@ const Table: React.FC<Props> = (props) => {
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
   const isSearching = useSelector<State, boolean>((state) => state.isSearching);
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
 
   const handleItemEdit = (item: ItemType) => {
     loading(true);
@@ -89,9 +97,39 @@ const Table: React.FC<Props> = (props) => {
     else dispatch(actions.pushSelected(key));
   };
 
-  const handleLoadMore = useCallback(() => {
-    // loadMore(query.input, query.cursor);
-  }, [query]);
+  const handleLoadMore = async () => {
+    dispatch(actions.setSearching(true));
+    const cstr = parseConnectionString(connection!);
+    const data = await invoke<FindKeyResponse>("find_keys", {
+      cstr,
+      pattern: query.input,
+      cursor: query.cursor,
+    });
+
+    if (data.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: data.Error,
+        })
+      );
+
+      return;
+    }
+
+    const { cursor, keys } = data.Response!.Collection!;
+
+    dispatch(actions.setSearching(false));
+    dispatch(actions.pushData(data.Response!.Collection!.keys.map(parseKey)));
+    dispatch(
+      actions.setQuery({
+        input: query.input,
+        cursor,
+        done: cursor === 0,
+        count: keys.length,
+      })
+    );
+  };
 
   return (
     <Container data-testid={"database-table-container"}>
@@ -139,7 +177,7 @@ const Table: React.FC<Props> = (props) => {
                 <Data
                   data-testid={"database-table-item-type"}
                   align="center"
-                  style={{ width: "15%" }}
+                  style={{ width: "15%", minWidth: 75 }}
                 >
                   <Type>{item.type}</Type>
                 </Data>

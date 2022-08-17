@@ -20,7 +20,7 @@ pub fn get(
         key: key.to_string(),
         value: serde_json::to_string(&value).expect("Failed to serialize"),
         is_new: true,
-        ttl: db.get_ttl(key),
+        ttl: db.get_ttl(key)?,
         key_type: "set".into(),
     }))
 }
@@ -46,7 +46,7 @@ pub fn set(
         key: key.to_string(),
         value: command.query::<String>(connection)?,
         is_new: true,
-        ttl: db.get_ttl(key),
+        ttl: db.get_ttl(key)?,
         key_type: "set".into(),
     }))
 }

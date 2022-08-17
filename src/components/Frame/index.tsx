@@ -70,7 +70,7 @@ const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
   }, [connection, favorites, connected]);
 
   useEffect(() => {
-    window.__TAURI__.os.platform().then((p) => setPlatform(p));
+    window.__TAURI__.os.platform().then((p: any) => setPlatform(p));
   }, []);
 
   if (!platform) return <div />;
