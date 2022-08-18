@@ -75,7 +75,8 @@ const Toolbar: React.FC<Props> = (props) => {
     );
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
+    await invoke("disconnect");
     dispatch(actions.setConnected(false));
     dispatch(actions.resetTerminal());
   };

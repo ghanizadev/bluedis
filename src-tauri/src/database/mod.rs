@@ -5,17 +5,13 @@ mod set;
 mod string;
 mod zset;
 
-use crate::database::zset::ZSetKey;
-use futures::future::join_all;
+use crate::{database::zset::ZSetKey, state::AppState};
 use redis::{
-    parse_redis_url, Client, Commands, Connection, ConnectionAddr, ConnectionInfo, FromRedisValue,
+    parse_redis_url, Client, Commands, Connection, ConnectionAddr, ConnectionInfo,
     RedisConnectionInfo,
 };
 use serde::{Deserialize, Serialize};
-use std::ops::Deref;
-use std::thread::Thread;
 use std::time::{SystemTime, UNIX_EPOCH};
-use tauri::command;
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug)]
 pub struct Key {
@@ -28,7 +24,6 @@ pub struct Key {
 
 #[derive(Default, Clone, Debug)]
 pub struct Database {
-    conn_str: String,
     host: String,
     password: String,
     port: u16,
@@ -41,7 +36,6 @@ impl Database {
         let url = parse_redis_url(connection_str.as_str()).expect("");
 
         Database {
-            conn_str: connection_str.clone(),
             host: url.host_str().unwrap_or("localhost").to_string(),
             password: url.password().unwrap_or("").to_string(),
             port: url.port().unwrap_or(6379),
@@ -50,7 +44,14 @@ impl Database {
         }
     }
 
+    pub fn with_index(&mut self, index: i64) -> Self {
+        self.db_index = index;
+        self.clone()
+    }
+
     pub fn get_connection(&self) -> Result<Connection, Box<dyn std::error::Error>> {
+        println!("DB Index: {:?}", self.db_index);
+
         let c_info = ConnectionInfo {
             redis: RedisConnectionInfo {
                 db: self.db_index,
@@ -89,28 +90,28 @@ impl Database {
         Ok(is_connected)
     }
 
-    pub fn set_ttl(&mut self, key: &str, ttl: i64, absolute: Option<bool>) {
+    pub fn set_ttl(&mut self, key: String, ttl: i64, absolute: Option<bool>) {
         let mut connection = self.get_connection().unwrap();
 
         if ttl < 0 {
             connection
-                .persist::<&str, ()>(key)
+                .persist::<String, ()>(key.to_string())
                 .expect("failed to persist");
         } else {
             match absolute {
                 None => {
                     connection
-                        .pexpire_at::<&str, i64>(key, ttl as usize)
+                        .pexpire_at::<&str, i64>(&key, ttl as usize)
                         .expect("failed to set ttl");
                 }
                 Some(is_abs) => {
                     if is_abs {
                         connection
-                            .pexpire::<&str, i64>(key, ttl as usize)
+                            .pexpire::<&str, i64>(&key, ttl as usize)
                             .expect("failed to set ttl");
                     } else {
                         connection
-                            .pexpire_at::<&str, i64>(key, ttl as usize)
+                            .pexpire_at::<&str, i64>(&key, ttl as usize)
                             .expect("failed to set ttl");
                     }
                 }
@@ -144,7 +145,7 @@ impl Database {
         let mut pipeline = redis::pipe();
 
         let expire_command = if abs { "PEXPIREAT" } else { "PEXPIRE" };
-        let mut value: String;
+        let value: String;
 
         match key_type.as_str() {
             "set" => {
@@ -244,7 +245,7 @@ impl Database {
             command.arg("COUNT");
             command.arg(10);
 
-            let (c, mut keys) = command.query::<(String, Vec<String>)>(&mut connection)?;
+            let (c, keys) = command.query::<(String, Vec<String>)>(&mut connection)?;
             new_cursor = match c.parse::<u64>() {
                 Ok(c) => c,
                 _ => new_cursor,
@@ -319,8 +320,6 @@ impl Database {
             done = new_cursor == 0 || items.len() as u64 >= l;
         }
 
-        println!("items: {}:?", items.len());
-
         let mut pipeline = redis::pipe();
 
         for item in &items {
@@ -329,8 +328,6 @@ impl Database {
 
         let mut response = vec![];
         let key_types = pipeline.query::<Vec<String>>(&mut connection)?;
-
-        println!("types: {}:?", key_types.len());
 
         let mut i = 0;
 
@@ -362,11 +359,11 @@ impl Database {
 
     pub fn select_db(&mut self, index: i64) -> Result<(), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
+        self.db_index = index;
+
         redis::cmd("SELECTDB")
             .arg(index)
             .query::<()>(&mut connection)?;
-
-        self.db_index = index;
 
         Ok(())
     }
@@ -387,7 +384,7 @@ impl Database {
         match key_type.as_str() {
             "set" => set::get(&mut connection, key.as_str()),
             "zset" => zset::get(&mut connection, key.as_str()),
-            "hash" => hash::get(self.clone(), &mut connection, key.as_str(), vec![]),
+            "hash" => hash::get(&mut connection, key),
             "list" => list::get(&mut connection, key.as_str()),
             "string" => string::get(&mut connection, key),
             _ => {
@@ -458,6 +455,24 @@ impl Database {
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
         list::del_list_member(&mut connection, key, value, index)
+    }
+
+    pub async fn add_hash_member(
+        &self,
+        key: String,
+        value: String,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        hash::add_member(&mut connection, key, value)
+    }
+
+    pub async fn del_hash_member(
+        &self,
+        key: String,
+        value: String,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        hash::del_member(&mut connection, key, value)
     }
 
     pub async fn update_string(

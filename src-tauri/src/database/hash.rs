@@ -1,4 +1,4 @@
-use crate::database::{Database, Key};
+use crate::{database::Key, helper::get_timestamp};
 use redis::Connection;
 use serde_json::{Map, Value};
 
@@ -21,77 +21,71 @@ fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {
 
 fn unmarshall(data: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let value = serde_json::from_str::<Map<String, Value>>(&data)?;
-    let mut result: Vec<String> = vec![];
+    let mut result: Vec<&str> = vec![];
 
-    for (key, value) in value.iter() {
-        result.push(key.clone());
-        result.push(value.to_string());
+    for (_, value) in value.iter() {
+        match value.as_str() {
+            Some(value) => {result.push(value)},
+            _ => {},
+        }
     }
 
-    Ok(result)
+    Ok(result.iter().map(|v| { v.to_string() }).collect())
 }
 
 pub fn get(
-    mut db: Database,
     connection: &mut Connection,
-    key: &str,
-    _args: Vec<&str>,
+    key: String,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let mut command = redis::cmd("HGETALL");
-    command.arg(key);
+    let mut pipeline = redis::pipe();
 
-    let result = command.query::<Vec<String>>(connection)?;
+    pipeline.cmd("HGETALL").arg(&key);
+    pipeline.cmd("PTTL").arg(&key);
+
+    let (result, pttl) = pipeline.query::<(Vec<String>, i64)>(connection)?;
 
     Ok(Some(Key {
         key: key.into(),
         value: marshall(result)?,
         is_new: false,
-        ttl: db.get_ttl(key)?,
         key_type: "hash".into(),
+        ttl: if pttl >= 0 {
+            pttl + get_timestamp()
+        } else {
+            pttl
+        },
     }))
 }
 
-pub fn set(
-    mut db: Database,
+pub fn add_member(
     connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
+    key: String,
+    value: String,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let data = unmarshall(args[0].to_string());
+    let data = unmarshall(value.clone())?;
     let mut command = redis::cmd("HSET");
 
-    command.arg(key);
+    command.arg(&key);
 
-    for arg in data {
-        command.arg(arg);
+    for d in data {
+        command.arg(d);
     }
 
     command.query::<()>(connection)?;
 
-    get(db, connection, key, args)
+    get(connection, key.clone())
 }
 
-pub fn del(
-    mut db: Database,
+pub fn del_member(
     connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
+    key: String,
+    value: String,
 ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let index_or_name = args[0];
     let mut command = redis::cmd("HDEL");
-    command.arg(key);
-    command.arg(index_or_name);
+    command.arg(&key);
+    command.arg(&value);
 
     command.query::<()>(connection)?;
 
-    Ok(None)
-}
-
-pub fn create(
-    db: Database,
-    connection: &mut Connection,
-    key: &str,
-    _args: Vec<&str>,
-) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    set(db, connection, key, vec!["newProp", "new value"])
+    get(connection, key)
 }

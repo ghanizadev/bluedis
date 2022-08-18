@@ -17,10 +17,9 @@ import { Recent } from "./components/recent";
 import { ListWrapper } from "./components/list-wrapper";
 import { ConnectionList } from "./components/connection-list";
 import { invoke } from "@tauri-apps/api";
-import { FindKeyResponse } from "../../services/find-key-response.interface";
 import { ConnectionResponse } from "../../services/connection-response.interface";
 import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
-import { parseKey } from "../../shared/helpers/parse-key.helper";
+import services from "../../services";
 
 const Connect = () => {
   const [connection, setConnection] = React.useState<Connection>({
@@ -56,45 +55,11 @@ const Connect = () => {
       );
 
       console.error(connect.Error);
-
       return;
     }
 
-    const data = await invoke<FindKeyResponse>("find_keys", {
-      cstr: connectionString,
-      pattern: "*",
-      cursor: 0,
-    });
-    const count = await invoke<{ Error?: string; Count?: number }>("db_count", {
-      cstr: connectionString,
-    });
-
-    if (data.Error || count.Error) {
-      dispatch(actions.setLoading(false));
-      dispatch(
-        actions.setError({
-          title: "Error",
-          message: data.Error ?? count.Error ?? "Failed to fetch keys",
-        })
-      );
-
-      return;
-    }
-
-    const { keys, cursor } = data.Response!.Collection;
-    dispatch(actions.setData(keys.map(parseKey)));
-
-    dispatch(actions.setConnected(true));
     dispatch(actions.currentConnection({ ...conn, id: nanoid(8) }));
-    dispatch(actions.setLoading(false));
-    dispatch(
-      actions.setQuery({
-        input: "*",
-        cursor,
-        done: cursor === 0,
-        count: count.Count ?? keys.length,
-      })
-    );
+    await services.findKeys();
   };
 
   const updateFavorites = async (favorites: Connection[]) => {
