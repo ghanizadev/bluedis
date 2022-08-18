@@ -12,7 +12,7 @@ import { Connection } from "../../redux/Types/Connection";
 import { State } from "../../redux/Types/State";
 import { emit } from "@tauri-apps/api/event";
 import { actions, store } from "../../redux/store";
-import { parseKey } from "../../shared/helpers/parse-key.helper";
+import services from "../../services";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -39,7 +39,6 @@ const Search = () => {
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection
   );
-  const dispatch = useDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMatch(e.target.value ?? "*");
@@ -49,7 +48,7 @@ const Search = () => {
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter") {
-      await emit("find-keys", {
+      await invoke("search", {
         cstr: parseConnectionString(connection!),
         pattern: match ?? "*",
         cursor: 0,
@@ -58,22 +57,20 @@ const Search = () => {
   };
 
   const handleSearch = async () => {
-    dispatch(actions.setSearching(true));
-    store.dispatch(actions.setData([]));
-    await emit("find-keys", {
+    await invoke("search", {
       cstr: parseConnectionString(connection!),
       pattern: match ?? "*",
       cursor: 0,
     });
-    dispatch(actions.setSearching(false));
   };
 
   const handleDatabaseChange = async (item: string) => {
     const db = databases.find((db) => db.name === item);
     await invoke("select_db", {
       cstr: parseConnectionString(connection!),
-      dbIndex: db,
+      dbIndex: db?.value ?? 0,
     });
+    await services.findKeys();
   };
 
   return (

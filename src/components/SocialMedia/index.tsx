@@ -1,7 +1,7 @@
+import { open } from '@tauri-apps/api/shell';
 import React from "react";
 import styled from "styled-components";
 
-// import { openLink } from "../../services/main-process";
 import Github from "../../assets/Github";
 import Linkedin from "../../assets/Linkedin";
 
@@ -37,9 +37,9 @@ const Button = styled.button`
 
 const SocialMedia: React.FC = () => {
   const handleClick = (url: string) => {
-    return (event: React.MouseEvent<HTMLButtonElement>) => {
+    return async (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
-      // openLink(url);
+      await open(url);
     };
   };
 

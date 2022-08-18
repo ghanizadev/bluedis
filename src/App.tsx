@@ -21,13 +21,6 @@ import { actions, store } from "./redux/store";
 import { invoke } from "@tauri-apps/api";
 import { Language } from "./i18n";
 import { Connection } from "./redux/Types/Connection";
-import { listen } from "@tauri-apps/api/event";
-import { parseKey } from "./shared/helpers/parse-key.helper";
-
-listen<any>("data", (event) => {
-  const { payload } = event;
-  store.dispatch(actions.pushData(payload.key.map(parseKey)));
-});
 
 const App = () => {
   const currentPage = useSelector<State, Page>((state) => state.currentPage);
@@ -41,8 +34,6 @@ const App = () => {
     let settings = await invoke<{ Error?: string; Success?: any }>(
       "load_preference"
     );
-
-    console.log({ settings });
 
     dispatch(
       actions.updatePreferences({

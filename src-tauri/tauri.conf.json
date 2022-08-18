@@ -36,6 +36,9 @@
         "readDir": true,
         "readFile": true,
         "writeFile": true
+      },
+      "shell": {
+        "open": true
       }
     },
     "bundle": {

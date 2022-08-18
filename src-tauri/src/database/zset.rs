@@ -1,4 +1,4 @@
-use crate::database::{Database, Key};
+use crate::database::{Key};
 use crate::helper::get_timestamp;
 use redis::Connection;
 use serde::{Deserialize, Serialize};
@@ -29,17 +29,17 @@ pub fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>>
     Ok(response)
 }
 
-pub fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let data: Vec<ZSetKey> = serde_json::from_str(&str)?;
-    let mut result: Vec<String> = vec![];
+// pub fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+//     let data: Vec<ZSetKey> = serde_json::from_str(&str)?;
+//     let mut result: Vec<String> = vec![];
 
-    for key in data {
-        result.push(key.score.to_string());
-        result.push(key.value);
-    }
+//     for key in data {
+//         result.push(key.score.to_string());
+//         result.push(key.value);
+//     }
 
-    Ok(result)
-}
+//     Ok(result)
+// }
 
 pub fn get(
     connection: &mut Connection,

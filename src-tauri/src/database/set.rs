@@ -1,4 +1,4 @@
-use crate::database::{Database, Key};
+use crate::database::{Key};
 use crate::helper::get_timestamp;
 use redis::Connection;
 
