@@ -1,15 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
-
-import CloseIcon from "../../assets/Close";
-import MinimizeIcon from "../../assets/Minimize";
-import MaximizeIcon from "../../assets/Maximize";
-// import {
-//   close,
-//   fullscreen,
-//   maximize,
-//   minimize,
-// } from "../../services/main-process";
 import { useBlur } from "../../shared/hooks/use-blur.hook";
 
 import { Title } from "./Title";

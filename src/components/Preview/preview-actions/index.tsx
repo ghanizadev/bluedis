@@ -16,7 +16,6 @@ import { invoke } from "@tauri-apps/api";
 import { parseConnectionString } from "../../../shared/helpers/parse-connection-string.helper";
 import { Connection } from "../../../redux/Types/Connection";
 import { State } from "../../../redux/Types/State";
-import services from "../../../services";
 
 let timeout: NodeJS.Timeout;
 

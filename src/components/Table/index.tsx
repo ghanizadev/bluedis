@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -6,7 +6,6 @@ import Checkbox from "../Checkbox";
 import { ItemType } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-// import { loadMore } from "../../services/main-process";
 import { Query } from "../../redux/Types/Query";
 import { t } from "../../i18n";
 import { useLoading } from "../../shared/hooks/use-loading.hook";
@@ -78,6 +77,7 @@ const Table: React.FC<Props> = (props) => {
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
+  const currentTotal = useSelector<State, number>((state) => state.currentTotalDocs);
   const isSearching = useSelector<State, boolean>((state) => state.isSearching);
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection
@@ -203,7 +203,7 @@ const Table: React.FC<Props> = (props) => {
         <LoadMore>
           <span>
             {query.done && t`showing all ${currentCount} keys`}
-            {!query.done && t`showing ${currentCount} keys - `}
+            {!query.done && t`showing ${currentCount} of ${currentTotal} keys - `}
             {query.cursor !== 0 && (
               <button
                 disabled={query.cursor === 0}

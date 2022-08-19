@@ -60,6 +60,19 @@ const Connect = () => {
 
     dispatch(actions.currentConnection({ ...conn, id: nanoid(8) }));
     await services.findKeys();
+
+    const info = await invoke<any>('get_info');
+    const config = await invoke<any>('get_config');
+
+    try {
+      console.log(JSON.parse(info));
+      console.log(JSON.parse(config));
+    }
+    catch(e) {
+      console.log(info);
+      console.log(config);
+    }
+    // console.log(JSON.parse(data));
   };
 
   const updateFavorites = async (favorites: Connection[]) => {
@@ -172,6 +185,7 @@ const Connect = () => {
                 type="checkbox"
                 checked={connection.tls}
                 onChange={handleTLSChange}
+                style={{ width: 16 }}
               />{" "}
               {t`Use TLS`}
             </label>

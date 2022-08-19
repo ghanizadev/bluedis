@@ -18,8 +18,10 @@ import { LastRefresh } from "./LastRefresh";
 import PickName from "./PickName";
 import { Separator } from "./Separator";
 import { SquareButton } from "./SquareButton";
-import { invoke } from "@tauri-apps/api";
-import {parseConnectionString} from "../../shared/helpers/parse-connection-string.helper";
+import { dialog, fs, invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 type Props = {
   onRefresh: () => void;
@@ -49,8 +51,34 @@ const Toolbar: React.FC<Props> = (props) => {
     onAddKey();
   };
 
-  const handleDownloadSelected = () => {
-    // exportItems(selected);
+  const handleDownloadSelected = async () => {
+    let path = await dialog.save({
+      title: t`Save the query result`,
+      defaultPath: `query_result_${Date.now()}.json`,
+    });
+
+    console.log({ path });
+
+    if(!path) return;
+
+    const response = await invoke<FindKeyResponse>("get_keys", {
+      keys: selected,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          message: response.Error,
+          title: "Error",
+        })
+      );
+
+      return;
+    }
+
+    const contents = response.Response?.Collection.keys.map(parseKey);
+
+    await fs.writeTextFile({ path, contents: JSON.stringify(contents) })
   };
 
   const handleDeleteSelected = () => {
@@ -65,11 +93,16 @@ const Toolbar: React.FC<Props> = (props) => {
         message,
         title,
         onConfirm: async () => {
-          await invoke("rm_keys", { cstr: parseConnectionString(currentConnection!), keys: selected }).then(() => {
-            dispatch(actions.clearSelection());
-          });
+          await invoke("rm_keys", {
+            cstr: parseConnectionString(currentConnection!),
+            keys: selected,
+          })
 
-          handleRefresh();
+          dispatch(actions.clearSelection());
+          dispatch(actions.removeDocument(selected));
+          dispatch(actions.setPreview());
+
+          // handleRefresh();
         },
       })
     );
@@ -79,6 +112,9 @@ const Toolbar: React.FC<Props> = (props) => {
     await invoke("disconnect");
     dispatch(actions.setConnected(false));
     dispatch(actions.resetTerminal());
+    dispatch(actions.setData([]));
+    dispatch(actions.setLoading(false));
+    dispatch(actions.setSearching(false));
   };
 
   const handleTerminal = () => {
@@ -157,8 +193,9 @@ const Toolbar: React.FC<Props> = (props) => {
         <Separator />
         <SquareButton
           data-testid="data-shell"
-          title={t`Open terminal`}
+          title={t`Terminal - Beta`}
           onClick={handleTerminal}
+          disabled={true}
         >
           <TerminalIcon />
         </SquareButton>

@@ -1,4 +1,4 @@
-use crate::database::{Database, Key};
+use crate::database::{Key};
 use crate::helper::get_timestamp;
 use redis::Connection;
 use uuid::Uuid;
@@ -25,24 +25,6 @@ pub fn get(
             pttl
         },
     }))
-}
-
-pub fn del(
-    mut _db: Database,
-    connection: &mut Connection,
-    key: &str,
-    args: Vec<&str>,
-) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-    let to_remove = args[0];
-    let mut command = redis::cmd("LREM");
-
-    command.arg(key);
-    command.arg("1");
-    command.arg(to_remove);
-
-    command.query::<()>(connection)?;
-
-    Ok(None)
 }
 
 pub fn add_list_member(

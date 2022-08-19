@@ -10,8 +10,7 @@ import { parseConnectionString } from "../../shared/helpers/parse-connection-str
 import { useDispatch, useSelector } from "react-redux";
 import { Connection } from "../../redux/Types/Connection";
 import { State } from "../../redux/Types/State";
-import { emit } from "@tauri-apps/api/event";
-import { actions, store } from "../../redux/store";
+import { actions } from "../../redux/store";
 import services from "../../services";
 
 const Container = styled.div`
@@ -28,49 +27,60 @@ const SearchInput = styled(InputAlt)`
 
 const Search = () => {
   const [match, setMatch] = React.useState<string>();
-  const databases = [
-    { value: 0, name: "default" },
-    { value: 1, name: "DB 1" },
-    { value: 2, name: "DB 2" },
-    { value: 3, name: "DB 3" },
-    { value: 4, name: "DB 4" },
-    { value: 5, name: "DB 5" },
-  ];
+  const databases = Array.apply(null, Array(16)).map((_, index) => ({
+    value: index,
+    name: index === 0 ? "Default" : "DB #" + index,
+  }));
   const connection = useSelector<State, Connection | undefined>(
     (state) => state.connection
   );
-
+  const isSearching = useSelector<State, boolean>((state) => state.isSearching);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMatch(e.target.value ?? "*");
+  };
+  const dispatch = useDispatch();
+
+  const search = async () => {
+    if (!isSearching) {
+      dispatch(actions.setSearching(true));
+      dispatch(actions.setData([]));
+
+      await invoke("search", {
+        cstr: parseConnectionString(connection!),
+        pattern: match ?? "*",
+        cursor: 0,
+      });
+
+      dispatch(actions.setSearching(false));
+    } else {
+      await invoke("stop_query");
+      dispatch(actions.setSearching(false));
+    }
   };
 
   const handleKeyListener = async (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
     if (e.key === "Enter") {
-      await invoke("search", {
-        cstr: parseConnectionString(connection!),
-        pattern: match ?? "*",
-        cursor: 0,
-      });
+      await search();
     }
   };
 
   const handleSearch = async () => {
-    await invoke("search", {
-      cstr: parseConnectionString(connection!),
-      pattern: match ?? "*",
-      cursor: 0,
-    });
+    await search();
   };
 
   const handleDatabaseChange = async (item: string) => {
     const db = databases.find((db) => db.name === item);
+    dispatch(actions.setLoading(true));
+
     await invoke("select_db", {
       cstr: parseConnectionString(connection!),
       dbIndex: db?.value ?? 0,
     });
+
     await services.findKeys();
+    dispatch(actions.setSearching(false));
   };
 
   return (
@@ -80,6 +90,7 @@ const Search = () => {
         data-testid={"search-input"}
         onChange={handleChange}
         onKeyDown={handleKeyListener}
+        disabled={isSearching}
       />
       <Dropdown
         data-testid={"search-dropdown"}
@@ -88,7 +99,7 @@ const Search = () => {
       />
       <Button
         data-testid={"search-button"}
-        label={t`Apply`}
+        label={isSearching ? t`Cancel` : t`Apply`}
         onClick={handleSearch}
       />
     </Container>

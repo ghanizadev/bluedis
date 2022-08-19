@@ -10,8 +10,6 @@ export const parseKey = (k: RawKey): ItemType => {
     value = k.value;
   }
 
-  console.log({ ttl: k.ttl });
-
   return {
     value,
     key: k.key,
