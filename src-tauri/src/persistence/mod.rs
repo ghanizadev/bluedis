@@ -48,7 +48,8 @@ impl Persistence {
             host TEXT,\
             port INTEGER,\
             password INTEGER,\
-            tls INTEGER\
+            tls INTEGER,\
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\
         );",
             (),
         )
@@ -60,7 +61,7 @@ impl Persistence {
             dark_mode INTEGER,\
             font_name TEXT,\
             font_size INTEGER,\
-            language INTEGER\
+            language INTEGER
         );",
             (),
         )
@@ -164,7 +165,7 @@ impl Persistence {
         let c = Connection::open(DBPATH)?;
 
         let mut stmt =
-            c.prepare("SELECT id, name, host, port, password, tls FROM main.favorite")?;
+            c.prepare("SELECT id, name, host, port, password, tls FROM main.favorite ORDER BY created_at")?;
         let iter = stmt.query_map([], |row| {
             Ok(Favorite {
                 id: row.get(0)?,

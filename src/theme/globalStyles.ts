@@ -25,85 +25,97 @@ export const GlobalStyles = createGlobalStyle<{
     outline: none;
   }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
+  span, h1, h2, h3, h4, h5, h6, p, li, div {
+    cursor: default;
+  }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
+  button, a, select {
+    cursor: pointer;
 
-::-webkit-scrollbar-thumb {
-  background: #888;
-}
+    span, h1, h2, h3, h4, h5, h6, p, li, div {
+      cursor: pointer;
+    }
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-} 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-}
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-a {
-  color: ${(props) => props.theme.foreground};
-}
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
 
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  } 
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 1px;
-  bottom: 1px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+  a {
+    color: ${(props) => props.theme.foreground};
+  }
 
-input:checked + .slider {
-  background-color: ${(props) => props.theme.foreground};
-}
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px ${(props) => props.theme.foreground};
-}
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(20px);
-  -ms-transform: translateX(20px);
-  transform: translateX(20px);
-}
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 1px;
+    bottom: 1px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
 
-.slider.round {
-  border-radius: 34px;
-}
+  input:checked + .slider {
+    background-color: ${(props) => props.theme.foreground};
+  }
 
-.slider.round:before {
-  border-radius: 50%;
-}
+  input:focus + .slider {
+    box-shadow: 0 0 1px ${(props) => props.theme.foreground};
+  }
 
-.loading, .loading * {
-  cursor: progress !important;
-}
+  input:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  .loading, .loading * {
+    cursor: progress !important;
+  }
 `;

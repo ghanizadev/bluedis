@@ -5,4 +5,5 @@ export const PreviewContainer = styled.div`
   background-color: ${(props) => props.theme.background};
   flex-basis: 0;
   overflow: hidden auto;
+  margin-bottom: 6px;
 `;

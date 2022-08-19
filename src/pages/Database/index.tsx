@@ -8,12 +8,6 @@ import { ItemType } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-// import {
-//   addKey,
-//   getDBCount,
-//   updateData,
-//   updatePreview,
-// } from "../../services/main-process";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";

@@ -9,5 +9,6 @@ export const Form = styled.div`
 
   & input {
     width: 100%;
+    margin-bottom: 5px;
   }
 `;

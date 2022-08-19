@@ -5,13 +5,15 @@ mod set;
 mod string;
 mod zset;
 
-use crate::{database::zset::ZSetKey, state::AppState};
+use std::sync::Mutex;
+
+use crate::{database::zset::ZSetKey, helper::get_timestamp, state::AppState};
 use redis::{
     parse_redis_url, Client, Commands, Connection, ConnectionAddr, ConnectionInfo,
     RedisConnectionInfo,
 };
 use serde::{Deserialize, Serialize};
-use std::time::{SystemTime, UNIX_EPOCH};
+use serde_json::{Map, Value};
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug)]
 pub struct Key {
@@ -50,8 +52,6 @@ impl Database {
     }
 
     pub fn get_connection(&self) -> Result<Connection, Box<dyn std::error::Error>> {
-        println!("DB Index: {:?}", self.db_index);
-
         let c_info = ConnectionInfo {
             redis: RedisConnectionInfo {
                 db: self.db_index,
@@ -90,7 +90,12 @@ impl Database {
         Ok(is_connected)
     }
 
-    pub fn set_ttl(&mut self, key: String, ttl: i64, absolute: Option<bool>) {
+    pub async fn set_ttl(
+        &mut self,
+        key: String,
+        ttl: i64,
+        absolute: Option<bool>,
+    ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().unwrap();
 
         if ttl < 0 {
@@ -101,37 +106,98 @@ impl Database {
             match absolute {
                 None => {
                     connection
-                        .pexpire_at::<&str, i64>(&key, ttl as usize)
+                        .pexpire::<&str, i64>(&key, ttl as usize)
                         .expect("failed to set ttl");
                 }
                 Some(is_abs) => {
                     if is_abs {
                         connection
-                            .pexpire::<&str, i64>(&key, ttl as usize)
+                            .pexpire_at::<&str, i64>(&key, ttl as usize)
                             .expect("failed to set ttl");
                     } else {
                         connection
-                            .pexpire_at::<&str, i64>(&key, ttl as usize)
-                            .expect("failed to set ttl");
+                        .pexpire::<&str, i64>(&key, ttl as usize)
+                        .expect("failed to set ttl");
                     }
                 }
-            }
-        }
+            };
+        };
+
+        Ok(self.get_key(key).await?)
     }
 
-    pub fn get_ttl(&mut self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
+    pub async fn get_ttl(&mut self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
         let ttl = redis::cmd("PTTL").arg(key).query::<i64>(&mut connection)?;
-        let start = SystemTime::now();
-        let now = start
-            .duration_since(UNIX_EPOCH)
-            .expect("failed to fetch timestamp");
 
         if ttl > 0 {
-            Ok(now.as_millis() as i64 + ttl)
+            Ok(ttl + get_timestamp())
         } else {
             Ok(ttl)
         }
+    }
+
+    pub async fn get_config(&self) -> Result<String, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        let mut pipeline = redis::cmd("CONFIG");
+
+        pipeline.arg("GET").arg(r"*");
+
+        let cfg = pipeline.query::<Vec<String>>(&mut connection)?;
+        let mut map = Map::new();
+
+        for (index, key) in cfg.iter().enumerate() {
+            if index % 2 == 0 {
+                map.insert(key.clone(), Value::from(cfg[index + 1].clone()));
+            }
+        }
+
+        Ok(serde_json::to_string(&map)?)
+    }
+
+    pub async fn get_info(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+        let mut pipeline = redis::pipe();
+
+        let mut response: Vec<String> = vec![];
+
+        pipeline.cmd("INFO");
+
+        let result = pipeline.query::<Vec<String>>(&mut connection)?;
+
+        for r in result {
+            let mut map = Map::new();
+            let data = r
+                .as_str()
+                .split_whitespace()
+                .map(|item| item.to_string())
+                .collect::<Vec<String>>();
+            let mut last_key = String::new();
+
+            for (index, key) in data.iter().enumerate() {
+                if key == "#" {
+                    last_key = data[index + 1].to_string();
+                    map.insert(last_key.to_string(), Value::from(Map::new()));
+                }
+
+                if !last_key.is_empty() && key.contains(":") {
+                    let kv = key
+                        .split(":")
+                        .map(|item| item.to_string())
+                        .collect::<Vec<String>>();
+
+                    map.entry(&last_key).and_modify(|map| {
+                        let mut m = map.as_object().unwrap().clone();
+                        m.insert(kv[0].clone(), Value::from(kv[1].clone()));
+                        *map = Value::from(m.clone());
+                    });
+                }
+            }
+
+            response.push(serde_json::to_string(&map)?)
+        }
+
+        Ok(response)
     }
 
     pub async fn create_key(
@@ -229,6 +295,7 @@ impl Database {
         pattern: String,
         cursor: u64,
         limit: Option<u64>,
+        state: tauri::State<'_, AppState>,
         callback: F,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection()?;
@@ -238,6 +305,11 @@ impl Database {
         let mut new_cursor = cursor;
 
         while !done {
+            if !*state.is_searching.lock().unwrap() { 
+                println!("Process stopped");
+                break;
+            }
+
             let mut command = redis::cmd("SCAN");
             command.arg(new_cursor);
             command.arg("MATCH");
@@ -347,6 +419,40 @@ impl Database {
         }
 
         Ok((response, new_cursor))
+    }
+
+    pub async fn get_keys(
+        &mut self,
+        keys: Vec<String>,
+    ) -> Result<Vec<Key>, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection()?;
+
+        let mut result: Vec<Key> = vec![];
+
+        for key in keys {
+            let mut key_type_cmd = redis::cmd("TYPE");
+            key_type_cmd.arg(&key);
+
+            let key_type = key_type_cmd.query::<String>(&mut connection)?;
+
+            let value = match key_type.as_str() {
+                "set" => set::get(&mut connection, key.as_str()),
+                "zset" => zset::get(&mut connection, key.as_str()),
+                "hash" => hash::get(&mut connection, key),
+                "list" => list::get(&mut connection, key.as_str()),
+                "string" => string::get(&mut connection, key),
+                _ => {
+                    let error = Box::<dyn std::error::Error>::from("The key could not be found");
+                    Err(error)
+                }
+            };
+
+            if let Some(v) = value? {
+                result.push(v);
+            }
+        }
+
+        Ok(result)
     }
 
     pub fn count(&mut self) -> Result<usize, Box<dyn std::error::Error>> {
