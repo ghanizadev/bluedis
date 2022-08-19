@@ -25,7 +25,11 @@ const Sidebar = () => {
 
   return (
     <Container data-testid="menu-sidebar" open={open}>
-      <MenuIcon data-testid="menu-button" onClick={() => setOpen(!open)} />
+      <MenuIcon
+        style={{ cursor: "pointer" }}
+        data-testid="menu-button"
+        onClick={() => setOpen(!open)}
+      />
       <Items open={open}>
         <Item
           data-testid={"menu-database"}

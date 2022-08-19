@@ -101,8 +101,6 @@ const Toolbar: React.FC<Props> = (props) => {
           dispatch(actions.clearSelection());
           dispatch(actions.removeDocument(selected));
           dispatch(actions.setPreview());
-
-          // handleRefresh();
         },
       })
     );

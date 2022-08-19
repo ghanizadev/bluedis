@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { Connection } from "../../../redux/Types/Connection";
 
 const Container = styled.li`
+  position: relative;
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -31,6 +33,10 @@ const InnerText = styled.span`
 `;
 
 const CloseButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
   background-image: url("/close.svg");
   background-repeat: no-repeat;
   background-position: center;

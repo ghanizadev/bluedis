@@ -1,10 +1,21 @@
+
+use std::time::Duration;
+
 use crate::database::zset::ZSetKey;
 use crate::state::AppState;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::Window;
+use tokio::{time, select, spawn};
+use tokio_util::sync::CancellationToken;
 
 use super::{Database, Key};
+
+#[derive(Serialize, Deserialize)]
+pub enum TTLResponse {
+    Success(i64),
+    Error(String),
+}
 
 #[derive(Serialize, Deserialize)]
 pub enum Response {
@@ -84,7 +95,7 @@ pub async fn db_count(state: tauri::State<'_, AppState>) -> Result<CountResponse
 
     let result = db.count();
 
-    Ok(match result {
+    Ok(match result.await {
         Ok(data) => CountResponse::Count(data as u32),
         Err(err) => CountResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
@@ -98,10 +109,10 @@ pub async fn authenticate(
     *state.is_connected.lock().unwrap() = true;
     *state.connection_string.lock().unwrap() = cstr.clone();
 
-    let mut db = Database::new(cstr);
+    let mut db = Database::new(cstr).with_index(0);
     let result = db.check_connection();
 
-    Ok(match result {
+    Ok(match result.await {
         Ok(data) => ConnectionResponse::Success(data),
         Err(err) => ConnectionResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
@@ -129,7 +140,7 @@ pub async fn rm_keys(
 
     let result = db.rm_keys(keys.iter().map(AsRef::as_ref).collect());
 
-    Ok(match result {
+    Ok(match result.await  {
         Ok(_) => DatabaseResponse::Empty(()),
         Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
@@ -140,15 +151,13 @@ pub async fn select_db(
     db_index: i64,
     state: tauri::State<'_, AppState>,
 ) -> Result<DatabaseResponse, ()> {
-    let connection_str = state.connection_string.lock().unwrap();
-    let mut db_i = state.db_index.lock().unwrap();
+    let cstr = String::from(&*state.connection_string.lock().unwrap());
+    *state.db_index.lock().unwrap() = db_index.clone();
 
-    *db_i = db_index;
-
-    let mut db = Database::new(connection_str.to_string());
+    let mut db = Database::new(cstr.clone());
     let result = db.select_db(db_index);
 
-    Ok(match result {
+    Ok(match result.await {
         Ok(_) => DatabaseResponse::Empty(()),
         Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
@@ -396,6 +405,7 @@ pub async fn search(
             )
             .expect("failed to emit search event");
     })
+    .await
     .expect("failed to search");
 
     Ok(())
@@ -430,14 +440,15 @@ pub async fn get_config(state: tauri::State<'_, AppState>) -> Result<String, ()>
 }
 
 #[tauri::command]
-pub async fn get_ttl(state: tauri::State<'_, AppState>) -> Result<String, ()> {
+pub async fn get_ttl(key: String, state: tauri::State<'_, AppState>) -> Result<TTLResponse, ()> {
     let cstr = String::from(&*state.connection_string.lock().unwrap());
+    let db_index = *state.db_index.lock().unwrap();
 
-    let db = Database::new(cstr);
+    let mut db = Database::new(cstr).with_index(db_index);
 
-    let result = match db.get_config().await {
-        Ok(count) => count,
-        Err(err) => err.to_string()
+    let result = match db.get_ttl(key.as_str()).await {
+        Ok(pttl) => TTLResponse::Success(pttl),
+        Err(err) => TTLResponse::Error(err.to_string())
     };
 
     Ok(result)

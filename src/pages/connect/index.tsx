@@ -20,6 +20,7 @@ import { invoke } from "@tauri-apps/api";
 import { ConnectionResponse } from "../../services/connection-response.interface";
 import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
 import services from "../../services";
+import Toggle from "../../components/Toggle";
 
 const Connect = () => {
   const [connection, setConnection] = React.useState<Connection>({
@@ -61,18 +62,17 @@ const Connect = () => {
     dispatch(actions.currentConnection({ ...conn, id: nanoid(8) }));
     await services.findKeys();
 
-    const info = await invoke<any>('get_info');
-    const config = await invoke<any>('get_config');
+    const info = await invoke<any>("get_info");
+    const config = await invoke<any>("get_config");
 
+    //TODO config/info tab
     try {
       console.log(JSON.parse(info));
       console.log(JSON.parse(config));
-    }
-    catch(e) {
+    } catch (e) {
       console.log(info);
       console.log(config);
     }
-    // console.log(JSON.parse(data));
   };
 
   const updateFavorites = async (favorites: Connection[]) => {
@@ -137,8 +137,8 @@ const Connect = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, password: e.target.value });
   };
-  const handleTLSChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConnection({ ...connection, tls: e.target.checked });
+  const handleTLSChange = () => {
+    setConnection((c) => ({ ...connection, tls: !c.tls }));
   };
 
   useEffect(() => {
@@ -151,6 +151,7 @@ const Connect = () => {
         <Content>
           <Form data-testid="connect-form">
             <h1>{t`Connect`}</h1>
+            <br />
             <label>
               {t`Host`}:
               <br />
@@ -180,15 +181,16 @@ const Connect = () => {
                 onChange={handlePasswordChange}
               />
             </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={connection.tls}
-                onChange={handleTLSChange}
-                style={{ width: 16 }}
-              />{" "}
+            <label
+              style={{
+                display: "inline-flex",
+                justifyContent: "space-between",
+              }}
+            >
               {t`Use TLS`}
+              <Toggle checked={connection.tls} onChange={handleTLSChange} />
             </label>
+            <br />
             <LoginButton onClick={handleConnect}>{t`Connect`}</LoginButton>
           </Form>
           <Recent>

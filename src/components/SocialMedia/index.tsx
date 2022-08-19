@@ -45,11 +45,11 @@ const SocialMedia: React.FC = () => {
 
   return (
     <Container>
-      <Button data-testid={"links-linkedin"} onClick={handleClick(LINKEDIN)}>
-        <Linkedin />
-      </Button>
       <Button data-testid={"links-github"} onClick={handleClick(GITHUB)}>
         <Github />
+      </Button>
+      <Button data-testid={"links-linkedin"} onClick={handleClick(LINKEDIN)}>
+        <Linkedin />
       </Button>
     </Container>
   );

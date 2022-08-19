@@ -17,6 +17,7 @@ import { Connection } from "../../redux/Types/Connection";
 import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
 import { parseKey } from "../../shared/helpers/parse-key.helper";
 import { Query } from "../../redux/Types/Query";
+import services from "../../services";
 
 const Content = styled.div`
   width: 100%;
@@ -117,10 +118,8 @@ const Home = () => {
       abs: ttlAbsolute,
     });
 
-    console.log(response);
-
-    dispatch(actions.setData([parseKey(response.Response.Created)]));
-
+    await services.findKeys();
+    dispatch(actions.setPreview(parseKey(response.Response.Created)));
     setAddItem(false);
   };
 

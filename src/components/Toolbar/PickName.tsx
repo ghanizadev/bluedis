@@ -28,7 +28,6 @@ const Content = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 
-  border: 1px solid ${(props) => props.theme.text};
   z-index: 10;
 
   & #input-container {
@@ -47,12 +46,15 @@ const ButtonsWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  margin-top: 5px;
+  margin-top: 12px;
+  margin-right: -6px;
 `;
 
 const InputName = styled(Input)`
   border: none;
-  border-bottom: 1px solid ${(props) => props.theme.text};
+  color: ${props => props.theme.text};
+  border-bottom: 1px solid ${(props) => props.theme.foreground};
+  background-color: transparent;
 `;
 
 type Props = {

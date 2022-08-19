@@ -10,5 +10,10 @@ export const Form = styled.div`
   & input {
     width: 100%;
     margin-bottom: 5px;
+    height: 26px;
+    background-color: transparent;
+    border: none;
+    color: ${props => props.theme.text};
+    border-bottom: 1px solid ${props => props.theme.foreground} ;
   }
 `;

@@ -3,6 +3,23 @@
 version = 3
 
 [[package]]
+name = "Bluedis"
+version = "0.2.3"
+dependencies = [
+ "futures",
+ "redis",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sys-locale",
+ "tauri",
+ "tauri-build",
+ "tokio",
+ "tokio-util",
+ "uuid 1.1.2",
+]
+
+[[package]]
 name = "adler"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -63,22 +80,6 @@ name = "anyhow"
 version = "1.0.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "508b352bb5c066aac251f6daf6b36eccd03e8a88e8081cd44959ea277a3af9a8"
-
-[[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "futures",
- "redis",
- "rusqlite",
- "serde",
- "serde_json",
- "sys-locale",
- "tauri",
- "tauri-build",
- "tokio",
- "uuid 1.1.2",
-]
 
 [[package]]
 name = "async-trait"
@@ -3052,6 +3053,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tokio-util"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc463cd8deddc3770d20f9852143d50bf6094e640b485cb2e189a2099085ff45"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "futures-sink",
+ "pin-project-lite",
+ "tokio",
 ]
 
 [[package]]

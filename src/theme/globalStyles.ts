@@ -25,15 +25,23 @@ export const GlobalStyles = createGlobalStyle<{
     outline: none;
   }
 
-  span, h1, h2, h3, h4, h5, h6, p, li, div {
+  span, h1, h2, h3, h4, h5, h6, p, div {
     cursor: default;
   }
 
   button, a, select {
     cursor: pointer;
 
-    span, h1, h2, h3, h4, h5, h6, p, li, div {
+    span, h1, h2, h3, h4, h5, h6, p, div {
       cursor: pointer;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+
+      span, h1, h2, h3, h4, h5, h6, p, div {
+        cursor: not-allowed;
+      }
     }
   }
 

@@ -1,10 +1,10 @@
-import React from "react";
+import { shell } from "@tauri-apps/api";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 
 import { t } from "../../i18n";
 import { State } from "../../redux/Types/State";
-// import { openLink } from "../../services/main-process";
+import { APP_LICENSE, APP_VERSION } from "../../shared/constants";
 
 const Container = styled.div`
   width: 100%;
@@ -53,13 +53,9 @@ const Header = styled.div`
 `;
 
 const Help = () => {
-  const license = useSelector<State, string | undefined>(
-    (state) => state.settings.license
-  );
-
   const handleOpenLink = (link: string) => {
-    return () => {
-      // openLink(link);
+    return async () => {
+      shell.open(link);
     };
   };
 
@@ -71,7 +67,7 @@ const Help = () => {
           <GhanizadevIcon src={`/logo_blue.png`} />
           <div>
             <h2>
-              Bluedis <small>v0.2.2</small>
+              Bluedis <small>v{APP_VERSION}</small>
             </h2>
             <p>ghanizadev ltd.</p>
             <Link onClick={handleOpenLink("https://ghanizadev.com")}>
@@ -89,7 +85,7 @@ const Help = () => {
           </Link>
         </p>
         <br />
-        <TextArea readOnly value={license}></TextArea>
+        <TextArea readOnly value={APP_LICENSE}></TextArea>
         <br />
         <p>
           {t`repository`}:{" "}
