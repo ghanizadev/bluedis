@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -34,7 +34,7 @@ const Arrow = styled.span`
 
 type Props = {
   items: string[];
-  onChange?: (item: string) => void;
+  onChange?: (item: string) => any;
   defaultValue?: string;
   defaultIndex?: number;
   "data-testid"?: string;
@@ -42,17 +42,30 @@ type Props = {
 
 const Dropdown: React.FC<Props> = (props) => {
   const { items, onChange, defaultValue, defaultIndex } = props;
-  const [v] = useState(() =>
+  const [v, sv] = useState<string>(() =>
     defaultValue ? defaultValue : items[defaultIndex ?? 0]
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange && onChange(e.target.value);
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+
+    if(!onChange || !selectRef.current) return;
+    const success = await onChange(e.target.value);
+
+    if(typeof success === 'boolean' && !success) {
+      selectRef.current.value = v;
+      return;
+    }
+
+    sv(e.target.value)
   };
 
   return (
     <Container>
       <Select
+        ref={selectRef}
         onChange={handleChange}
         defaultValue={v}
         data-testid={props["data-testid"] ?? "dropdown-select"}

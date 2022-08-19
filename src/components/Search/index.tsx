@@ -74,13 +74,24 @@ const Search = () => {
     const db = databases.find((db) => db.name === item);
     dispatch(actions.setLoading(true));
 
-    await invoke("select_db", {
-      cstr: parseConnectionString(connection!),
+    const response = await invoke<any>("select_db", {
       dbIndex: db?.value ?? 0,
     });
+    
+    if(response.Error) {
+      dispatch(actions.setError({
+        title: "Error",
+        message: response.Error,
+      }))
+
+      dispatch(actions.setLoading(false));
+      return false;
+    }
 
     await services.findKeys();
     dispatch(actions.setSearching(false));
+
+    return true;
   };
 
   return (

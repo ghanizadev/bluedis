@@ -5,7 +5,7 @@ mod set;
 mod string;
 mod zset;
 
-use std::sync::Mutex;
+use std::{time::Duration};
 
 use crate::{database::zset::ZSetKey, helper::get_timestamp, state::AppState};
 use redis::{
@@ -51,7 +51,7 @@ impl Database {
         self.clone()
     }
 
-    pub fn get_connection(&self) -> Result<Connection, Box<dyn std::error::Error>> {
+    pub async fn get_connection(&self) -> Result<Connection, Box<dyn std::error::Error>> {
         let c_info = ConnectionInfo {
             redis: RedisConnectionInfo {
                 db: self.db_index,
@@ -74,11 +74,12 @@ impl Database {
         };
 
         let c = Client::open(c_info)?;
-        Ok(c.get_connection()?)
+        Ok(c.get_connection_with_timeout(Duration::from_secs(12))?)
     }
 
-    pub fn check_connection(&mut self) -> Result<bool, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+    pub async fn check_connection(&mut self) -> Result<bool, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection().await?;
+
         let command = redis::cmd("PING");
         let result = command.query::<String>(&mut connection)?;
         let mut is_connected = false;
@@ -96,7 +97,7 @@ impl Database {
         ttl: i64,
         absolute: Option<bool>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection().unwrap();
+        let mut connection = self.get_connection().await.unwrap();
 
         if ttl < 0 {
             connection
@@ -127,7 +128,7 @@ impl Database {
     }
 
     pub async fn get_ttl(&mut self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         let ttl = redis::cmd("PTTL").arg(key).query::<i64>(&mut connection)?;
 
         if ttl > 0 {
@@ -138,7 +139,7 @@ impl Database {
     }
 
     pub async fn get_config(&self) -> Result<String, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         let mut pipeline = redis::cmd("CONFIG");
 
         pipeline.arg("GET").arg(r"*");
@@ -156,7 +157,7 @@ impl Database {
     }
 
     pub async fn get_info(&self) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         let mut pipeline = redis::pipe();
 
         let mut response: Vec<String> = vec![];
@@ -207,7 +208,7 @@ impl Database {
         ttl: i64,
         abs: bool,
     ) -> Result<Key, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         let mut pipeline = redis::pipe();
 
         let expire_command = if abs { "PEXPIREAT" } else { "PEXPIRE" };
@@ -290,7 +291,7 @@ impl Database {
         })
     }
 
-    pub fn search_keys<F: Fn(Vec<Key>, u64)>(
+    pub async fn search_keys<F: Fn(Vec<Key>, u64)>(
         &mut self,
         pattern: String,
         cursor: u64,
@@ -298,7 +299,7 @@ impl Database {
         state: tauri::State<'_, AppState>,
         callback: F,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
 
         let l = limit.unwrap_or(100);
         let mut done = false;
@@ -365,7 +366,7 @@ impl Database {
         cursor: u64,
         limit: Option<u64>,
     ) -> Result<(Vec<Key>, u64), Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
 
         let mut new_cursor = cursor;
         let l = limit.unwrap_or(100);
@@ -425,7 +426,7 @@ impl Database {
         &mut self,
         keys: Vec<String>,
     ) -> Result<Vec<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
 
         let mut result: Vec<Key> = vec![];
 
@@ -455,33 +456,33 @@ impl Database {
         Ok(result)
     }
 
-    pub fn count(&mut self) -> Result<usize, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+    pub async fn count(&mut self) -> Result<usize, Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection().await?;
         let command = redis::cmd("DBSIZE");
         let count = command.query::<usize>(&mut connection);
 
         Ok(count?)
     }
 
-    pub fn select_db(&mut self, index: i64) -> Result<(), Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+    pub async fn select_db(&mut self, index: i64) -> Result<(), Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection().await?;
         self.db_index = index;
 
-        redis::cmd("SELECTDB")
+        redis::cmd("SELECT")
             .arg(index)
             .query::<()>(&mut connection)?;
 
         Ok(())
     }
 
-    pub fn rm_keys(&mut self, keys: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+    pub async fn rm_keys(&mut self, keys: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
+        let mut connection = self.get_connection().await?;
         connection.del::<Vec<&str>, ()>(keys)?;
         Ok(())
     }
 
     pub async fn get_key(&self, key: String) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         let mut key_type_cmd = redis::cmd("TYPE");
         key_type_cmd.arg(&key);
 
@@ -506,7 +507,7 @@ impl Database {
         value: Option<ZSetKey>,
         old_value: Option<String>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
 
         if let Some(v) = value {
             return zset::add_zset_member(&mut connection, key, v, old_value);
@@ -520,7 +521,7 @@ impl Database {
         key: String,
         value: Option<String>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         zset::del_zset_member(&mut connection, key, value)
     }
 
@@ -530,7 +531,7 @@ impl Database {
         value: String,
         replace: Option<String>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         set::add_set_member(&mut connection, key, value, replace)
     }
 
@@ -539,7 +540,7 @@ impl Database {
         key: String,
         value: String,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         set::del_set_member(&mut connection, key, value)
     }
 
@@ -549,7 +550,7 @@ impl Database {
         value: String,
         replace: Option<u64>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         list::add_list_member(&mut connection, key, value, replace)
     }
 
@@ -559,7 +560,7 @@ impl Database {
         value: String,
         index: Option<u64>,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         list::del_list_member(&mut connection, key, value, index)
     }
 
@@ -568,7 +569,7 @@ impl Database {
         key: String,
         value: String,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         hash::add_member(&mut connection, key, value)
     }
 
@@ -577,7 +578,7 @@ impl Database {
         key: String,
         value: String,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         hash::del_member(&mut connection, key, value)
     }
 
@@ -586,7 +587,7 @@ impl Database {
         key: String,
         value: String,
     ) -> Result<Option<Key>, Box<dyn std::error::Error>> {
-        let mut connection = self.get_connection()?;
+        let mut connection = self.get_connection().await?;
         string::update_string(&mut connection, key, value)
     }
 }

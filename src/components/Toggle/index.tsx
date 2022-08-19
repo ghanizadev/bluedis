@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 const Container = styled.div`
   -webkit-app-region: no-drag;
+  width: 40px;
 `;
 
 type Props = {

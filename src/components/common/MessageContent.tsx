@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const MessageContent = styled.div`
-  width: 500px;
+  width: 400px;
   background-color: ${(props) => props.theme.sidebarBackground};
   color: ${(props) => props.theme.text};
   position: absolute;

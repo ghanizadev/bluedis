@@ -1,11 +1,11 @@
 [package]
-name = "app"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "Bluedis"
+version = "0.2.3"
+description = ""
+authors = ["ghanizadev <jf.melo6@gmail.com>"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "Bluedis"
 edition = "2021"
 rust-version = "1.57"
 
@@ -22,6 +22,7 @@ redis = { version = "0.21.5", features = ["tls"] }
 uuid = { version = "1.1.2", features = ["v4","fast-rng"] }
 rusqlite = { version = "0.28.0", features = ["bundled"] }
 tokio = { version = "1.20.1", features = ["full"] }
+tokio-util = { version="0.7.3" }
 futures = "0.3"
 sys-locale = "0.2.1"
 
