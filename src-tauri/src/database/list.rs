@@ -1,4 +1,4 @@
-use crate::database::{Key};
+use crate::database::Key;
 use crate::helper::get_timestamp;
 use redis::Connection;
 use uuid::Uuid;
@@ -14,17 +14,21 @@ pub fn get(
 
     let (result, pttl) = pipeline.query::<(Vec<String>, i64)>(connection)?;
 
-    Ok(Some(Key {
-        key: key.into(),
-        value: serde_json::to_string(&result).unwrap_or_else(|_| "".into()),
-        is_new: false,
-        key_type: "list".into(),
-        ttl: if pttl >= 0 {
-            pttl + get_timestamp()
-        } else {
-            pttl
-        },
-    }))
+    if result.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(Key {
+            key: key.into(),
+            value: serde_json::to_string(&result).unwrap_or_else(|_| "".into()),
+            is_new: false,
+            key_type: "list".into(),
+            ttl: if pttl >= 0 {
+                pttl + get_timestamp()
+            } else {
+                pttl
+            },
+        }))
+    }
 }
 
 pub fn add_list_member(

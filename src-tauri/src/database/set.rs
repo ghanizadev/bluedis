@@ -1,4 +1,4 @@
-use crate::database::{Key};
+use crate::database::Key;
 use crate::helper::get_timestamp;
 use redis::Connection;
 
@@ -13,17 +13,21 @@ pub fn get(
 
     let (value, pttl) = command.query::<(Vec<String>, i64)>(connection)?;
 
-    Ok(Some(Key {
-        key: key.to_string(),
-        value: serde_json::to_string(&value).expect("Failed to serialize"),
-        is_new: true,
-        key_type: "set".into(),
-        ttl: if pttl >= 0 {
-            pttl + get_timestamp()
-        } else {
-            pttl
-        },
-    }))
+    if value.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(Key {
+            key: key.to_string(),
+            value: serde_json::to_string(&value).expect("Failed to serialize"),
+            is_new: true,
+            key_type: "set".into(),
+            ttl: if pttl >= 0 {
+                pttl + get_timestamp()
+            } else {
+                pttl
+            },
+        }))
+    }
 }
 
 pub fn del_set_member(

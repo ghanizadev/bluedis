@@ -1,9 +1,9 @@
 pub mod commands;
 
-use std::path::{Path, PathBuf};
-
 use rusqlite::{params, Connection, OptionalExtension, Result};
 use serde::{Deserialize, Serialize};
+use std::fs::create_dir_all;
+use std::path::{Path, PathBuf};
 use tauri::api::path::resource_dir;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -41,7 +41,16 @@ pub struct Persistence {}
 
 fn get_db_path() -> PathBuf {
     let dir = tauri::api::path::data_dir().unwrap();
-    Path::new(&dir).join("config")
+    let path = Path::new(&dir)
+        .join("Bluedis")
+        .join("0.2.3")
+        .join("Resources");
+
+    if !path.exists() {
+        create_dir_all(&path).expect("Failed to create directory");
+    }
+
+    path.join("config")
 }
 
 impl Persistence {

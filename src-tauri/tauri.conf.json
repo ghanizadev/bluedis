@@ -38,19 +38,18 @@
         "all": true,
         "scope": {
           "allow": [
-            "$APP",
             "$APP/*",
             "$DOCUMENT/*",
-            "$DOCUMENT",
             "$DESKTOP/*",
-            "$DESKTOP",
-            "$RESOURCE/*",
-            "$RESOURCE"
+            "$RESOURCE/*"
           ]
         }
       },
       "shell": {
         "open": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {

@@ -25,12 +25,12 @@ fn unmarshall(data: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
 
     for (_, value) in value.iter() {
         match value.as_str() {
-            Some(value) => {result.push(value)},
-            _ => {},
+            Some(value) => result.push(value),
+            _ => {}
         }
     }
 
-    Ok(result.iter().map(|v| { v.to_string() }).collect())
+    Ok(result.iter().map(|v| v.to_string()).collect())
 }
 
 pub fn get(
@@ -44,17 +44,21 @@ pub fn get(
 
     let (result, pttl) = pipeline.query::<(Vec<String>, i64)>(connection)?;
 
-    Ok(Some(Key {
-        key: key.into(),
-        value: marshall(result)?,
-        is_new: false,
-        key_type: "hash".into(),
-        ttl: if pttl >= 0 {
-            pttl + get_timestamp()
-        } else {
-            pttl
-        },
-    }))
+    if result.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(Key {
+            key: key.into(),
+            value: marshall(result)?,
+            is_new: false,
+            key_type: "hash".into(),
+            ttl: if pttl >= 0 {
+                pttl + get_timestamp()
+            } else {
+                pttl
+            },
+        }))
+    }
 }
 
 pub fn add_member(

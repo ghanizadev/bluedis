@@ -44,18 +44,19 @@ const Search = () => {
     if (!isSearching) {
       dispatch(actions.setSearching(true));
       dispatch(actions.setData([]));
+      dispatch(actions.setQuery({ input: match ? match : "*", cursor: 0, done: false, count: 0 }));
 
       await invoke("search", {
         cstr: parseConnectionString(connection!),
-        pattern: match ?? "*",
+        pattern: match ? match : "*",
         cursor: 0,
       });
-
-      dispatch(actions.setSearching(false));
     } else {
       await invoke("stop_query");
-      dispatch(actions.setSearching(false));
     }
+
+    dispatch(actions.setSearching(false));
+
   };
 
   const handleKeyListener = async (

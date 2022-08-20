@@ -5,7 +5,7 @@ mod set;
 mod string;
 mod zset;
 
-use std::{time::Duration};
+use std::time::Duration;
 
 use crate::{database::zset::ZSetKey, helper::get_timestamp, state::AppState};
 use redis::{
@@ -117,14 +117,14 @@ impl Database {
                             .expect("failed to set ttl");
                     } else {
                         connection
-                        .pexpire::<&str, i64>(&key, ttl as usize)
-                        .expect("failed to set ttl");
+                            .pexpire::<&str, i64>(&key, ttl as usize)
+                            .expect("failed to set ttl");
                     }
                 }
             };
         };
 
-        Ok(self.get_key(key).await?)
+        self.get_key(key).await
     }
 
     pub async fn get_ttl(&mut self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
@@ -181,9 +181,9 @@ impl Database {
                     map.insert(last_key.to_string(), Value::from(Map::new()));
                 }
 
-                if !last_key.is_empty() && key.contains(":") {
+                if !last_key.is_empty() && key.contains(':') {
                     let kv = key
-                        .split(":")
+                        .split(':')
                         .map(|item| item.to_string())
                         .collect::<Vec<String>>();
 
@@ -284,7 +284,15 @@ impl Database {
 
         Ok(Key {
             key: key_name,
-            ttl,
+            ttl: if ttl > 0 {
+                if abs {
+                    ttl
+                } else {
+                    get_timestamp() + ttl
+                }
+            } else {
+                -1
+            },
             key_type,
             value,
             is_new: true,
@@ -301,12 +309,13 @@ impl Database {
     ) -> Result<(), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
 
-        let l = limit.unwrap_or(100);
+        let l = limit.unwrap_or(20);
         let mut done = false;
         let mut new_cursor = cursor;
+        let mut count: u64 = 0;
 
         while !done {
-            if !*state.is_searching.lock().unwrap() { 
+            if !*state.is_searching.lock().unwrap() {
                 println!("Process stopped");
                 break;
             }
@@ -351,10 +360,11 @@ impl Database {
                     i += 1;
                 }
 
+                count += response.len() as u64;
                 callback(response, new_cursor);
             }
 
-            done = new_cursor == 0 || keys.len() as u64 >= l;
+            done = new_cursor == 0 || count >= l;
         }
 
         Ok(())
@@ -369,7 +379,7 @@ impl Database {
         let mut connection = self.get_connection().await?;
 
         let mut new_cursor = cursor;
-        let l = limit.unwrap_or(100);
+        let l = limit.unwrap_or(20);
         let mut done = false;
 
         let mut items: Vec<String> = vec![];

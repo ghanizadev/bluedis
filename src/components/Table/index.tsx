@@ -79,9 +79,6 @@ const Table: React.FC<Props> = (props) => {
   const currentCount = useSelector<State, number>((state) => state.data.length);
   const currentTotal = useSelector<State, number>((state) => state.currentTotalDocs);
   const isSearching = useSelector<State, boolean>((state) => state.isSearching);
-  const connection = useSelector<State, Connection | undefined>(
-    (state) => state.connection
-  );
 
   const handleItemEdit = (item: ItemType) => {
     loading(true);
@@ -99,36 +96,12 @@ const Table: React.FC<Props> = (props) => {
 
   const handleLoadMore = async () => {
     dispatch(actions.setSearching(true));
-    const cstr = parseConnectionString(connection!);
-    const data = await invoke<FindKeyResponse>("find_keys", {
-      cstr,
+    await invoke<FindKeyResponse>("search", {
       pattern: query.input,
       cursor: query.cursor,
     });
 
-    if (data.Error) {
-      dispatch(
-        actions.setError({
-          title: "Error",
-          message: data.Error,
-        })
-      );
-
-      return;
-    }
-
-    const { cursor, keys } = data.Response!.Collection!;
-
     dispatch(actions.setSearching(false));
-    dispatch(actions.pushData(data.Response!.Collection!.keys.map(parseKey)));
-    dispatch(
-      actions.setQuery({
-        input: query.input,
-        cursor,
-        done: cursor === 0,
-        count: keys.length,
-      })
-    );
   };
 
   return (
@@ -204,7 +177,7 @@ const Table: React.FC<Props> = (props) => {
           <span>
             {query.done && t`showing all ${currentCount} keys`}
             {!query.done && t`showing ${currentCount} of ${currentTotal} keys - `}
-            {query.cursor !== 0 && (
+            {!query.done && (
               <button
                 disabled={query.cursor === 0}
                 onClick={handleLoadMore}

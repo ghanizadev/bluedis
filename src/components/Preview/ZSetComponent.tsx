@@ -5,7 +5,6 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-// import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddOrderedItem from "./AddOrderedItem";
@@ -62,7 +61,7 @@ const ZSetComponent: React.FC<Props> = (props) => {
     }
 
     let data = response.Response!.Single!;
-    dispatch(actions.setPreview(parseKey(data.key)));
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
 
     setItemValue(undefined);
   };
@@ -88,7 +87,7 @@ const ZSetComponent: React.FC<Props> = (props) => {
     }
 
     let data = response.Response!.Single!;
-    dispatch(actions.setPreview(parseKey(data.key)));
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
 
     setItemValue(undefined);
   };

@@ -13,11 +13,10 @@ import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
 import { invoke } from "@tauri-apps/api";
 import { FindKeyResponse } from "../../services/find-key-response.interface";
-import { Connection } from "../../redux/Types/Connection";
-import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
 import { parseKey } from "../../shared/helpers/parse-key.helper";
 import { Query } from "../../redux/Types/Query";
 import services from "../../services";
+import { useLoading } from "../../shared/hooks/use-loading.hook";
 
 const Content = styled.div`
   width: 100%;
@@ -38,32 +37,44 @@ const Home = () => {
     (state) => state.preview
   );
   const connected = useSelector<State, boolean>((state) => state.connected);
-  const connection = useSelector<State, Connection | undefined>(
-    (state) => state.connection
-  );
   const lastQuery = useSelector<State, Query>((state) => state.query);
 
   const [addItem, setAddItem] = React.useState(false);
 
   const dispatch = useDispatch();
+  const loading = useLoading();
 
   const handlePreview = async (item: ItemType) => {
-    if (preview === item) {
+    if (preview?.key === item.key) {
       dispatch(actions.setPreview(undefined));
+      loading(false);
       return;
     }
 
-    let cstr = parseConnectionString(connection!);
     let response = await invoke<FindKeyResponse>("get_key", {
-      cstr,
       key: item.key,
     });
 
-    if (response.Error) throw new Error("key not found or expired");
+    if (response.Error) {
+      dispatch(actions.setError({
+        title: "Error",
+        message: response.Error,
+      }));
 
-    let { key: rawKey } = response.Response!.Single!;
+      loading(false);
+      await services.findKeys();
+      return;
+    }
 
-    dispatch(actions.setPreview(parseKey(rawKey)));
+    let data = response.Response!.Single!;
+
+    if(data.key)
+      dispatch(actions.setPreview(parseKey(data.key)));
+    else {
+      await services.findKeys();
+    }
+
+    loading(false);
   };
 
   const handlePreviewClose = () => {
@@ -71,12 +82,13 @@ const Home = () => {
   };
 
   const handleRefresh = async () => {
-    let cstr = parseConnectionString(connection!);
+    dispatch(actions.setSearching(true));
     let response = await invoke<FindKeyResponse>("find_keys", {
-      cstr,
       pattern: lastQuery.input,
-      cursor: lastQuery.cursor ?? 0,
+      cursor: 0,
     });
+
+    dispatch(actions.setSearching(false));
 
     if (response.Error) {
       dispatch(
@@ -108,10 +120,8 @@ const Home = () => {
     ttl: number,
     ttlAbsolute: boolean
   ) => {
-    let cstr = parseConnectionString(connection!);
 
     let response = await invoke<any>("create_key", {
-      cstr,
       keyName: key,
       keyType: type,
       ttl,
@@ -124,10 +134,9 @@ const Home = () => {
   };
 
   React.useEffect(() => {
-    if (!connected || !connection) return;
+    if (!connected) return;
 
-    let cstr = parseConnectionString(connection);
-    invoke<{ Count?: number; Error?: string }>("db_count", { cstr }).then(
+    invoke<{ Count?: number; Error?: string }>("db_count").then(
       (response) => {
         if (response.Count) {
           dispatch(actions.setCount(response.Count));

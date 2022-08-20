@@ -1,35 +1,60 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
+import { useClickOutside } from "../../shared/hooks/use-click-outside.hook";
 
 const Container = styled.div`
   margin: 0 5px;
   color: ${(props) => props.theme.innerText};
+  
+  position: relative;
 `;
 
-const Select = styled.select`
+const Select = styled.button`
   height: 40px;
-  min-width: 100px;
+  min-width: 120px;
   border: none;
   appearance: initial;
-  padding: 6px 15px 6px 6px;
+  padding: 12px;
 
   background-color: ${(props) => props.theme.foreground};
 
   color: ${(props) => props.theme.innerText};
+  
+  position: relative;
 `;
 
-const Option = styled.option`
+const Option = styled.div`
   background-color: #fff;
   color: ${(props) => props.theme.foreground};
   line-height: 30px;
+  
+  &:hover {
+    color: ${(props) => props.theme.text};
+    background-color: ${(props) => props.theme.foreground};
+  }
 `;
 
 const Arrow = styled.span`
-  margin-left: -15px;
+  margin-left: -20px;
   width: 15px;
   text-align: center;
 
   pointer-events: none;
+  position: absolute;
+  top: 20px;
+  transform: translateY(-50%);
+`;
+
+const Menu = styled.div`
+  position: absolute;
+  z-index: 1;
+  
+  top: 40px;
+  left: 0;
+  right: 0;
+  
+  max-height: 300px;
+  overflow-y: auto;
 `;
 
 type Props = {
@@ -45,38 +70,52 @@ const Dropdown: React.FC<Props> = (props) => {
   const [v, sv] = useState<string>(() =>
     defaultValue ? defaultValue : items[defaultIndex ?? 0]
   );
+  const [isOpen, setIsOpen] = useState(false);
 
-  const selectRef = useRef<HTMLSelectElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
+  useClickOutside(menuRef, () => {
+    handleFocus()
+  });
 
-    if(!onChange || !selectRef.current) return;
-    const success = await onChange(e.target.value);
 
-    if(typeof success === 'boolean' && !success) {
-      selectRef.current.value = v;
-      return;
+  const handleSelect = (item: string) => {
+    return async () => {
+      if(!onChange) return;
+      const success = await onChange(item);
+
+      setIsOpen(false);
+
+      if(typeof success === 'boolean' && !success) return;
+
+      sv(item);
     }
-
-    sv(e.target.value)
   };
+
+  const handleOpen = () => {
+    setIsOpen(o => !o);
+  }
+
+  const handleFocus = () => {
+    setIsOpen(false);
+  }
 
   return (
     <Container>
       <Select
-        ref={selectRef}
-        onChange={handleChange}
-        defaultValue={v}
+        onClick={handleOpen}
         data-testid={props["data-testid"] ?? "dropdown-select"}
       >
-        {items.map((item, index) => {
-          return (
-            <Option key={index} value={item}>
-              {item}
-            </Option>
-          );
-        })}
+        {v}
+        {isOpen && <Menu ref={menuRef}>
+          {items.map((item, index) => {
+            return (
+              <Option key={item + index} onClick={handleSelect(item)}>
+                {item}
+              </Option>
+            );
+          })}
+        </Menu>}
       </Select>
       <Arrow>▾</Arrow>
     </Container>
