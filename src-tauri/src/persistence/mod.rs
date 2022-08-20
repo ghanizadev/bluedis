@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use rusqlite::{params, Connection, OptionalExtension, Result};
 use serde::{Deserialize, Serialize};
-use tauri::api::path::{resource_dir};
+use tauri::api::path::resource_dir;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Preference {
@@ -40,8 +40,8 @@ pub struct Favorite {
 pub struct Persistence {}
 
 fn get_db_path() -> PathBuf {
-    Path::new(".")
-    .join("config")
+    let dir = tauri::api::path::data_dir().unwrap();
+    Path::new(&dir).join("config")
 }
 
 impl Persistence {
@@ -178,8 +178,9 @@ impl Persistence {
         let path = get_db_path();
         let c = Connection::open(path)?;
 
-        let mut stmt =
-            c.prepare("SELECT id, name, host, port, password, tls FROM main.favorite ORDER BY created_at")?;
+        let mut stmt = c.prepare(
+            "SELECT id, name, host, port, password, tls FROM main.favorite ORDER BY created_at",
+        )?;
         let iter = stmt.query_map([], |row| {
             Ok(Favorite {
                 id: row.get(0)?,
