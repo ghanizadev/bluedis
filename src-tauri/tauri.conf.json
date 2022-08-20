@@ -35,15 +35,19 @@
         "save": true
       },
       "fs": {
-        "createDir": true,
-        "readDir": true,
-        "readFile": true,
-        "writeFile": true,
-        "scope": [
-          "$APP/*",
-          "$DOCUMENT/*",
-          "$RESOURCE/*"
-        ]
+        "all": true,
+        "scope": {
+          "allow": [
+            "$APP",
+            "$APP/*",
+            "$DOCUMENT/*",
+            "$DOCUMENT",
+            "$DESKTOP/*",
+            "$DESKTOP",
+            "$RESOURCE/*",
+            "$RESOURCE"
+          ]
+        }
       },
       "shell": {
         "open": true
@@ -81,7 +85,10 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "webviewInstallMode": {
+          "type": "offlineInstaller"
+        }
       }
     },
     "security": {

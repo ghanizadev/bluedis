@@ -35,6 +35,15 @@ const App = () => {
       "load_preference"
     );
 
+    if(settings.Error) {
+      dispatch(actions.setError({
+        title: "Error",
+        message: settings.Error,
+      }));
+
+      return;
+    }
+
     dispatch(
       actions.updatePreferences({
         appearance: {
@@ -50,7 +59,16 @@ const App = () => {
       })
     );
 
-    let favorites = await invoke<{ Collection: any[] }>("get_all_favorites");
+    let favorites = await invoke<{ Error?: string, Collection: any[] }>("get_all_favorites");
+
+    if(favorites.Error) {
+      dispatch(actions.setError({
+        title: "Error",
+        message: favorites.Error,
+      }));
+
+      return;
+    }
 
     dispatch(
       actions.updateFavorites(

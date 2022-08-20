@@ -6,9 +6,9 @@
 )]
 
 mod database;
+mod general;
 mod helper;
 mod persistence;
-mod general;
 mod state;
 
 use crate::persistence::{Persistence, Preference};
@@ -17,6 +17,8 @@ use sys_locale::get_locale;
 #[tokio::main]
 async fn main() {
     let locale = get_locale().unwrap_or_else(|| String::from("en-US"));
+
+    persistence::Persistence::new();
 
     println!("Locale: {:?}", locale);
 
