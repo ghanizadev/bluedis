@@ -38,7 +38,12 @@
         "createDir": true,
         "readDir": true,
         "readFile": true,
-        "writeFile": true
+        "writeFile": true,
+        "scope": [
+          "$APP/*",
+          "$DOCUMENT/*",
+          "$RESOURCE/*"
+        ]
       },
       "shell": {
         "open": true

@@ -22,6 +22,7 @@ import { dialog, fs, invoke } from "@tauri-apps/api";
 import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
 import { FindKeyResponse } from "../../services/find-key-response.interface";
 import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { documentDir, join } from "@tauri-apps/api/path";
 
 type Props = {
   onRefresh: () => void;
@@ -54,7 +55,7 @@ const Toolbar: React.FC<Props> = (props) => {
   const handleDownloadSelected = async () => {
     let path = await dialog.save({
       title: t`Save the query result`,
-      defaultPath: `query_result_${Date.now()}.json`,
+      defaultPath: await join(await documentDir(), `query_result_${Date.now()}.json`),
     });
 
     console.log({ path });
