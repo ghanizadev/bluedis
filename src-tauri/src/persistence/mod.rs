@@ -1,9 +1,10 @@
 pub mod commands;
 
+use std::path::{Path, PathBuf};
+
 use rusqlite::{params, Connection, OptionalExtension, Result};
 use serde::{Deserialize, Serialize};
-
-const DBPATH: &str = "./config";
+use tauri::api::path::{resource_dir};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Preference {
@@ -38,9 +39,16 @@ pub struct Favorite {
 
 pub struct Persistence {}
 
+fn get_db_path() -> PathBuf {
+    Path::new(".")
+    .join("config")
+}
+
 impl Persistence {
     pub fn new() -> Self {
-        let c = Connection::open(DBPATH).unwrap();
+        let path = get_db_path();
+        let c = Connection::open(path).unwrap();
+
         c.execute(
             "CREATE TABLE IF NOT EXISTS main.favorite (\
             id TEXT PRIMARY KEY,\
@@ -73,7 +81,8 @@ impl Persistence {
     }
 
     pub fn get_preferences(&self) -> Result<Preference, Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         let preference = c
             .query_row(
@@ -98,7 +107,8 @@ impl Persistence {
     }
 
     pub fn save_preferences(&self, pref: Preference) -> Result<(), Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         c.execute(
             "INSERT OR REPLACE INTO main.preference (id, dark_mode, font_name, font_size, language) VALUES (?1, ?2, ?3, ?4, ?5);",
@@ -117,7 +127,8 @@ impl Persistence {
     }
 
     pub fn save_favorite(&self, fav: Favorite) -> Result<(), Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         c.execute(
             "INSERT OR REPLACE INTO main.favorite (id, name, host, port, password, tls) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
@@ -130,7 +141,8 @@ impl Persistence {
     }
 
     pub fn del_favorite(&self, id: String) -> Result<(), Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         c.execute("DELETE FROM main.favorite WHERE id = ?1", params![id])?;
         c.close().expect("failed to close connection");
@@ -139,7 +151,8 @@ impl Persistence {
     }
 
     pub fn get_favorite(&self, id: u32) -> Result<Option<Favorite>, Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         let favorite = c
             .query_row(
@@ -162,7 +175,8 @@ impl Persistence {
     }
 
     pub fn get_all_favorites(&self) -> Result<Vec<Favorite>, Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         let mut stmt =
             c.prepare("SELECT id, name, host, port, password, tls FROM main.favorite ORDER BY created_at")?;
@@ -189,7 +203,8 @@ impl Persistence {
     }
 
     pub fn wipe_data(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let c = Connection::open(DBPATH)?;
+        let path = get_db_path();
+        let c = Connection::open(path)?;
 
         c.execute("DROP TABLE IF EXISTS main.preference;", ())?;
         c.execute("DROP TABLE IF EXISTS main.favorite;", ())?;
