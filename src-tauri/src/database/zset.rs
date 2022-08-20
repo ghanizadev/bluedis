@@ -1,4 +1,4 @@
-use crate::database::{Key};
+use crate::database::Key;
 use crate::helper::get_timestamp;
 use redis::Connection;
 use serde::{Deserialize, Serialize};
@@ -29,18 +29,6 @@ pub fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>>
     Ok(response)
 }
 
-// pub fn unmarshall(str: String) -> Result<Vec<String>, Box<dyn std::error::Error>> {
-//     let data: Vec<ZSetKey> = serde_json::from_str(&str)?;
-//     let mut result: Vec<String> = vec![];
-
-//     for key in data {
-//         result.push(key.score.to_string());
-//         result.push(key.value);
-//     }
-
-//     Ok(result)
-// }
-
 pub fn get(
     connection: &mut Connection,
     key: &str,
@@ -58,17 +46,21 @@ pub fn get(
 
     let (value, pttl) = pipeline.query::<(Vec<String>, i64)>(connection)?;
 
-    Ok(Some(Key {
-        key: key.to_string(),
-        value: marshall(value)?,
-        is_new: false,
-        key_type: "zset".to_string(),
-        ttl: if pttl >= 0 {
-            pttl + get_timestamp()
-        } else {
-            pttl
-        },
-    }))
+    if value.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(Key {
+            key: key.to_string(),
+            value: marshall(value)?,
+            is_new: false,
+            key_type: "zset".to_string(),
+            ttl: if pttl >= 0 {
+                pttl + get_timestamp()
+            } else {
+                pttl
+            },
+        }))
+    }
 }
 
 pub fn del_zset_member(

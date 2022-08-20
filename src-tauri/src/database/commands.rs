@@ -1,12 +1,9 @@
-
-use std::time::Duration;
-
 use crate::database::zset::ZSetKey;
 use crate::state::AppState;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::Window;
-use tokio::{time, select, spawn};
+use tokio::{select, spawn, time};
 use tokio_util::sync::CancellationToken;
 
 use super::{Database, Key};
@@ -140,7 +137,7 @@ pub async fn rm_keys(
 
     let result = db.rm_keys(keys.iter().map(AsRef::as_ref).collect());
 
-    Ok(match result.await  {
+    Ok(match result.await {
         Ok(_) => DatabaseResponse::Empty(()),
         Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
@@ -214,9 +211,10 @@ pub async fn get_keys(
     let result = db.get_keys(keys);
 
     Ok(match result.await {
-        Ok(keys) => {
-            DatabaseResponse::Response(Response::Collection(FindKeyCollectionResult { keys, cursor: 0 }))
-        }
+        Ok(keys) => DatabaseResponse::Response(Response::Collection(FindKeyCollectionResult {
+            keys,
+            cursor: 0,
+        })),
         Err(err) => DatabaseResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
 }
@@ -419,7 +417,7 @@ pub async fn get_info(state: tauri::State<'_, AppState>) -> Result<Vec<String>, 
 
     let result = match db.get_info().await {
         Ok(count) => count,
-        Err(err) => vec![err.to_string()]
+        Err(err) => vec![err.to_string()],
     };
 
     Ok(result)
@@ -433,7 +431,7 @@ pub async fn get_config(state: tauri::State<'_, AppState>) -> Result<String, ()>
 
     let result = match db.get_config().await {
         Ok(count) => count,
-        Err(err) => err.to_string()
+        Err(err) => err.to_string(),
     };
 
     Ok(result)
@@ -448,22 +446,31 @@ pub async fn get_ttl(key: String, state: tauri::State<'_, AppState>) -> Result<T
 
     let result = match db.get_ttl(key.as_str()).await {
         Ok(pttl) => TTLResponse::Success(pttl),
-        Err(err) => TTLResponse::Error(err.to_string())
+        Err(err) => TTLResponse::Error(err.to_string()),
     };
 
     Ok(result)
 }
 
 #[tauri::command]
-pub async fn set_ttl(key: String, ttl: i64, abs: Option<bool>, state: tauri::State<'_, AppState>) -> Result<DatabaseResponse, ()> {
+pub async fn set_ttl(
+    key: String,
+    ttl: i64,
+    abs: Option<bool>,
+    state: tauri::State<'_, AppState>,
+) -> Result<DatabaseResponse, ()> {
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
     let mut db = Database::new(cstr).with_index(db_index);
 
     let result = match db.set_ttl(key, ttl, abs).await {
-        Ok(key) => DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 })),
-        Err(err) => DatabaseResponse::Error(format!("failed to set TTL, reason: {:?}", err.to_string())),
+        Ok(key) => {
+            DatabaseResponse::Response(Response::Single(FindSingleKeyResult { key, cursor: 0 }))
+        }
+        Err(err) => {
+            DatabaseResponse::Error(format!("failed to set TTL, reason: {:?}", err.to_string()))
+        }
     };
 
     Ok(result)

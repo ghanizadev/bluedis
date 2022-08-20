@@ -60,8 +60,8 @@ const ListComponent: React.FC<Props> = (props) => {
     }
 
     let data = response.Response!.Single!;
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
 
-    dispatch(actions.setPreview(parseKey(data.key)));
     setItemValue(undefined);
   };
 
@@ -87,8 +87,8 @@ const ListComponent: React.FC<Props> = (props) => {
     }
 
     let data = response.Response!.Single!;
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
 
-    dispatch(actions.setPreview(parseKey(data.key)));
     setItemValue(undefined);
   };
 

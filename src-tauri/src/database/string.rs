@@ -1,4 +1,4 @@
-use crate::database::{Key};
+use crate::database::Key;
 use crate::helper::get_timestamp;
 use redis::Connection;
 
@@ -13,17 +13,21 @@ pub fn get(
 
     let (value, pttl) = pipeline.query::<(String, i64)>(connection)?;
 
-    Ok(Some(Key {
-        key: key.to_string(),
-        value,
-        is_new: false,
-        key_type: "string".into(),
-        ttl: if pttl >= 0 {
-            pttl + get_timestamp()
-        } else {
-            pttl
-        },
-    }))
+    if value.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(Key {
+            key: key.to_string(),
+            value,
+            is_new: false,
+            key_type: "string".into(),
+            ttl: if pttl >= 0 {
+                pttl + get_timestamp()
+            } else {
+                pttl
+            },
+        }))
+    }
 }
 
 pub fn update_string(

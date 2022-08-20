@@ -51,8 +51,7 @@ const HashComponent: React.FC<Props> = (props) => {
     }
 
     let data = response.Response!.Single!;
-
-    dispatch(actions.setPreview(parseKey(data.key)));
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
 
     setItemValue(undefined);
   };
@@ -73,8 +72,7 @@ const HashComponent: React.FC<Props> = (props) => {
     }
 
     let data = response.Response!.Single!;
-
-    dispatch(actions.setPreview(parseKey(data.key)));
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
 
     setItemValue(undefined);
   };
