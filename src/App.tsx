@@ -84,8 +84,17 @@ const App = () => {
     );
   };
 
+  const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+  }
+
   React.useEffect(() => {
     updateSettings();
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => {
+        document.removeEventListener('contextmenu', handleContextMenu);
+    }
   }, []);
 
   return (
