@@ -43,7 +43,7 @@ fn get_db_path() -> PathBuf {
     let dir = tauri::api::path::data_dir().unwrap();
     let path = Path::new(&dir)
         .join("Bluedis")
-        .join("0.2.3-rc.1")
+        .join("0.2.3")
         .join("Resources");
 
     if !path.exists() {

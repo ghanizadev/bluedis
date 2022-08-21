@@ -1,6 +1,6 @@
 [package]
 name = "Bluedis"
-version = "0.2.3-rc.1"
+version = "0.2.3"
 description = ""
 authors = ["ghanizadev <jf.melo6@gmail.com>"]
 license = ""
