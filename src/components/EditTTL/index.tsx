@@ -46,7 +46,7 @@ const EditTTL: React.FC = () => {
       abs: ttlAbsolute,
     });
 
-    if(response.Response?.Single)
+    if (response.Response?.Single)
       dispatch(actions.setPreview(parseKey(response.Response?.Single.key)));
 
     setTTL(0);

@@ -55,12 +55,15 @@ const Toolbar: React.FC<Props> = (props) => {
   const handleDownloadSelected = async () => {
     let path = await dialog.save({
       title: t`Save the query result`,
-      defaultPath: await join(await documentDir(), `query_result_${Date.now()}.json`),
+      defaultPath: await join(
+        await documentDir(),
+        `query_result_${Date.now()}.json`
+      ),
     });
 
     console.log({ path });
 
-    if(!path) return;
+    if (!path) return;
 
     const response = await invoke<FindKeyResponse>("get_keys", {
       keys: selected,
@@ -79,7 +82,7 @@ const Toolbar: React.FC<Props> = (props) => {
 
     const contents = response.Response?.Collection.keys.map(parseKey);
 
-    await fs.writeTextFile({ path, contents: JSON.stringify(contents) })
+    await fs.writeTextFile({ path, contents: JSON.stringify(contents) });
   };
 
   const handleDeleteSelected = () => {
@@ -97,7 +100,7 @@ const Toolbar: React.FC<Props> = (props) => {
           await invoke("rm_keys", {
             cstr: parseConnectionString(currentConnection!),
             keys: selected,
-          })
+          });
 
           dispatch(actions.clearSelection());
           dispatch(actions.removeDocument(selected));

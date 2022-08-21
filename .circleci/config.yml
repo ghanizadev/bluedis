@@ -15,12 +15,12 @@ jobs:
           root: .
           paths:
             - .
-          
+
   build-app:
     docker:
       - image: cimg/node:14.19.0
     steps:
-      - attach_workspace: 
+      - attach_workspace:
           at: .
       - run:
           name: Install prerequisites
@@ -39,7 +39,7 @@ jobs:
     docker:
       - image: cimg/node:14.19.0
     steps:
-      - attach_workspace: 
+      - attach_workspace:
           at: .
       - run:
           name: Run React tests with coverage
@@ -51,12 +51,12 @@ jobs:
           root: .
           paths:
             - .
-  
+
   code-coverage:
     machine:
       image: ubuntu-2004:current
     steps:
-      - attach_workspace: 
+      - attach_workspace:
           at: .
       - run:
           name: Download cc-test-reporter
@@ -86,10 +86,10 @@ workflows:
       - build-app:
           requires:
             - setup
-              
+
   develop:
     when:
-      equal: [ develop, << pipeline.git.branch >> ]
+      equal: [develop, << pipeline.git.branch >>]
     jobs:
       - setup
       - test:
@@ -104,7 +104,7 @@ workflows:
 
   deploy:
     when:
-      equal: [ master, << pipeline.git.branch >> ]
+      equal: [master, << pipeline.git.branch >>]
     jobs:
       - setup
       - test:

@@ -8,7 +8,7 @@ import { FindKeyResponse } from "./find-key-response.interface";
 const getConnectionConfig = () => {
   let state = store.getState();
   return parseConnectionString(state.connection!);
-}
+};
 
 const findKeys = async (query?: Query) => {
   let state = store.getState();
@@ -50,9 +50,9 @@ const findKeys = async (query?: Query) => {
       count: count.Count ?? keys.length,
     })
   );
-}
+};
 
 export default {
   getConnectionConfig,
   findKeys,
-}
+};

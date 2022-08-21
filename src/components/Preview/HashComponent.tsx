@@ -29,7 +29,9 @@ const HashComponent: React.FC<Props> = (props) => {
     value: string;
     new: boolean;
   }>();
-  const connection = useSelector<State, Connection | undefined>(state => state.connection);
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
   const dispatch = useDispatch();
 
   const handleAddOpen = () => {
@@ -37,7 +39,12 @@ const HashComponent: React.FC<Props> = (props) => {
   };
   const handleItemSubmit = async (item: { key: string; value: string }) => {
     const cstr = parseConnectionString(connection!);
-    const response = await invoke<FindKeyResponse>('alter_hash', {cstr, action: "add_member", key, value: JSON.stringify(item) });
+    const response = await invoke<FindKeyResponse>("alter_hash", {
+      cstr,
+      action: "add_member",
+      key,
+      value: JSON.stringify(item),
+    });
 
     if (response.Error) {
       dispatch(
@@ -58,7 +65,12 @@ const HashComponent: React.FC<Props> = (props) => {
 
   const handleItemDelete = async (item: { key: string; value: string }) => {
     const cstr = parseConnectionString(connection!);
-    const response = await invoke<FindKeyResponse>('alter_hash', {cstr, action: "del_member", key, value: item.key });
+    const response = await invoke<FindKeyResponse>("alter_hash", {
+      cstr,
+      action: "del_member",
+      key,
+      value: item.key,
+    });
 
     if (response.Error) {
       dispatch(

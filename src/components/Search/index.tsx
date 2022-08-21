@@ -44,7 +44,14 @@ const Search = () => {
     if (!isSearching) {
       dispatch(actions.setSearching(true));
       dispatch(actions.setData([]));
-      dispatch(actions.setQuery({ input: match ? match : "*", cursor: 0, done: false, count: 0 }));
+      dispatch(
+        actions.setQuery({
+          input: match ? match : "*",
+          cursor: 0,
+          done: false,
+          count: 0,
+        })
+      );
 
       await invoke("search", {
         cstr: parseConnectionString(connection!),
@@ -56,7 +63,6 @@ const Search = () => {
     }
 
     dispatch(actions.setSearching(false));
-
   };
 
   const handleKeyListener = async (
@@ -78,12 +84,14 @@ const Search = () => {
     const response = await invoke<any>("select_db", {
       dbIndex: db?.value ?? 0,
     });
-    
-    if(response.Error) {
-      dispatch(actions.setError({
-        title: "Error",
-        message: response.Error,
-      }))
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
 
       dispatch(actions.setLoading(false));
       return false;

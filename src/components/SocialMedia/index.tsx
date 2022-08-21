@@ -1,4 +1,4 @@
-import { open } from '@tauri-apps/api/shell';
+import { open } from "@tauri-apps/api/shell";
 import React from "react";
 import styled from "styled-components";
 

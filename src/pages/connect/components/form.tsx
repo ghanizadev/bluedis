@@ -13,7 +13,7 @@ export const Form = styled.div`
     height: 26px;
     background-color: transparent;
     border: none;
-    color: ${props => props.theme.text};
-    border-bottom: 1px solid ${props => props.theme.foreground} ;
+    color: ${(props) => props.theme.text};
+    border-bottom: 1px solid ${(props) => props.theme.foreground};
   }
 `;

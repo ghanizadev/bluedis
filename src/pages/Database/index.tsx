@@ -56,10 +56,12 @@ const Home = () => {
     });
 
     if (response.Error) {
-      dispatch(actions.setError({
-        title: "Error",
-        message: response.Error,
-      }));
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
 
       loading(false);
       await services.findKeys();
@@ -68,8 +70,7 @@ const Home = () => {
 
     let data = response.Response!.Single!;
 
-    if(data.key)
-      dispatch(actions.setPreview(parseKey(data.key)));
+    if (data.key) dispatch(actions.setPreview(parseKey(data.key)));
     else {
       await services.findKeys();
     }
@@ -120,7 +121,6 @@ const Home = () => {
     ttl: number,
     ttlAbsolute: boolean
   ) => {
-
     let response = await invoke<any>("create_key", {
       keyName: key,
       keyType: type,
@@ -136,13 +136,11 @@ const Home = () => {
   React.useEffect(() => {
     if (!connected) return;
 
-    invoke<{ Count?: number; Error?: string }>("db_count").then(
-      (response) => {
-        if (response.Count) {
-          dispatch(actions.setCount(response.Count));
-        }
+    invoke<{ Count?: number; Error?: string }>("db_count").then((response) => {
+      if (response.Count) {
+        dispatch(actions.setCount(response.Count));
       }
-    );
+    });
   }, [data, connected]);
 
   return (

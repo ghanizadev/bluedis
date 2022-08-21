@@ -52,7 +52,7 @@ const ButtonsWrapper = styled.div`
 
 const InputName = styled(Input)`
   border: none;
-  color: ${props => props.theme.text};
+  color: ${(props) => props.theme.text};
   border-bottom: 1px solid ${(props) => props.theme.foreground};
   background-color: transparent;
 `;

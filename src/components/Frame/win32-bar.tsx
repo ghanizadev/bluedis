@@ -28,14 +28,17 @@ export const Win32Bar: FC<{ title?: string }> = ({ title }) => {
   };
 
   const handleMaximize = async () => {
-    await appWindow.isMaximized()
+    (await appWindow.isMaximized())
       ? await appWindow.unmaximize()
-      : await appWindow.maximize()
+      : await appWindow.maximize();
   };
 
   return (
     <Bar data-testid={"win32-bar"}>
-      <TitleWrapper data-tauri-drag-region={true} style={{ display: "flex", flex: 1 }}>
+      <TitleWrapper
+        data-tauri-drag-region={true}
+        style={{ display: "flex", flex: 1 }}
+      >
         <img
           src={"/icon.png"}
           alt=""
@@ -46,9 +49,17 @@ export const Win32Bar: FC<{ title?: string }> = ({ title }) => {
         </Title>
       </TitleWrapper>
       <ButtonWrapper windows>
-        <Resize data-testid="frame-minimize" onClick={handleMinimize} image={"minus"} />
-        <Resize data-testid="frame-maximize" onClick={handleMaximize} image={"square"} />
-        <Close data-testid="frame-close" onClick={handleClose}  image={"x"} />
+        <Resize
+          data-testid="frame-minimize"
+          onClick={handleMinimize}
+          image={"minus"}
+        />
+        <Resize
+          data-testid="frame-maximize"
+          onClick={handleMaximize}
+          image={"square"}
+        />
+        <Close data-testid="frame-close" onClick={handleClose} image={"x"} />
       </ButtonWrapper>
     </Bar>
   );

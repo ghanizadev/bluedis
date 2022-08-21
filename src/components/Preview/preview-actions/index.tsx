@@ -30,7 +30,6 @@ export const PreviewActions: FC<PreviewActionsProps> = (props) => {
   const { item, onAddClick, onSaveClick } = props;
 
   const connection = useSelector<State, Connection | undefined>(
-  
     (state) => state.connection
   );
   const [deleting, setDeleting] = React.useState(false);
