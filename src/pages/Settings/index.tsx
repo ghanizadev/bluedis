@@ -7,7 +7,6 @@ import Toggle from "../../components/Toggle";
 import { State } from "../../redux/Types/State";
 import { Settings as ISettings } from "../../redux/Types/Settings";
 import { actions, store } from "../../redux/store";
-import { savePreferences, wipeData } from "../../services/main-process";
 import Button from "../../components/Button";
 import { DarkTheme, LightTheme } from "../../theme";
 import { t } from "../../i18n";
@@ -18,6 +17,9 @@ import { Content } from "./Content";
 import { Row } from "./Row";
 import { Subtitle } from "./Subtitle";
 import { FONTS, LANGUAGES } from "./settings.constants";
+import { invoke } from "@tauri-apps/api";
+import { merge } from "../../shared/helpers/merge.helper";
+import { DeepPartial } from "@reduxjs/toolkit";
 
 const Settings = () => {
   const settings = useSelector<State, ISettings>((state) => state.settings);
@@ -25,23 +27,29 @@ const Settings = () => {
 
   const fontSizeRef = useRef<HTMLInputElement>(null);
 
-  const saveChanges = () => {
-    const settings = store.getState().settings;
-    savePreferences(settings);
+  const saveChanges = async (s: ISettings) => {
+    const pref = {
+      id: 1,
+      dark_mode: !!s.appearance.darkTheme,
+      font_name: s.appearance.fontFamily,
+      font_size: parseInt(s.appearance.fontSize),
+      language: s.region.language,
+    };
+    await invoke("save_preference", { pref });
   };
 
   const handleDarkModeChange = () => {
     const darkTheme = !settings.appearance.darkTheme;
 
-    dispatch(
-      actions.changeAppearance({
-        ...settings.appearance,
+    let payload: DeepPartial<ISettings> = {
+      appearance: {
         ...(darkTheme ? DarkTheme : LightTheme),
         darkTheme,
-      })
-    );
+      },
+    };
 
-    saveChanges();
+    dispatch(actions.updatePreferences(payload));
+    saveChanges(merge<ISettings>(settings, payload));
   };
 
   const handleLanguageChange = (value: string) => {
@@ -49,47 +57,44 @@ const Settings = () => {
 
     if (language === undefined) return;
 
-    dispatch(
-      actions.changeRegion({
-        ...settings.region,
+    let payload: DeepPartial<ISettings> = {
+      region: {
         language,
-      })
-    );
-    saveChanges();
+      },
+    };
+    dispatch(actions.updatePreferences(payload));
+    saveChanges(merge(settings, payload));
   };
 
   const handleFontFamilyChange = (value: string) => {
-    dispatch(
-      actions.changeAppearance({
-        ...settings.appearance,
+    let payload: DeepPartial<ISettings> = {
+      appearance: {
         fontFamily: value as AppearanceFont,
-      })
-    );
-    saveChanges();
+      },
+    };
+
+    dispatch(actions.updatePreferences(payload));
+    saveChanges(merge(settings, payload));
   };
 
-  const changeFont = () => {
+  const handleFontSizeChange = () => {
     if (!fontSizeRef.current) return;
 
     const value = fontSizeRef.current.value.match(/\d+/)?.join("");
 
-    dispatch(
-      actions.changeAppearance({
-        ...settings.appearance,
-        fontSize: `${value}pt`,
-      })
-    );
-    saveChanges();
-  };
-
-  const handleFontSizeChange = () => {
-    changeFont();
+    const payload: DeepPartial<ISettings> = {
+      appearance: {
+        fontSize: value,
+      },
+    };
+    dispatch(actions.updatePreferences(payload));
+    saveChanges(merge(settings, payload));
   };
 
   const handleFontSizeChangeOnEnter = (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
-    if (e.key === "Enter") changeFont();
+    if (e.key === "Enter") handleFontSizeChange();
   };
 
   const handleWipeData = () => {
@@ -97,8 +102,8 @@ const Settings = () => {
       actions.setConfirmation({
         title: t`Confirmation`,
         message: t`Do you really want to wipe all stored data? This includes all your preferences and favorites`,
-        onConfirm: () => {
-          wipeData();
+        onConfirm: async () => {
+          await invoke("wipe_data", {});
         },
       })
     );

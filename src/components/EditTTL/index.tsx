@@ -10,8 +10,10 @@ import { MessageBackground } from "../common/MessageBackground";
 import { MessageContent } from "../common/MessageContent";
 import { Input } from "../Input";
 import Toggle from "../Toggle";
-import * as services from "../../services/main-process";
 import { t } from "../../i18n";
+import { invoke } from "@tauri-apps/api";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 const Row = styled.div`
   display: flex;
@@ -36,15 +38,35 @@ const EditTTL: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!item) return;
-    services.setTTL(item.key, ttl, ttlAbsolute);
+    let response = await invoke<FindKeyResponse>("set_ttl", {
+      key: item.key,
+      ttl,
+      abs: ttlAbsolute,
+    });
+
+    if(response.Response?.Single)
+      dispatch(actions.setPreview(parseKey(response.Response?.Single.key)));
+
+    setTTL(0);
+    setTTLAbsolute(false);
     dispatch(actions.setEditTTL(undefined));
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     if (!item) return;
-    services.setTTL(item.key, -1);
+
+    const response = await invoke<FindKeyResponse>("set_ttl", {
+      key: item.key,
+      ttl: -1,
+    });
+
+    if (response.Response?.Single)
+      dispatch(actions.setPreview(parseKey(response.Response?.Single.key)));
+
+    setTTL(0);
+    setTTLAbsolute(false);
     dispatch(actions.setEditTTL(undefined));
   };
 
@@ -117,6 +139,7 @@ const EditTTL: React.FC = () => {
                 data-testid={"edit-ttl-cancel"}
               />
               <Button
+                disabled={ttl === 0}
                 label={t`Confirm`}
                 onClick={handleConfirm}
                 data-testid={"edit-ttl-confirm"}

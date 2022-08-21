@@ -1,0 +1,112 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
+  "build": {
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "devPath": "http://localhost:5173",
+    "distDir": "../dist",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "Bluedis",
+    "version": "0.2.3"
+  },
+  "tauri": {
+    "allowlist": {
+      "window": {
+        "center": true,
+        "close": true,
+        "hide": true,
+        "maximize": true,
+        "minimize": true,
+        "setFocus": true,
+        "show": true,
+        "unmaximize": true,
+        "unminimize": true,
+        "setTitle": true,
+        "requestUserAttention": true,
+        "startDragging": true,
+        "setFullscreen": true
+      },
+      "os": {
+        "all": true
+      },
+      "dialog": {
+        "save": true
+      },
+      "fs": {
+        "all": true,
+        "scope": {
+          "allow": [
+            "$APP/*",
+            "$DOCUMENT/*",
+            "$DESKTOP/*",
+            "$RESOURCE/*"
+          ]
+        }
+      },
+      "shell": {
+        "open": true
+      },
+      "path": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "category": "DeveloperTool",
+      "copyright": "",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "identifier": "com.ghanizadev.bluedis",
+      "longDescription": "",
+      "macOS": {
+        "license": null,
+        "minimumSystemVersion": "10.13",
+        "entitlements": "../config/entitlements.plist",
+        "exceptionDomain": "",
+        "frameworks": [],
+        "providerShortName": "UCR59P8R4M",
+        "signingIdentity": "3rd Party Mac Developer Application: GHANIZADEV LTD EOOD (UCR59P8R4M)"
+      },
+      "resources": [],
+      "shortDescription": "",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": "",
+        "webviewInstallMode": {
+          "type": "offlineInstaller"
+        }
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 600,
+        "resizable": true,
+        "title": "Bluedis",
+        "width": 800,
+        "decorations": false,
+        "minHeight": 600,
+        "minWidth": 800
+      }
+    ]
+  }
+}

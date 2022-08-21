@@ -21,6 +21,7 @@ const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
   );
   const [host, setHost] = React.useState("");
   const [name, setName] = React.useState("");
+  const [platform, setPlatform] = React.useState<string>();
 
   const formatName = (name: string) => {
     if (name.length > 30) {
@@ -68,12 +69,17 @@ const Frame: FC<{ children?: React.ReactNode | React.ReactNode[] }> = (
     }
   }, [connection, favorites, connected]);
 
+  useEffect(() => {
+    window.__TAURI__.os.platform().then((p: any) => setPlatform(p));
+  }, []);
+
+  if (!platform) return <div />;
+
   return (
     <Background data-testid="frame">
-      {window.electron.platform === "darwin" && (
+      {platform === "darwin" ? (
         <OSXBar title={`Bluedis ${host}${name}`} />
-      )}
-      {window.electron.platform !== "darwin" && (
+      ) : (
         <Win32Bar title={`Bluedis ${host}${name}`} />
       )}
       <WorkingArea>{props.children}</WorkingArea>

@@ -8,15 +8,15 @@ import { ItemType } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
 import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
-import {
-  addKey,
-  getDBCount,
-  updateData,
-  updatePreview,
-} from "../../services/main-process";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
 import Shell from "../../components/Shell";
+import { invoke } from "@tauri-apps/api";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { Query } from "../../redux/Types/Query";
+import services from "../../services";
+import { useLoading } from "../../shared/hooks/use-loading.hook";
 
 const Content = styled.div`
   width: 100%;
@@ -37,26 +37,73 @@ const Home = () => {
     (state) => state.preview
   );
   const connected = useSelector<State, boolean>((state) => state.connected);
+  const lastQuery = useSelector<State, Query>((state) => state.query);
 
   const [addItem, setAddItem] = React.useState(false);
 
   const dispatch = useDispatch();
+  const loading = useLoading();
 
-  const handlePreview = (item: ItemType) => {
-    if (preview === item) {
+  const handlePreview = async (item: ItemType) => {
+    if (preview?.key === item.key) {
       dispatch(actions.setPreview(undefined));
+      loading(false);
       return;
     }
 
-    updatePreview(item.key);
+    let response = await invoke<FindKeyResponse>("get_key", {
+      key: item.key,
+    });
+
+    if (response.Error) {
+      dispatch(actions.setError({
+        title: "Error",
+        message: response.Error,
+      }));
+
+      loading(false);
+      await services.findKeys();
+      return;
+    }
+
+    let data = response.Response!.Single!;
+
+    if(data.key)
+      dispatch(actions.setPreview(parseKey(data.key)));
+    else {
+      await services.findKeys();
+    }
+
+    loading(false);
   };
 
   const handlePreviewClose = () => {
     dispatch(actions.setPreview(undefined));
   };
 
-  const handleRefresh = () => {
-    updateData();
+  const handleRefresh = async () => {
+    dispatch(actions.setSearching(true));
+    let response = await invoke<FindKeyResponse>("find_keys", {
+      pattern: lastQuery.input,
+      cursor: 0,
+    });
+
+    dispatch(actions.setSearching(false));
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: "Failed refresh, check your connection",
+        })
+      );
+
+      return;
+    }
+
+    const { keys, cursor } = response.Response!.Collection;
+    dispatch(actions.setData(keys.map(parseKey)));
+    dispatch(actions.setQuery({ ...lastQuery, cursor, done: cursor === 0 }));
   };
 
   const handleAddCancel = () => {
@@ -67,18 +114,35 @@ const Home = () => {
     setAddItem(true);
   };
 
-  const handleAddConfirm = (
+  const handleAddConfirm = async (
     type: "set" | "zset" | "hash" | "string" | "list",
     key: string,
     ttl: number,
     ttlAbsolute: boolean
   ) => {
-    addKey(key, type, ttl, ttlAbsolute);
+
+    let response = await invoke<any>("create_key", {
+      keyName: key,
+      keyType: type,
+      ttl,
+      abs: ttlAbsolute,
+    });
+
+    await services.findKeys();
+    dispatch(actions.setPreview(parseKey(response.Response.Created)));
     setAddItem(false);
   };
 
   React.useEffect(() => {
-    connected && getDBCount();
+    if (!connected) return;
+
+    invoke<{ Count?: number; Error?: string }>("db_count").then(
+      (response) => {
+        if (response.Count) {
+          dispatch(actions.setCount(response.Count));
+        }
+      }
+    );
   }, [data, connected]);
 
   return (

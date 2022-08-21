@@ -1,0 +1,35 @@
+[package]
+name = "Bluedis"
+version = "0.2.3"
+description = ""
+authors = ["ghanizadev <jf.melo6@gmail.com>"]
+license = ""
+repository = ""
+default-run = "Bluedis"
+edition = "2021"
+rust-version = "1.57"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1.0.4", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "1.0.5", features = ["dialog-save", "fs-all", "os-all", "path-all", "shell-open", "window-center", "window-close", "window-hide", "window-maximize", "window-minimize", "window-request-user-attention", "window-set-focus", "window-set-fullscreen", "window-set-title", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
+redis = { version = "0.21.5", features = ["tls"] }
+uuid = { version = "1.1.2", features = ["v4","fast-rng"] }
+rusqlite = { version = "0.28.0", features = ["bundled"] }
+tokio = { version = "1.20.1", features = ["full"] }
+tokio-util = { version="0.7.3" }
+futures = "0.3"
+sys-locale = "0.2.1"
+
+[features]
+# by default Tauri runs in production mode
+# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
+default = [ "custom-protocol" ]
+# this feature is used used for production builds where `devPath` points to the filesystem
+# DO NOT remove this
+custom-protocol = [ "tauri/custom-protocol" ]

@@ -5,10 +5,11 @@ export type OpenProps = {
 };
 export const Container = styled.div<OpenProps>`
   width: ${(props) => (props.open ? "200px" : "35px")};
+  ${(props) => (props.open ? "min-width: 200px;" : "min-width: unset;")};
   height: 100%;
   padding: 5px;
   overflow-x: hidden;
 
   background-color: ${(props) => props.theme.sidebarBackground};
-  transition: width 250ms ease-out;
+  transition: all 250ms ease-out;
 `;

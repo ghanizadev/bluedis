@@ -1,6 +1,6 @@
 import { Confirmation } from "./Confirmation";
 import { Connection } from "./Connection";
-import { Error } from "./Error";
+import { IError } from "./IError";
 import { ItemType } from "./Item";
 import { Page } from "./Page";
 import { Settings } from "./Settings";
@@ -18,7 +18,7 @@ export type State = {
   settings: Settings;
   connection?: Connection;
   favorites: Connection[];
-  error?: Error;
+  error?: IError;
   confirmation?: Confirmation;
   lastRefresh: Date;
   currentTotalDocs: number; //TODO remove this thing here, for god sake

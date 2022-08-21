@@ -1,18 +1,21 @@
 import React, { FC } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { PreviewActionButton } from "../../common/PreviewActionButton";
 import { t } from "../../../i18n";
-import { ReactComponent as AddIcon } from "../../../assets/plus.svg";
-import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
-import { ReactComponent as TTLIcon } from "../../../assets/clock.svg";
-import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
-import { ReactComponent as SaveIcon } from "../../../assets/save.svg";
-import { deleteKey } from "../../../services/main-process";
+import AddIcon from "../../../assets/Plus";
+import CopyIcon from "../../../assets/Clipboard";
+import TTLIcon from "../../../assets/Clock";
+import RemoveIcon from "../../../assets/Trash";
+import SaveIcon from "../../../assets/Save";
 import { ItemType } from "../../../redux/Types/Item";
 import { actions } from "../../../redux/store";
 
 import { Container } from "./container";
+import { invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../../shared/helpers/parse-connection-string.helper";
+import { Connection } from "../../../redux/Types/Connection";
+import { State } from "../../../redux/Types/State";
 
 let timeout: NodeJS.Timeout;
 
@@ -26,20 +29,29 @@ export interface PreviewActionsProps {
 export const PreviewActions: FC<PreviewActionsProps> = (props) => {
   const { item, onAddClick, onSaveClick } = props;
 
+  const connection = useSelector<State, Connection | undefined>(
+  
+    (state) => state.connection
+  );
   const [deleting, setDeleting] = React.useState(false);
   const dispatch = useDispatch();
 
-  const handleDocumentCopy = () => {
+  const handleDocumentCopy = async () => {
     const text = JSON.stringify({ [item.key]: item.value });
-    navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(text);
   };
 
   const handleDocumentDelete = () => {
     setDeleting(true);
 
-    timeout = setTimeout(() => {
+    timeout = setTimeout(async () => {
+      await invoke("rm_keys", {
+        cstr: parseConnectionString(connection!),
+        keys: [item.key],
+      });
+      dispatch(actions.removeDocument([item.key]));
+      dispatch(actions.setPreview());
       setDeleting(false);
-      deleteKey([item.key]);
     }, 1000);
   };
 

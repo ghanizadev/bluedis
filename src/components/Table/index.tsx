@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -6,7 +6,6 @@ import Checkbox from "../Checkbox";
 import { ItemType } from "../../redux/Types/Item";
 import { actions } from "../../redux/store";
 import { State } from "../../redux/Types/State";
-import { loadMore } from "../../services/main-process";
 import { Query } from "../../redux/Types/Query";
 import { t } from "../../i18n";
 import { useLoading } from "../../shared/hooks/use-loading.hook";
@@ -16,6 +15,11 @@ import { Type } from "./Type";
 import { Data } from "./Data";
 import { Header } from "./Header";
 import { Container } from "./Container";
+import { invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { Connection } from "../../redux/Types/Connection";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 const Row = styled.tr`
   height: 32px;
@@ -73,6 +77,7 @@ const Table: React.FC<Props> = (props) => {
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
+  const currentTotal = useSelector<State, number>((state) => state.currentTotalDocs);
   const isSearching = useSelector<State, boolean>((state) => state.isSearching);
 
   const handleItemEdit = (item: ItemType) => {
@@ -89,9 +94,15 @@ const Table: React.FC<Props> = (props) => {
     else dispatch(actions.pushSelected(key));
   };
 
-  const handleLoadMore = useCallback(() => {
-    loadMore(query.input, query.cursor);
-  }, [query]);
+  const handleLoadMore = async () => {
+    dispatch(actions.setSearching(true));
+    await invoke<FindKeyResponse>("search", {
+      pattern: query.input,
+      cursor: query.cursor,
+    });
+
+    dispatch(actions.setSearching(false));
+  };
 
   return (
     <Container data-testid={"database-table-container"}>
@@ -139,7 +150,7 @@ const Table: React.FC<Props> = (props) => {
                 <Data
                   data-testid={"database-table-item-type"}
                   align="center"
-                  style={{ width: "15%" }}
+                  style={{ width: "15%", minWidth: 75 }}
                 >
                   <Type>{item.type}</Type>
                 </Data>
@@ -165,8 +176,8 @@ const Table: React.FC<Props> = (props) => {
         <LoadMore>
           <span>
             {query.done && t`showing all ${currentCount} keys`}
-            {!query.done && t`showing ${currentCount} keys - `}
-            {query.cursor !== 0 && (
+            {!query.done && t`showing ${currentCount} of ${currentTotal} keys - `}
+            {!query.done && (
               <button
                 disabled={query.cursor === 0}
                 onClick={handleLoadMore}

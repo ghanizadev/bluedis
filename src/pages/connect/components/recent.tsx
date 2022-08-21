@@ -5,7 +5,7 @@ export const Recent = styled.div`
   display: flex;
   flex-direction: column;
   border-left: 1px solid gray;
-  margin: 0 15px;
-  padding: 0 15px;
-  width: 230px;
+  padding: 0 0 0 15px;
+  grid-column: 2;
+  grid-row: 1;
 `;

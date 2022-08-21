@@ -7,8 +7,8 @@ import { MessageContent } from "../../common/MessageContent";
 import { MessageButtonWrapper } from "../../common/MessageButtonWrapper";
 import { PreviewActionButton } from "../../common/PreviewActionButton";
 import { PreviewActions } from "../../common/PreviewActions";
-import { ReactComponent as RemoveIcon } from "../../../assets/trash.svg";
-import { ReactComponent as CopyIcon } from "../../../assets/clipboard.svg";
+import RemoveIcon from "../../../assets/Trash";
+import CopyIcon from "../../../assets/Clipboard";
 import { t } from "../../../i18n";
 
 type Props = {
@@ -55,14 +55,14 @@ const AddListMember: React.FC<Props> = (props) => {
             data-testid="add-item-modal-copy"
             onClick={handleItemCopy}
           >
-            <CopyIcon title={t`Copy as JSON`} />
+            <CopyIcon xlinkTitle={t`Copy as JSON`} />
           </PreviewActionButton>
           <PreviewActionButton
             data-testid="add-item-modal-remove"
             remove
             onClick={handleItemRemove}
           >
-            <RemoveIcon title={t`Remove property`} />
+            <RemoveIcon xlinkTitle={t`Remove property`} />
           </PreviewActionButton>
         </PreviewActions>
         <MessageButtonWrapper>

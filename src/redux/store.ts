@@ -3,17 +3,20 @@ import {
   configureStore,
   createSlice,
   getDefaultMiddleware,
+  DeepPartial,
 } from "@reduxjs/toolkit";
 
 import { Appearance } from "./Types/Appearance";
 import { Confirmation } from "./Types/Confirmation";
 import { Connection } from "./Types/Connection";
-import { Error } from "./Types/Error";
+import { IError } from "./Types/IError";
 import { ItemType } from "./Types/Item";
 import { Page } from "./Types/Page";
 import { State } from "./Types/State";
 import { Query } from "./Types/Query";
 import { Region } from "./Types/Region";
+import { Settings } from "./Types/Settings";
+import { merge } from "../shared/helpers/merge.helper";
 
 const initialState: State = {
   currentTotalDocs: 0,
@@ -43,7 +46,7 @@ const initialState: State = {
     stdout: [
       "Bluedis Terminal (Beta)",
       "\u00a0",
-      'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
+      'This terminal is under tests still. Type "help" to check for commands.rs or go to Help tab.',
       "\u00a0",
     ],
   },
@@ -96,8 +99,11 @@ const slice = createSlice({
     changeRegion: (state, action: PayloadAction<Region>) => {
       state.settings.region = action.payload;
     },
-    updatePreferences: (state, action) => {
-      state.settings = { ...state.settings, ...action.payload };
+    updatePreferences: (
+      state,
+      action: PayloadAction<DeepPartial<Settings>>
+    ) => {
+      state.settings = merge<Settings>(state.settings, action.payload);
     },
     currentConnection: (state, action: PayloadAction<Connection>) => {
       state.connection = action.payload;
@@ -116,7 +122,7 @@ const slice = createSlice({
     updateLicense: (state, action: PayloadAction<string>) => {
       state.settings.license = action.payload;
     },
-    setError: (state, action: PayloadAction<Error | undefined>) => {
+    setError: (state, action: PayloadAction<IError | undefined>) => {
       state.error = action.payload;
     },
     setConfirmation: (
@@ -159,7 +165,7 @@ const slice = createSlice({
       state.terminal.stdout = [
         "Bluedis Terminal (Beta)",
         "\u00a0",
-        'This terminal is under tests still. Type "help" to check for commands or go to Help tab.',
+        'This terminal is under tests still. Type "help" to check for commands.rs or go to Help tab.',
         "\u00a0",
       ];
     },

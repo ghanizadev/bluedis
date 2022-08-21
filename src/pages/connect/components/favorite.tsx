@@ -1,29 +1,23 @@
 import React, { FC } from "react";
 import styled from "styled-components";
 
-import { ReactComponent as CloseIcon } from "../../../assets/close.svg";
 import { Connection } from "../../../redux/Types/Connection";
 
 const Container = styled.li`
+  position: relative;
+
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 200px;
+  width: 100%;
   height: 40px;
   margin-bottom: 8px;
   padding: 3px;
   cursor: pointer;
 
   &:hover {
-    background-color: ${(props) => props.theme.foreground};
-    color: ${(props) => props.theme.innerText};
-  }
-
-  & svg {
-    width: 16px;
-    height: 16px;
-    min-width: 16px;
+    color: ${(props) => props.theme.foreground};
   }
 `;
 
@@ -38,6 +32,30 @@ const InnerText = styled.span`
   }
 `;
 
+const CloseButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  background-image: url("/close.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  background-color: transparent;
+  border: none;
+
+  height: 16px;
+  width: 16px;
+
+  filter: invert(1);
+
+  &:hover {
+    filter: invert(0);
+    background-color: ${(props) => props.theme.innerText};
+  }
+`;
+
 type Props = {
   connection: Connection;
   onConnect: (connection: Connection) => void;
@@ -48,7 +66,7 @@ export const Favorite: FC<Props> = (props) => {
   const { connection, onConnect, onRemove } = props;
 
   const handleRemove = (connection: Connection) => {
-    return (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    return (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       onRemove(connection);
     };
@@ -60,7 +78,7 @@ export const Favorite: FC<Props> = (props) => {
         <br />
         redis://{connection.host}:{connection.port}
       </InnerText>
-      <CloseIcon onClick={handleRemove(connection)} />
+      <CloseButton onClick={handleRemove(connection)} />
     </Container>
   );
 };

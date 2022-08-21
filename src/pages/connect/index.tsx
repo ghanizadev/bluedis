@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { nanoid } from "nanoid";
 import { useDispatch, useSelector } from "react-redux";
 
-import { connect, saveFavorites } from "../../services/main-process";
 import { actions, store } from "../../redux/store";
 import { State } from "../../redux/Types/State";
 import { Connection } from "../../redux/Types/Connection";
@@ -17,38 +16,120 @@ import { LoginButton } from "./components/login-button";
 import { Recent } from "./components/recent";
 import { ListWrapper } from "./components/list-wrapper";
 import { ConnectionList } from "./components/connection-list";
+import { invoke } from "@tauri-apps/api";
+import { ConnectionResponse } from "../../services/connection-response.interface";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import services from "../../services";
+import Toggle from "../../components/Toggle";
 
 const Connect = () => {
-  const [connection, setConnection] = React.useState({
+  const [connection, setConnection] = React.useState<Connection>({
     host: "localhost",
     port: "6379",
     password: "",
     tls: false,
+    id: "new-connection",
   });
   const favorites = useSelector<State, Connection[]>(
     (state) => state.favorites
   );
   const dispatch = useDispatch();
 
-  const handleRemoveFromHistory = (connection: Connection) => {
-    dispatch(actions.removeFavorite(connection.id));
-    const updated = store.getState();
-    saveFavorites(updated.favorites);
-  };
-
-  const handleConnectFromHistory = (connection: Connection) => {
-    dispatch(actions.currentConnection(connection));
-    connect(connection);
-  };
-
-  const handleConnect = () => {
-    dispatch(actions.currentConnection({ ...connection, id: nanoid(8) }));
+  const connect = async (conn: Connection) => {
     dispatch(actions.setLoading(true));
-    connect(connection);
+
+    let connectionString = parseConnectionString(conn);
+
+    let connect = await invoke<ConnectionResponse>("authenticate", {
+      cstr: connectionString,
+    });
+
+    if (connect.Error || !connect.Success) {
+      dispatch(actions.setLoading(false));
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: !connect.Success
+            ? "Failed to login, check your credentials and internet connection"
+            : connect.Error ?? "Internal error",
+        })
+      );
+
+      console.error(connect.Error);
+      return;
+    }
+
+    dispatch(actions.currentConnection({ ...conn, id: nanoid(8) }));
+    await services.findKeys();
+
+    const info = await invoke<any>("get_info");
+    const config = await invoke<any>("get_config");
+
+    //TODO config/info tab
+    try {
+      console.log(JSON.parse(info));
+      console.log(JSON.parse(config));
+    } catch (e) {
+      console.log(info);
+      console.log(config);
+    }
+  };
+
+  const updateFavorites = async (favorites: Connection[]) => {
+    await Promise.all(
+      favorites.map(async (fav) => {
+        let resp = await invoke<any>("save_favorite", {
+          fav: { ...fav, port: +fav.port },
+        });
+
+        if (resp.Error)
+          dispatch(
+            actions.setError({
+              title: "Error",
+              message: resp.Error,
+            })
+          );
+      })
+    );
+  };
+
+  const handleRemoveFromHistory = async (connection: Connection) => {
+    dispatch(actions.removeFavorite(connection.id));
+    const resp = await invoke<{ Error?: string }>("del_favorite", {
+      id: connection.id,
+    });
+
+    if (resp.Error)
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: resp.Error,
+        })
+      );
+  };
+
+  const handleConnectFromHistory = async (conn: Connection) => {
+    return connect(conn);
+  };
+
+  const handleConnect = async () => {
+    return connect(connection);
   };
 
   const handleHostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConnection({ ...connection, host: e.target.value });
+    try {
+      const url = new URL(e.target.value);
+
+      setConnection({
+        ...connection,
+        host: url.hostname,
+        port: url.port,
+        password: url.password,
+        tls: url.protocol.startsWith("rediss"),
+      });
+    } catch (err) {
+      setConnection({ ...connection, host: e.target.value });
+    }
   };
   const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, port: e.target.value });
@@ -56,9 +137,13 @@ const Connect = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConnection({ ...connection, password: e.target.value });
   };
-  const handleTLSChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setConnection({ ...connection, tls: e.target.checked });
+  const handleTLSChange = () => {
+    setConnection((c) => ({ ...connection, tls: !c.tls }));
   };
+
+  useEffect(() => {
+    updateFavorites(favorites);
+  }, [favorites]);
 
   return (
     <>
@@ -66,30 +151,46 @@ const Connect = () => {
         <Content>
           <Form data-testid="connect-form">
             <h1>{t`Connect`}</h1>
+            <br />
             <label>
               {t`Host`}:
               <br />
               <input
-                defaultValue={connection.host}
+                value={connection.host}
                 onChange={handleHostChange}
+                spellCheck={false}
+                autoCapitalize={"off"}
               />
             </label>
             <label>
               {t`Port`}:
               <br />
               <input
-                defaultValue={connection.port}
+                value={connection.port}
                 onChange={handlePortChange}
+                spellCheck={false}
+                autoCapitalize={"off"}
               />
             </label>
             <label>
               {t`Password`}:
               <br />
-              <input type="password" onChange={handlePasswordChange} />
+              <input
+                type="password"
+                value={connection.password}
+                onChange={handlePasswordChange}
+              />
             </label>
-            <label>
-              <input type="checkbox" onChange={handleTLSChange} /> {t`Use TLS`}
+            <label
+              style={{
+                display: "inline-flex",
+                justifyContent: "space-between",
+              }}
+            >
+              {t`Use TLS`}
+              <Toggle checked={connection.tls} onChange={handleTLSChange} />
             </label>
+            <br />
             <LoginButton onClick={handleConnect}>{t`Connect`}</LoginButton>
           </Form>
           <Recent>

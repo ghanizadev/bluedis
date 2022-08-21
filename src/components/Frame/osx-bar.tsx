@@ -1,20 +1,11 @@
-import React, { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
-
-import { ReactComponent as CloseIcon } from "../../assets/close.svg";
-import { ReactComponent as MinimizeIcon } from "../../assets/minimize.svg";
-import { ReactComponent as MaximizeIcon } from "../../assets/maximize.svg";
-import {
-  close,
-  fullscreen,
-  maximize,
-  minimize,
-} from "../../services/main-process";
 import { useBlur } from "../../shared/hooks/use-blur.hook";
 
 import { Title } from "./Title";
 import { ButtonWrapper } from "./ButtonWrapper";
 import { MacButton } from "./mac-button";
+import { appWindow } from "@tauri-apps/api/window";
 
 export const Bar = styled.div`
   position: relative;
@@ -25,9 +16,6 @@ export const Bar = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-
-  -webkit-app-region: drag;
-  -webkit-user-select: none;
 `;
 
 const TitleWrapper = styled.div`
@@ -35,27 +23,57 @@ const TitleWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 22px;
+
+  &:hover {
+    cursor: grab;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
 `;
+
+let unlistenResize: () => void = () => {};
 
 export const OSXBar: FC<{ title?: string }> = ({ title }) => {
   const [hover, setHover] = useState(false);
   const { isBlurred } = useBlur();
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleClose = () => {
-    close();
+    appWindow.close();
   };
 
   const handleMinimize = () => {
-    minimize();
+    appWindow.minimize();
   };
 
-  const handleFullscreen = () => {
-    fullscreen();
+  const handleFullscreen = async () => {
+    await appWindow.setFullscreen(true);
   };
 
   const handleMaximize = () => {
-    maximize();
+    appWindow.maximize();
   };
+
+  useEffect(() => {
+    appWindow
+      .onResized(async () => {
+        let fullscreen = await appWindow.isFullscreen();
+        setIsFullscreen(fullscreen);
+        setHover(false);
+      })
+      .then((fn) => {
+        unlistenResize = fn;
+      });
+
+    return () => {
+      unlistenResize && unlistenResize();
+    };
+  }, [isFullscreen]);
+
+  if (isFullscreen) return <></>;
 
   return (
     <Bar data-testid={"osx-bar"}>
@@ -67,26 +85,31 @@ export const OSXBar: FC<{ title?: string }> = ({ title }) => {
           color={isBlurred ? "#ccc" : "hsl(0,100%,66%)"}
           data-testid="frame-close"
           onClick={handleClose}
-        >
-          {hover && <CloseIcon width={10} height={10} strokeWidth={2} />}
-        </MacButton>
+          image={"close"}
+          hover={hover}
+        />
         <MacButton
           color={isBlurred ? "#ccc" : "hsl(45,100%,50%)"}
           data-testid="frame-minimize"
           onClick={handleMinimize}
-        >
-          {hover && <MinimizeIcon width={10} height={10} strokeWidth={2} />}
-        </MacButton>
+          image={"minimize"}
+          hover={hover}
+        />
         <MacButton
           color={isBlurred ? "#ccc" : "hsl(127,98%,40%)"}
           data-testid="frame-fullscreen"
           onClick={handleFullscreen}
-        >
-          {hover && <MaximizeIcon width={10} height={10} strokeWidth={2} />}
-        </MacButton>
+          image={"maximize"}
+          hover={hover}
+        />
       </ButtonWrapper>
-      <TitleWrapper onDoubleClick={handleMaximize}>
-        <Title data-testid={"frame-titlebar"}>{title}</Title>
+      <TitleWrapper
+        data-tauri-drag-region={true}
+        onDoubleClick={handleMaximize}
+      >
+        <Title data-tauri-drag-region={true} data-testid={"frame-titlebar"}>
+          {title}
+        </Title>
       </TitleWrapper>
     </Bar>
   );

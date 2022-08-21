@@ -2,20 +2,14 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { State } from "../../redux/Types/State";
-import {
-  deleteKey,
-  disconnect,
-  exportItems,
-  saveFavorites,
-} from "../../services/main-process";
 import { actions, store } from "../../redux/store";
-import { ReactComponent as AddIcon } from "../../assets/plus.svg";
-import { ReactComponent as RefreshIcon } from "../../assets/refresh.svg";
-import { ReactComponent as RemoveIcon } from "../../assets/trash.svg";
-import { ReactComponent as DownloadIcon } from "../../assets/download.svg";
-import { ReactComponent as DisconnectIcon } from "../../assets/log-out.svg";
-import { ReactComponent as FavoriteIcon } from "../../assets/star.svg";
-import { ReactComponent as TerminalIcon } from "../../assets/terminal.svg";
+import AddIcon from "../../assets/Plus";
+import RefreshIcon from "../../assets/Refresh";
+import RemoveIcon from "../../assets/Trash";
+import DownloadIcon from "../../assets/Download";
+import DisconnectIcon from "../../assets/LogOut";
+import FavoriteIcon from "../../assets/Star";
+import TerminalIcon from "../../assets/Terminal";
 import { Connection } from "../../redux/Types/Connection";
 import { t } from "../../i18n";
 
@@ -24,6 +18,11 @@ import { LastRefresh } from "./LastRefresh";
 import PickName from "./PickName";
 import { Separator } from "./Separator";
 import { SquareButton } from "./SquareButton";
+import { dialog, fs, invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { documentDir, join } from "@tauri-apps/api/path";
 
 type Props = {
   onRefresh: () => void;
@@ -53,8 +52,34 @@ const Toolbar: React.FC<Props> = (props) => {
     onAddKey();
   };
 
-  const handleDownloadSelected = () => {
-    exportItems(selected);
+  const handleDownloadSelected = async () => {
+    let path = await dialog.save({
+      title: t`Save the query result`,
+      defaultPath: await join(await documentDir(), `query_result_${Date.now()}.json`),
+    });
+
+    console.log({ path });
+
+    if(!path) return;
+
+    const response = await invoke<FindKeyResponse>("get_keys", {
+      keys: selected,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          message: response.Error,
+          title: "Error",
+        })
+      );
+
+      return;
+    }
+
+    const contents = response.Response?.Collection.keys.map(parseKey);
+
+    await fs.writeTextFile({ path, contents: JSON.stringify(contents) })
   };
 
   const handleDeleteSelected = () => {
@@ -68,16 +93,27 @@ const Toolbar: React.FC<Props> = (props) => {
       actions.setConfirmation({
         message,
         title,
-        onConfirm: () => {
-          deleteKey(selected);
+        onConfirm: async () => {
+          await invoke("rm_keys", {
+            cstr: parseConnectionString(currentConnection!),
+            keys: selected,
+          })
+
           dispatch(actions.clearSelection());
+          dispatch(actions.removeDocument(selected));
+          dispatch(actions.setPreview());
         },
       })
     );
   };
 
-  const handleDisconnect = () => {
-    disconnect();
+  const handleDisconnect = async () => {
+    await invoke("disconnect");
+    dispatch(actions.setConnected(false));
+    dispatch(actions.resetTerminal());
+    dispatch(actions.setData([]));
+    dispatch(actions.setLoading(false));
+    dispatch(actions.setSearching(false));
   };
 
   const handleTerminal = () => {
@@ -88,13 +124,28 @@ const Toolbar: React.FC<Props> = (props) => {
     setNewName(true);
   };
 
-  const handleNewFavoriteName = (name: string) => {
+  const handleNewFavoriteName = async (name: string) => {
     if (currentConnection) {
       dispatch(actions.addFavorite({ ...currentConnection, name }));
       dispatch(actions.currentConnection({ ...currentConnection, name }));
 
       const updated = store.getState();
-      saveFavorites(updated.favorites);
+
+      await Promise.all(
+        updated.favorites.map(async (fav) => {
+          let resp = await invoke<any>("save_favorite", {
+            fav: { ...fav, port: +fav.port },
+          });
+
+          if (resp.Error)
+            dispatch(
+              actions.setError({
+                title: "Error",
+                message: resp.Error,
+              })
+            );
+        })
+      );
     }
     setNewName(false);
   };
@@ -141,8 +192,9 @@ const Toolbar: React.FC<Props> = (props) => {
         <Separator />
         <SquareButton
           data-testid="data-shell"
-          title={t`Open terminal`}
+          title={t`Terminal - Beta`}
           onClick={handleTerminal}
+          disabled={true}
         >
           <TerminalIcon />
         </SquareButton>

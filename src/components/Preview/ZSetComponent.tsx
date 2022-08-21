@@ -5,11 +5,18 @@ import { PreviewContainer } from "../common/PreviewContainer";
 import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { PreviewTableData } from "../common/PreviewTableData";
-import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddOrderedItem from "./AddOrderedItem";
 import { PreviewActions } from "./preview-actions";
+import { invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { useDispatch, useSelector } from "react-redux";
+import { Connection } from "../../redux/Types/Connection";
+import { State } from "../../redux/Types/State";
+import { actions } from "../../redux/store";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
 
 type Props = {
   item: Item<ZSetType>;
@@ -17,6 +24,10 @@ type Props = {
 
 const ZSetComponent: React.FC<Props> = (props) => {
   const { key, value, ttl } = props.item;
+  const dispatch = useDispatch();
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
 
   const [itemValue, setItemValue] = React.useState<{
     isNew?: boolean;
@@ -24,17 +35,60 @@ const ZSetComponent: React.FC<Props> = (props) => {
     value: string;
   }>();
 
-  const handleItemSubmit = (
+  const handleItemSubmit = async (
     oldValue: string,
     newValue: string,
     score: string
   ) => {
-    alterKey(key, [{ score, value: newValue }], { oldValue });
+    const cstr = parseConnectionString(connection!);
+    let response = await invoke<FindKeyResponse>("alter_zset", {
+      cstr,
+      action: "add_member",
+      key,
+      value: { score: +score, value: newValue },
+      oldValue,
+    });
+
+    if (response.Error) {
+      dispatch(
+          actions.setError({
+            title: "Error",
+            message: response.Error,
+          })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
+
     setItemValue(undefined);
   };
 
-  const handleItemDelete = (item: { score: string; value: string }) => {
-    delKeyMember(key, item.value);
+  const handleItemDelete = async (item: { score: string; value: string }) => {
+    const cstr = parseConnectionString(connection!);
+    let response = await invoke<FindKeyResponse>("alter_zset", {
+      cstr,
+      action: "del_member",
+      key,
+      oldValue: item.value,
+    });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
+
     setItemValue(undefined);
   };
 

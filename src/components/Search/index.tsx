@@ -3,9 +3,15 @@ import styled from "styled-components";
 
 import Button from "../Button";
 import Dropdown from "../Dropdown";
-import { findKeys, selectDatabase } from "../../services/main-process";
 import { t } from "../../i18n";
 import { InputAlt } from "../Input";
+import { invoke } from "@tauri-apps/api";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { useDispatch, useSelector } from "react-redux";
+import { Connection } from "../../redux/Types/Connection";
+import { State } from "../../redux/Types/State";
+import { actions } from "../../redux/store";
+import services from "../../services";
 
 const Container = styled.div`
   margin: 0 8px 5px 8px;
@@ -21,33 +27,72 @@ const SearchInput = styled(InputAlt)`
 
 const Search = () => {
   const [match, setMatch] = React.useState<string>();
-  const databases = [
-    { value: 0, name: "default" },
-    { value: 1, name: "DB 1" },
-    { value: 2, name: "DB 2" },
-    { value: 3, name: "DB 3" },
-    { value: 4, name: "DB 4" },
-    { value: 5, name: "DB 5" },
-  ];
-
+  const databases = Array.apply(null, Array(16)).map((_, index) => ({
+    value: index,
+    name: index === 0 ? "Default" : "DB #" + index,
+  }));
+  const connection = useSelector<State, Connection | undefined>(
+    (state) => state.connection
+  );
+  const isSearching = useSelector<State, boolean>((state) => state.isSearching);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMatch(e.target.value ?? "*");
   };
+  const dispatch = useDispatch();
 
-  const handleKeyListener = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const search = async () => {
+    if (!isSearching) {
+      dispatch(actions.setSearching(true));
+      dispatch(actions.setData([]));
+      dispatch(actions.setQuery({ input: match ? match : "*", cursor: 0, done: false, count: 0 }));
+
+      await invoke("search", {
+        cstr: parseConnectionString(connection!),
+        pattern: match ? match : "*",
+        cursor: 0,
+      });
+    } else {
+      await invoke("stop_query");
+    }
+
+    dispatch(actions.setSearching(false));
+
+  };
+
+  const handleKeyListener = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Enter") {
-      findKeys(match || "*", 0);
+      await search();
     }
   };
 
-  const handleSearch = () => {
-    findKeys(match || "*", 0);
+  const handleSearch = async () => {
+    await search();
   };
 
-  const handleDatabaseChange = (item: string) => {
+  const handleDatabaseChange = async (item: string) => {
     const db = databases.find((db) => db.name === item);
+    dispatch(actions.setLoading(true));
 
-    if (db) selectDatabase(db.value);
+    const response = await invoke<any>("select_db", {
+      dbIndex: db?.value ?? 0,
+    });
+    
+    if(response.Error) {
+      dispatch(actions.setError({
+        title: "Error",
+        message: response.Error,
+      }))
+
+      dispatch(actions.setLoading(false));
+      return false;
+    }
+
+    await services.findKeys();
+    dispatch(actions.setSearching(false));
+
+    return true;
   };
 
   return (
@@ -57,6 +102,7 @@ const Search = () => {
         data-testid={"search-input"}
         onChange={handleChange}
         onKeyDown={handleKeyListener}
+        disabled={isSearching}
       />
       <Dropdown
         data-testid={"search-dropdown"}
@@ -65,7 +111,7 @@ const Search = () => {
       />
       <Button
         data-testid={"search-button"}
-        label={t`Apply`}
+        label={isSearching ? t`Cancel` : t`Apply`}
         onClick={handleSearch}
       />
     </Container>

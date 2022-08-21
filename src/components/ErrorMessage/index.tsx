@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import Button from "../Button";
 import { actions } from "../../redux/store";
-import { Error } from "../../redux/Types/Error";
+import { IError } from "../../redux/Types/IError";
 import { State } from "../../redux/Types/State";
 import { MessageContent } from "../common/MessageContent";
 import { MessageBackground } from "../common/MessageBackground";
@@ -18,7 +18,9 @@ const ButtonsWrapper = styled.div`
 `;
 
 const ErrorMessage = () => {
-  const message = useSelector<State, Error | undefined>((state) => state.error);
+  const message = useSelector<State, IError | undefined>(
+    (state) => state.error
+  );
   const dispatch = useDispatch();
 
   const handleClose = () => {

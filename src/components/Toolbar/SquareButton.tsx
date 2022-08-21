@@ -32,5 +32,6 @@ export const SquareButton = styled.button<{
 
   &:disabled {
     color: gray;
+    cursor: not-allowed;
   }
 `;

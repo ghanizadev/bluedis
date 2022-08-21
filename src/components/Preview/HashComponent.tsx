@@ -5,11 +5,19 @@ import { PreviewTable } from "../common/PreviewTable";
 import { PreviewTableData } from "../common/PreviewTableData";
 import { PreviewTableRow } from "../common/PreviewTableRow";
 import { HashType, Item } from "../../redux/Types/Item";
-import { alterKey, delKeyMember } from "../../services/main-process";
 import { t } from "../../i18n";
 
 import AddHashItem from "./AddHashItem";
 import { PreviewActions } from "./preview-actions";
+import { invoke } from "@tauri-apps/api";
+import { useSelector } from "react-redux";
+import { State } from "../../redux/Types/State";
+import { Connection } from "../../redux/Types/Connection";
+import { useDispatch } from "react-redux";
+import { parseConnectionString } from "../../shared/helpers/parse-connection-string.helper";
+import { FindKeyResponse } from "../../services/find-key-response.interface";
+import { actions } from "../../redux/store";
+import { parseKey } from "../../shared/helpers/parse-key.helper";
 
 type Props = {
   item: Item<HashType>;
@@ -21,16 +29,51 @@ const HashComponent: React.FC<Props> = (props) => {
     value: string;
     new: boolean;
   }>();
+  const connection = useSelector<State, Connection | undefined>(state => state.connection);
+  const dispatch = useDispatch();
+
   const handleAddOpen = () => {
     setItemValue({ key: "", value: "", new: true });
   };
-  const handleItemSubmit = (item: { key: string; value: string }) => {
-    alterKey(key, { [item.key]: item.value });
+  const handleItemSubmit = async (item: { key: string; value: string }) => {
+    const cstr = parseConnectionString(connection!);
+    const response = await invoke<FindKeyResponse>('alter_hash', {cstr, action: "add_member", key, value: JSON.stringify(item) });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
+
     setItemValue(undefined);
   };
 
-  const handleItemDelete = (item: { key: string; value: string }) => {
-    delKeyMember(key, item.key);
+  const handleItemDelete = async (item: { key: string; value: string }) => {
+    const cstr = parseConnectionString(connection!);
+    const response = await invoke<FindKeyResponse>('alter_hash', {cstr, action: "del_member", key, value: item.key });
+
+    if (response.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
+
+      return;
+    }
+
+    let data = response.Response!.Single!;
+    dispatch(actions.setPreview(data.key ? parseKey(data.key) : undefined));
+
     setItemValue(undefined);
   };
 
