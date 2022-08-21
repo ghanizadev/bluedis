@@ -6,7 +6,6 @@ import Table from "../../components/Table";
 import Search from "../../components/Search";
 import { ItemType } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
-import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
@@ -17,6 +16,7 @@ import { parseKey } from "../../shared/helpers/parse-key.helper";
 import { Query } from "../../redux/Types/Query";
 import services from "../../services";
 import { useLoading } from "../../shared/hooks/use-loading.hook";
+import Preview from "../../components/Preview";
 
 const Content = styled.div`
   width: 100%;

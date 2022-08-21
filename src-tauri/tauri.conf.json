@@ -74,9 +74,7 @@
         "minimumSystemVersion": "10.13",
         "entitlements": "../config/entitlements.plist",
         "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": "UCR59P8R4M",
-        "signingIdentity": "3rd Party Mac Developer Application: GHANIZADEV LTD EOOD (UCR59P8R4M)"
+        "frameworks": []
       },
       "resources": [],
       "shortDescription": "",
