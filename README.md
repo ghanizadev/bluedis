@@ -15,4 +15,3 @@
   - Launchpad
   - Snapcraft
   - Standalone
-  

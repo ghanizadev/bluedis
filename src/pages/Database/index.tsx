@@ -6,7 +6,6 @@ import Table from "../../components/Table";
 import Search from "../../components/Search";
 import { ItemType } from "../../redux/Types/Item";
 import Toolbar from "../../components/Toolbar";
-import Preview from "../../components/Preview";
 import { actions } from "../../redux/store";
 import AddKey from "../../components/AddKey";
 import { State } from "../../redux/Types/State";
@@ -17,6 +16,7 @@ import { parseKey } from "../../shared/helpers/parse-key.helper";
 import { Query } from "../../redux/Types/Query";
 import services from "../../services";
 import { useLoading } from "../../shared/hooks/use-loading.hook";
+import Preview from "../../components/Preview";
 
 const Content = styled.div`
   width: 100%;
@@ -56,10 +56,12 @@ const Home = () => {
     });
 
     if (response.Error) {
-      dispatch(actions.setError({
-        title: "Error",
-        message: response.Error,
-      }));
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
+      );
 
       loading(false);
       await services.findKeys();
@@ -68,8 +70,7 @@ const Home = () => {
 
     let data = response.Response!.Single!;
 
-    if(data.key)
-      dispatch(actions.setPreview(parseKey(data.key)));
+    if (data.key) dispatch(actions.setPreview(parseKey(data.key)));
     else {
       await services.findKeys();
     }
@@ -120,7 +121,6 @@ const Home = () => {
     ttl: number,
     ttlAbsolute: boolean
   ) => {
-
     let response = await invoke<any>("create_key", {
       keyName: key,
       keyType: type,
@@ -136,13 +136,11 @@ const Home = () => {
   React.useEffect(() => {
     if (!connected) return;
 
-    invoke<{ Count?: number; Error?: string }>("db_count").then(
-      (response) => {
-        if (response.Count) {
-          dispatch(actions.setCount(response.Count));
-        }
+    invoke<{ Count?: number; Error?: string }>("db_count").then((response) => {
+      if (response.Count) {
+        dispatch(actions.setCount(response.Count));
       }
-    );
+    });
   }, [data, connected]);
 
   return (

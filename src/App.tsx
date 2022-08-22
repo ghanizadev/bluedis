@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ThemeProvider } from "styled-components";
 
@@ -17,7 +17,7 @@ import Loading from "./components/Loading";
 import { Appearance } from "./redux/Types/Appearance";
 import Connect from "./pages/connect";
 import { defaultAppearanceSettings, DarkTheme, LightTheme } from "./theme";
-import { actions, store } from "./redux/store";
+import { actions } from "./redux/store";
 import { invoke } from "@tauri-apps/api";
 import { Language } from "./i18n";
 import { Connection } from "./redux/Types/Connection";
@@ -35,11 +35,13 @@ const App = () => {
       "load_preference"
     );
 
-    if(settings.Error) {
-      dispatch(actions.setError({
-        title: "Error",
-        message: settings.Error,
-      }));
+    if (settings.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: settings.Error,
+        })
+      );
 
       return;
     }
@@ -59,13 +61,17 @@ const App = () => {
       })
     );
 
-    let favorites = await invoke<{ Error?: string, Collection: any[] }>("get_all_favorites");
+    let favorites = await invoke<{ Error?: string; Collection: any[] }>(
+      "get_all_favorites"
+    );
 
-    if(favorites.Error) {
-      dispatch(actions.setError({
-        title: "Error",
-        message: favorites.Error,
-      }));
+    if (favorites.Error) {
+      dispatch(
+        actions.setError({
+          title: "Error",
+          message: favorites.Error,
+        })
+      );
 
       return;
     }
@@ -85,16 +91,16 @@ const App = () => {
   };
 
   const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-  }
+    e.preventDefault();
+  };
 
-  React.useEffect(() => {
+  useEffect(() => {
     updateSettings();
 
-    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener("contextmenu", handleContextMenu);
     return () => {
-        document.removeEventListener('contextmenu', handleContextMenu);
-    }
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
   }, []);
 
   return (

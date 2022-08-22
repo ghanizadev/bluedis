@@ -77,7 +77,9 @@ const Table: React.FC<Props> = (props) => {
   const selected = useSelector<State, string[]>((state) => state.selected);
   const query = useSelector<State, Query>((state) => state.query);
   const currentCount = useSelector<State, number>((state) => state.data.length);
-  const currentTotal = useSelector<State, number>((state) => state.currentTotalDocs);
+  const currentTotal = useSelector<State, number>(
+    (state) => state.currentTotalDocs
+  );
   const isSearching = useSelector<State, boolean>((state) => state.isSearching);
 
   const handleItemEdit = (item: ItemType) => {
@@ -176,7 +178,8 @@ const Table: React.FC<Props> = (props) => {
         <LoadMore>
           <span>
             {query.done && t`showing all ${currentCount} keys`}
-            {!query.done && t`showing ${currentCount} of ${currentTotal} keys - `}
+            {!query.done &&
+              t`showing ${currentCount} of ${currentTotal} keys - `}
             {!query.done && (
               <button
                 disabled={query.cursor === 0}

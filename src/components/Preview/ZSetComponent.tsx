@@ -51,10 +51,10 @@ const ZSetComponent: React.FC<Props> = (props) => {
 
     if (response.Error) {
       dispatch(
-          actions.setError({
-            title: "Error",
-            message: response.Error,
-          })
+        actions.setError({
+          title: "Error",
+          message: response.Error,
+        })
       );
 
       return;

@@ -34,7 +34,11 @@
     ],
     "padding-line-between-statements": [
       "error",
-      { "blankLine": "always", "prev": ["var", "const", "function", "class"], "next": ["if", "while", "function"] }
+      {
+        "blankLine": "always",
+        "prev": ["var", "const", "function", "class"],
+        "next": ["if", "while", "function"]
+      }
     ]
   },
   "parser": "@typescript-eslint/parser",

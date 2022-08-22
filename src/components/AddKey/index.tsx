@@ -27,8 +27,8 @@ const Key = styled(Input)`
   flex: 1;
   background-color: transparent;
   margin-left: 6px;
-  border-bottom: 1px solid ${props => props.theme.foreground};
-  color: ${props => props.theme.text};
+  border-bottom: 1px solid ${(props) => props.theme.foreground};
+  color: ${(props) => props.theme.text};
 `;
 
 type Props = {

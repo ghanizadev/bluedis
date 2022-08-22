@@ -5,7 +5,7 @@ import { useClickOutside } from "../../shared/hooks/use-click-outside.hook";
 const Container = styled.div`
   margin: 0 5px;
   color: ${(props) => props.theme.innerText};
-  
+
   position: relative;
 `;
 
@@ -19,7 +19,7 @@ const Select = styled.button`
   background-color: ${(props) => props.theme.foreground};
 
   color: ${(props) => props.theme.innerText};
-  
+
   position: relative;
 `;
 
@@ -27,7 +27,7 @@ const Option = styled.div`
   background-color: #fff;
   color: ${(props) => props.theme.foreground};
   line-height: 30px;
-  
+
   &:hover {
     color: ${(props) => props.theme.text};
     background-color: ${(props) => props.theme.foreground};
@@ -48,11 +48,11 @@ const Arrow = styled.span`
 const Menu = styled.div`
   position: absolute;
   z-index: 1;
-  
+
   top: 40px;
   left: 0;
   right: 0;
-  
+
   max-height: 300px;
   overflow-y: auto;
 `;
@@ -75,30 +75,29 @@ const Dropdown: React.FC<Props> = (props) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(menuRef, () => {
-    handleFocus()
+    handleFocus();
   });
-
 
   const handleSelect = (item: string) => {
     return async () => {
-      if(!onChange) return;
+      if (!onChange) return;
       const success = await onChange(item);
 
       setIsOpen(false);
 
-      if(typeof success === 'boolean' && !success) return;
+      if (typeof success === "boolean" && !success) return;
 
       sv(item);
-    }
+    };
   };
 
   const handleOpen = () => {
-    setIsOpen(o => !o);
-  }
+    setIsOpen((o) => !o);
+  };
 
   const handleFocus = () => {
     setIsOpen(false);
-  }
+  };
 
   return (
     <Container>
@@ -107,15 +106,17 @@ const Dropdown: React.FC<Props> = (props) => {
         data-testid={props["data-testid"] ?? "dropdown-select"}
       >
         {v}
-        {isOpen && <Menu ref={menuRef}>
-          {items.map((item, index) => {
-            return (
-              <Option key={item + index} onClick={handleSelect(item)}>
-                {item}
-              </Option>
-            );
-          })}
-        </Menu>}
+        {isOpen && (
+          <Menu ref={menuRef}>
+            {items.map((item, index) => {
+              return (
+                <Option key={item + index} onClick={handleSelect(item)}>
+                  {item}
+                </Option>
+              );
+            })}
+          </Menu>
+        )}
       </Select>
       <Arrow>▾</Arrow>
     </Container>
