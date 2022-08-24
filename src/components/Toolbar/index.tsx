@@ -61,8 +61,6 @@ const Toolbar: React.FC<Props> = (props) => {
       ),
     });
 
-    console.log({ path });
-
     if (!path) return;
 
     const response = await invoke<FindKeyResponse>("get_keys", {
@@ -111,12 +109,14 @@ const Toolbar: React.FC<Props> = (props) => {
   };
 
   const handleDisconnect = async () => {
-    await invoke("disconnect");
     dispatch(actions.setConnected(false));
     dispatch(actions.resetTerminal());
     dispatch(actions.setData([]));
     dispatch(actions.setLoading(false));
     dispatch(actions.setSearching(false));
+    dispatch(actions.setPreview(undefined));
+    dispatch(actions.setQuery({ count: 0, cursor: 0, done: false, input: "*" }));
+    await invoke("disconnect");
   };
 
   const handleTerminal = () => {
