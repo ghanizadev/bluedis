@@ -2,7 +2,7 @@ name: bluedis
 title: Bluedis
 base: core20
 version: "0.2.4"
-architectures: [amd64]
+architectures: [amd64, i386]
 summary: An elegant Redis interface
 description: |
   This project was made aiming local debugging of Redis instances.
