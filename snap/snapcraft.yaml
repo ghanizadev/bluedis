@@ -12,7 +12,7 @@ description: |
   Checkout the GitHub repository for further information.
 
   https://github.com/ghanizadev/bluedis
-grade: devel
+grade: stable
 confinement: strict
 icon: snap/local/icon.png
 
@@ -32,7 +32,7 @@ environment:
 
 parts:
   bluedis:
-    source: .
+    source: ./.snapcraft
     plugin: npm
     build-snaps: [node/16/stable]
     npm-node-version: "8.x"
@@ -44,6 +44,7 @@ parts:
       - libgtk-3-dev
       - libwebkit2gtk-4.0-37
     override-build: |
+      npm ci
       npm run tauri build -- --bundles none
       mkdir -p "$SNAPCRAFT_PART_INSTALL/bin"
       cp "$SNAPCRAFT_PART_BUILD/src-tauri/target/release/bluedis" "$SNAPCRAFT_PART_INSTALL/bin"
