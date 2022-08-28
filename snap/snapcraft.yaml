@@ -1,8 +1,8 @@
 name: bluedis
 title: Bluedis
-base: core18
-version: "0.2.2"
-architectures: [amd64, i386]
+base: core20
+version: "0.2.4"
+architectures: [amd64]
 summary: An elegant Redis interface
 description: |
   This project was made aiming local debugging of Redis instances.
@@ -12,32 +12,40 @@ description: |
   Checkout the GitHub repository for further information.
 
   https://github.com/ghanizadev/bluedis
-grade: stable
+grade: devel
 confinement: strict
 icon: snap/local/icon.png
 
 apps:
   bluedis:
-    command: bin/bluedis --no-sandbox
-    extensions: [gnome-3-34]
+    command: bin/Bluedis
+    extensions: [gnome-3-38]
     plugs:
       - browser-support
       - network
       - network-bind
-    environment:
-      TMPDIR: $XDG_RUNTIME_DIR
+      - desktop
+      - desktop-legacy
+
+environment:
+  TMPDIR: $XDG_RUNTIME_DIR
 
 parts:
   bluedis:
-    plugin: nil
     source: .
-    override-build: |
-      cp -rv "$SNAPCRAFT_PART_BUILD"/out/Bluedis-* "$SNAPCRAFT_PART_INSTALL"
-      mv "$SNAPCRAFT_PART_INSTALL"/Bluedis-* "$SNAPCRAFT_PART_INSTALL"/bin
-    build-snaps:
-      - node/14/stable
+    plugin: npm
+    build-snaps: [node/16/stable]
+    npm-node-version: "8.x"
     build-packages:
-      - unzip
-    stage-packages:
-      - libnss3
-      - libnspr4
+      - cargo
+      - rustc
+      - openssl
+      - libssl-dev
+      - build-essential
+      - libgtk-3-dev
+      - libwebkit2gtk-4.0-37
+    override-build: |
+      npm run tauri build -- --bundles none
+      mkdir -p "$SNAPCRAFT_PART_INSTALL/bin"
+      cp "$SNAPCRAFT_PART_BUILD/src-tauri/target/release/bluedis" "$SNAPCRAFT_PART_INSTALL/bin"
+      mv "$SNAPCRAFT_PART_INSTALL/bin/bluedis" "$SNAPCRAFT_PART_INSTALL/bin/Bluedis"
