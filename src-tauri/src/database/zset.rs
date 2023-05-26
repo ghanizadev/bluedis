@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct ZSetKey {
-    score: i64,
-    value: String,
+    pub(crate) score: i64,
+    pub(crate) value: String,
 }
 
 pub fn marshall(data: Vec<String>) -> Result<String, Box<dyn std::error::Error>> {

@@ -13,9 +13,11 @@ pub async fn open_external(window: Window, link: String) -> Option<String> {
 
 #[tauri::command]
 async fn open_console(handle: tauri::AppHandle) {
-  let console_window = tauri::WindowBuilder::new(
-    &handle,
-    "console", /* the unique window label */
-    tauri::WindowUrl::App("index.html/#/console".parse().unwrap())
-  ).build().unwrap();
+    let console_window = tauri::WindowBuilder::new(
+        &handle,
+        "console", /* the unique window label */
+        tauri::WindowUrl::App("index.html/#/console".parse().unwrap()),
+    )
+    .build()
+    .unwrap();
 }
