@@ -10,18 +10,21 @@ mod persistence;
 mod state;
 
 use crate::persistence::{Persistence, Preference};
+use crate::state::AppState;
 use sys_locale::get_locale;
 
 #[tokio::main]
+#[cfg(not(tarpaulin_include))]
 async fn main() {
     let locale = get_locale().unwrap_or_else(|| String::from("en-US"));
 
-    persistence::Persistence::new();
+    Persistence::new(None);
 
-    println!("Locale: {:?}", locale);
+    let app_state = AppState::new();
+    *app_state.locale.lock().unwrap() = locale;
 
     tauri::Builder::default()
-        .manage(state::AppState::new())
+        .manage(app_state)
         .invoke_handler(tauri::generate_handler![
             database::commands::find_keys,
             database::commands::get_keys,
