@@ -28,7 +28,12 @@ function checkDistFolder(cb) {
 }
 
 function testCargo(cb) {
-  execSync(`REDIS_HOST="${redis_host}" REDIS_PORT="${redis_port}" cargo test --jobs 1 --manifest-path ./src-tauri/Cargo.toml`);
+  execSync(`REDIS_HOST="${redis_host}" REDIS_PORT="${redis_port}" $HOME/.cargo/bin/cargo test --jobs 1 --manifest-path ./src-tauri/Cargo.toml`);
+  cb();
+}
+
+function coverageCargo(cb) {
+  execSync(`REDIS_HOST="${redis_host}" REDIS_PORT="${redis_port}" $HOME/.cargo/bin/cargo tarpaulin --out lcov --output-dir ../coverage/app --manifest-path ./src-tauri/Cargo.toml`);
   cb();
 }
 
@@ -38,3 +43,4 @@ async function teardownTests(cb) {
 }
 
 export const test = gulp.series([setupTests, checkDistFolder, testCargo, teardownTests]);
+export const coverage = gulp.series([setupTests, checkDistFolder, coverageCargo, teardownTests]);

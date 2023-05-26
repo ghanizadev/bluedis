@@ -1,14 +1,20 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4.7.0
-
+  node: circleci/node@5.1.0
+  
 jobs:
   setup:
     docker:
-      - image: cimg/node:14.19.0
+      - image: alexhayton/docker-tauri-circleci
     steps:
       - checkout
+      - run:
+          name: Install Rust
+          command: |
+            sudo apt update &&\
+            sudo apt install curl -y &&\
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - node/install-packages:
           pkg-manager: npm
       - persist_to_workspace:
@@ -18,7 +24,7 @@ jobs:
 
   build-app:
     docker:
-      - image: cimg/node:14.19.0
+      - image: AlexHayton/docker-tauri-circleci
     steps:
       - attach_workspace:
           at: .
@@ -29,7 +35,7 @@ jobs:
             sudo apt install xfce4 fakeroot -y
       - run:
           name: Build app
-          command: npm run pack
+          command: npm run tauri build
       - persist_to_workspace:
           root: .
           paths:
@@ -37,27 +43,31 @@ jobs:
 
   test:
     docker:
-      - image: cimg/node:14.19.0
+      - image: AlexHayton/docker-tauri-circleci
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Run React tests with coverage
-          command: npm run test:react -- --coverage
-      - run:
-          name: Run App tests #TODO Add coverage
-          command: npm run test:app
+          name: Run tests
+          command: npm run test
       - persist_to_workspace:
           root: .
           paths:
             - .
 
-  code-coverage:
-    machine:
-      image: ubuntu-2004:current
+  coverage:
+    docker:
+      - image: AlexHayton/docker-tauri-circleci
     steps:
       - attach_workspace:
           at: .
+      - run:
+          name: Install Cargo reporter
+          command: |
+            cargo install cargo-tarpaulin
+      - run:
+          name: Generate coverage
+          command: npm run coverage
       - run:
           name: Download cc-test-reporter
           command: |
@@ -95,7 +105,7 @@ workflows:
       - test:
           requires:
             - setup
-      - code-coverage:
+      - coverage:
           requires:
             - test
       - build-app:
@@ -110,7 +120,7 @@ workflows:
       - test:
           requires:
             - setup
-      - code-coverage:
+      - coverage:
           requires:
             - test
       - build-app:
