@@ -54,50 +54,46 @@ mod database_tests {
     }
 
     #[tokio::test]
+    #[ignore]
     async fn it_should_change_ttl() {
-        // Set TTL
-        // Change TTL (absolute)
-        // Get absolute TTL
-        // Remove TTL
+        todo!()
     }
 
     #[tokio::test]
+    #[ignore]
     async fn it_should_create_with_ttl() {
-        // Create with TTL
-        // Create with absolute TTL
+        todo!()
     }
 
     #[tokio::test]
+    #[ignore]
     async fn it_should_search_keys() {
-        let db = Database::new("redis://localhost:6379".into());
-
-        db.create_key("test::search::a".into(), "string".into(), -1, false)
-            .await
-            .unwrap();
-        db.create_key("test::search::aq".into(), "string".into(), -1, false)
-            .await
-            .unwrap();
-        db.create_key("test::search::ab".into(), "string".into(), -1, false)
-            .await
-            .unwrap();
-        db.create_key("test::search::aaab".into(), "string".into(), -1, false)
-            .await
-            .unwrap();
-
-        // let keys = db.search_keys("".into(), 0, Some(100), State{ 0: &AppState::new() }, || {}).await.unwrap();
+        todo!()
     }
 
     #[tokio::test]
-    async fn it_should_not_create() {}
+    #[ignore]
+    async fn it_should_not_create() {
+      todo!()
+    }
 
     #[tokio::test]
-    async fn it_should_get_by_key_list() {}
+    #[ignore]
+    async fn it_should_get_by_key_list() {
+      todo!()
+    }
 
     #[tokio::test]
-    async fn it_should_delete_by_key_list() {}
+    #[ignore]
+    async fn it_should_delete_by_key_list() {
+      todo!()
+    }
 
     #[tokio::test]
-    async fn it_should_count() {}
+    #[ignore]
+    async fn it_should_count() {
+      todo!()
+    }
 
     #[tokio::test]
     async fn it_should_create_hash() {
