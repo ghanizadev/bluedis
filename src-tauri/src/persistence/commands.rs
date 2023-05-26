@@ -20,7 +20,7 @@ pub enum FavoriteResponse {
 
 #[tauri::command]
 pub async fn load_preference() -> PreferenceResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.get_preferences();
 
     match result {
@@ -33,7 +33,7 @@ pub async fn load_preference() -> PreferenceResponse {
 
 #[tauri::command]
 pub async fn save_preference(pref: Preference) -> PreferenceResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.save_preferences(pref);
 
     match result {
@@ -46,7 +46,7 @@ pub async fn save_preference(pref: Preference) -> PreferenceResponse {
 
 #[tauri::command]
 pub async fn save_favorite(fav: Favorite) -> FavoriteResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.save_favorite(fav);
 
     match result {
@@ -57,7 +57,7 @@ pub async fn save_favorite(fav: Favorite) -> FavoriteResponse {
 
 #[tauri::command]
 pub async fn get_all_favorites() -> FavoriteResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.get_all_favorites();
 
     match result {
@@ -70,7 +70,7 @@ pub async fn get_all_favorites() -> FavoriteResponse {
 
 #[tauri::command]
 pub async fn get_favorite(id: u32) -> FavoriteResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.get_favorite(id);
 
     match result {
@@ -86,7 +86,7 @@ pub async fn get_favorite(id: u32) -> FavoriteResponse {
 
 #[tauri::command]
 pub async fn del_favorite(id: String) -> FavoriteResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.del_favorite(id);
 
     match result {
@@ -99,7 +99,7 @@ pub async fn del_favorite(id: String) -> FavoriteResponse {
 
 #[tauri::command]
 pub async fn wipe_data() -> PreferenceResponse {
-    let persistence = Persistence::new();
+    let persistence = Persistence::new(None);
     let result = persistence.wipe_data();
 
     match result {
