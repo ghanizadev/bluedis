@@ -39,7 +39,7 @@ pub struct Database {
 
 impl Database {
     pub fn new(connection_str: String) -> Database {
-        let url = parse_redis_url(connection_str.as_str()).expect("");
+        let url = parse_redis_url(connection_str.as_str()).expect(format!("Failed to parse Redis URL: {}", connection_str).as_str());
 
         Database {
             host: url.host_str().unwrap_or("localhost").to_string(),

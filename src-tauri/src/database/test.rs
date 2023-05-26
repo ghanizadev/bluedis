@@ -4,6 +4,7 @@ mod database_tests {
     use std::time::Duration;
     use tauri::State;
     use tokio::time::sleep;
+    use std::env;
 
     fn get_connection() -> Connection {
         let c_info = ConnectionInfo {
@@ -20,10 +21,29 @@ mod database_tests {
         c.get_connection_with_timeout(Duration::from_secs(12))
             .unwrap()
     }
+  
+  fn get_url() -> String {
+    let host = match env::var("REDIS_HOST") {
+      Ok(val) => val,
+      Err(_e) => "localhost".to_string(),
+    };
+
+    let port = match env::var("REDIS_PORT") {
+      Ok(val) => val,
+      Err(_e) => "6379".to_string(),
+    };
+
+    let ssl = match env::var("REDIS_SSL") {
+      Ok(_) => "s".to_string(),
+      Err(_e) => "".to_string(),
+    };
+    
+    format!("redis{}://{}:{}", ssl, host, port).to_string()
+  }
 
     #[tokio::test]
     async fn it_should_check_connection() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         let connection = db.check_connection().await.unwrap();
 
         assert_eq!(connection, true);
@@ -31,7 +51,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_connect_to_a_different_db() {
-        let db = Database::new("redis://localhost:6379".into()).with_index(1);
+        let db = Database::new(get_url()).with_index(1);
         let connection = db.check_connection().await.unwrap();
 
         assert_eq!(connection, true);
@@ -39,7 +59,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_db_config() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         let config = db.get_config().await.unwrap();
 
         assert_ne!(config.len(), 0)
@@ -47,7 +67,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_db_info() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         let config = db.get_info().await.unwrap();
 
         assert_ne!(config.len(), 0)
@@ -97,7 +117,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_create_hash() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::hash::key".into(), "hash".into(), 0, false)
             .await
             .unwrap();
@@ -117,7 +137,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_change_hash_members() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::hash::key_change".into(), "hash".into(), 0, false)
             .await
             .unwrap();
@@ -164,7 +184,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_set_hash_ttl() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::hash::key_ttl".into(), "hash".into(), 0, false)
             .await
             .unwrap();
@@ -200,7 +220,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_set_string() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::string::key".into(), "string".into(), 0, false)
             .await
             .unwrap();
@@ -220,7 +240,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_update_string() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::string::key_change".into(), "string".into(), 0, false)
             .await
             .unwrap();
@@ -257,7 +277,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_set_string_ttl() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::string::key_ttl".into(), "string".into(), 0, false)
             .await
             .unwrap();
@@ -293,7 +313,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_create_list() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::list::key".into(), "list".into(), 0, false)
             .await
             .unwrap();
@@ -313,7 +333,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_change_list_member() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         // Create List
         db.create_key("test::list::key_change".into(), "list".into(), 0, false)
             .await
@@ -483,7 +503,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_create_set() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::set::key".into(), "set".into(), 0, false)
             .await
             .unwrap();
@@ -503,7 +523,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_change_set_member() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::set::key_change".into(), "set".into(), 0, false)
             .await
             .unwrap();
@@ -560,7 +580,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_create_zset() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::zset::key".into(), "zset".into(), 0, false)
             .await
             .unwrap();
@@ -580,7 +600,7 @@ mod database_tests {
 
     #[tokio::test]
     async fn it_should_change_zset_member() {
-        let db = Database::new("redis://localhost:6379".into());
+        let db = Database::new(get_url());
         db.create_key("test::zset::key_change".into(), "zset".into(), 0, false)
             .await
             .unwrap();
