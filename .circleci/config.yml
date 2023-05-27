@@ -6,7 +6,7 @@ orbs:
 jobs:
   setup:
     docker:
-      - image: alexhayton/docker-tauri-circleci
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - checkout
       - run:
@@ -24,7 +24,7 @@ jobs:
 
   build-app:
     docker:
-      - image: AlexHayton/docker-tauri-circleci
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
@@ -43,7 +43,7 @@ jobs:
 
   test:
     docker:
-      - image: AlexHayton/docker-tauri-circleci
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
@@ -57,7 +57,7 @@ jobs:
 
   coverage:
     docker:
-      - image: AlexHayton/docker-tauri-circleci
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
