@@ -1,13 +1,13 @@
 [package]
-name = "Bluedis"
-version = "0.2.4"
+name = "bluedis"
+version = "0.2.5"
 description = ""
 authors = ["ghanizadev <jf.melo6@gmail.com>"]
 license = ""
 repository = ""
-default-run = "Bluedis"
+default-run = "bluedis"
 edition = "2021"
-rust-version = "1.57"
+rust-version = "1.69"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
