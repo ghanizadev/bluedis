@@ -33,7 +33,7 @@ function testCargo(cb) {
 }
 
 function coverageCargo(cb) {
-  execSync(`REDIS_HOST="${redis_host}" REDIS_PORT="${redis_port}" $HOME/.cargo/bin/cargo tarpaulin --out lcov --output-dir ../coverage/app --manifest-path ./src-tauri/Cargo.toml`);
+  execSync(`REDIS_HOST="${redis_host}" REDIS_PORT="${redis_port}" cargo tarpaulin --out html --output-dir ../coverage/app --manifest-path ./src-tauri/Cargo.toml`);
   cb();
 }
 
