@@ -1,9 +1,13 @@
+#[cfg(not(tarpaulin_include))]
 pub mod commands;
 mod hash;
 mod list;
 mod set;
 mod string;
 mod zset;
+
+#[cfg(test)]
+mod test;
 
 use std::time::Duration;
 
@@ -35,7 +39,7 @@ pub struct Database {
 
 impl Database {
     pub fn new(connection_str: String) -> Database {
-        let url = parse_redis_url(connection_str.as_str()).expect("");
+        let url = parse_redis_url(connection_str.as_str()).expect(format!("Failed to parse Redis URL: {}", connection_str).as_str());
 
         Database {
             host: url.host_str().unwrap_or("localhost").to_string(),
@@ -48,7 +52,7 @@ impl Database {
 
     pub fn with_index(&mut self, index: i64) -> Self {
         self.db_index = index;
-        self.clone()
+        self.clone() //TODO is it necessary?
     }
 
     pub async fn get_connection(&self) -> Result<Connection, Box<dyn std::error::Error>> {
@@ -77,7 +81,7 @@ impl Database {
         Ok(c.get_connection_with_timeout(Duration::from_secs(12))?)
     }
 
-    pub async fn check_connection(&mut self) -> Result<bool, Box<dyn std::error::Error>> {
+    pub async fn check_connection(&self) -> Result<bool, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
 
         let command = redis::cmd("PING");
@@ -92,7 +96,7 @@ impl Database {
     }
 
     pub async fn set_ttl(
-        &mut self,
+        &self,
         key: String,
         ttl: i64,
         absolute: Option<bool>,
@@ -127,7 +131,7 @@ impl Database {
         self.get_key(key).await
     }
 
-    pub async fn get_ttl(&mut self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
+    pub async fn get_ttl(&self, key: &str) -> Result<i64, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
         let ttl = redis::cmd("PTTL").arg(key).query::<i64>(&mut connection)?;
 
@@ -300,7 +304,7 @@ impl Database {
     }
 
     pub async fn search_keys<F: Fn(Vec<Key>, u64)>(
-        &mut self,
+        &self,
         pattern: String,
         cursor: u64,
         limit: Option<u64>,
@@ -371,7 +375,7 @@ impl Database {
     }
 
     pub async fn find_keys(
-        &mut self,
+        &self,
         pattern: String,
         cursor: u64,
         limit: Option<u64>,
@@ -433,7 +437,7 @@ impl Database {
     }
 
     pub async fn get_keys(
-        &mut self,
+        &self,
         keys: Vec<String>,
     ) -> Result<Vec<Key>, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
@@ -466,7 +470,7 @@ impl Database {
         Ok(result)
     }
 
-    pub async fn count(&mut self) -> Result<usize, Box<dyn std::error::Error>> {
+    pub async fn count(&self) -> Result<usize, Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
         let command = redis::cmd("DBSIZE");
         let count = command.query::<usize>(&mut connection);
@@ -485,7 +489,7 @@ impl Database {
         Ok(())
     }
 
-    pub async fn rm_keys(&mut self, keys: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn rm_keys(&self, keys: Vec<&str>) -> Result<(), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
         connection.del::<Vec<&str>, ()>(keys)?;
         Ok(())

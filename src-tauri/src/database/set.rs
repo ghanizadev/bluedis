@@ -19,7 +19,7 @@ pub fn get(
         Ok(Some(Key {
             key: key.to_string(),
             value: serde_json::to_string(&value).expect("Failed to serialize"),
-            is_new: true,
+            is_new: false,
             key_type: "set".into(),
             ttl: if pttl >= 0 {
                 pttl + get_timestamp()

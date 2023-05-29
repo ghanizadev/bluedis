@@ -3,8 +3,6 @@ use crate::state::AppState;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::Window;
-use tokio::{select, spawn, time};
-use tokio_util::sync::CancellationToken;
 
 use super::{Database, Key};
 
@@ -68,7 +66,7 @@ pub async fn find_keys(
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(cstr.clone()).with_index(db_index.clone());
+    let db = Database::new(cstr.clone()).with_index(db_index.clone());
 
     let result = db.find_keys(pattern, cursor, None);
 
@@ -88,7 +86,7 @@ pub async fn db_count(state: tauri::State<'_, AppState>) -> Result<CountResponse
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(cstr.clone()).with_index(db_index.clone());
+    let db = Database::new(cstr.clone()).with_index(db_index.clone());
 
     let result = db.count();
 
@@ -106,7 +104,7 @@ pub async fn authenticate(
     *state.is_connected.lock().unwrap() = true;
     *state.connection_string.lock().unwrap() = cstr.clone();
 
-    let mut db = Database::new(cstr).with_index(0);
+    let db = Database::new(cstr).with_index(0);
     let result = db.check_connection();
 
     Ok(match result.await {
@@ -133,7 +131,7 @@ pub async fn rm_keys(
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(cstr.clone()).with_index(db_index.clone());
+    let db = Database::new(cstr.clone()).with_index(db_index.clone());
 
     let result = db.rm_keys(keys.iter().map(AsRef::as_ref).collect());
 
@@ -207,7 +205,7 @@ pub async fn get_keys(
     let connection_str = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(connection_str.to_string()).with_index(db_index.clone());
+    let db = Database::new(connection_str.to_string()).with_index(db_index.clone());
     let result = db.get_keys(keys);
 
     Ok(match result.await {
@@ -380,7 +378,7 @@ pub async fn search(
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(cstr.clone()).with_index(db_index.clone());
+    let db = Database::new(cstr.clone()).with_index(db_index.clone());
 
     let p = match pattern {
         Some(v) => v,
@@ -442,7 +440,7 @@ pub async fn get_ttl(key: String, state: tauri::State<'_, AppState>) -> Result<T
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(cstr).with_index(db_index);
+    let db = Database::new(cstr).with_index(db_index);
 
     let result = match db.get_ttl(key.as_str()).await {
         Ok(pttl) => TTLResponse::Success(pttl),
@@ -462,7 +460,7 @@ pub async fn set_ttl(
     let cstr = String::from(&*state.connection_string.lock().unwrap());
     let db_index = *state.db_index.lock().unwrap();
 
-    let mut db = Database::new(cstr).with_index(db_index);
+    let db = Database::new(cstr).with_index(db_index);
 
     let result = match db.set_ttl(key, ttl, abs).await {
         Ok(key) => {

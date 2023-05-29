@@ -1,12 +1,12 @@
 version: 2.1
 
 orbs:
-  node: circleci/node@4.7.0
+  node: circleci/node@5.1.0
 
 jobs:
   setup:
     docker:
-      - image: cimg/node:14.19.0
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - checkout
       - node/install-packages:
@@ -18,7 +18,7 @@ jobs:
 
   build-app:
     docker:
-      - image: cimg/node:14.19.0
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
@@ -29,35 +29,56 @@ jobs:
             sudo apt install xfce4 fakeroot -y
       - run:
           name: Build app
-          command: npm run pack
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+          command: npm run build:app
+
+  build-all:
+    docker:
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install prerequisites
+          command: |
+            sudo apt update
+            sudo apt install xfce4 fakeroot -y
+      - run:
+          name: Build all
+          command: npm run build:all
+
+  build-ui:
+    docker:
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Build UI
+          command: npm run build:ui
 
   test:
     docker:
-      - image: cimg/node:14.19.0
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Run React tests with coverage
-          command: npm run test:react -- --coverage
-      - run:
-          name: Run App tests #TODO Add coverage
-          command: npm run test:app
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+          name: Run tests
+          command: npm run test
 
-  code-coverage:
-    machine:
-      image: ubuntu-2004:current
+  coverage:
+    docker:
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
+      - run:
+          name: Install Cargo reporter
+          command: |
+            cargo install cargo-tarpaulin
+      - run:
+          name: Generate coverage
+          command: npm run coverage
       - run:
           name: Download cc-test-reporter
           command: |
@@ -73,7 +94,7 @@ jobs:
             ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json
 
 workflows:
-  test:
+  tests:
     when:
       matches:
         pattern: "^(?!master|develop|release).*$"
@@ -86,33 +107,33 @@ workflows:
       - build-app:
           requires:
             - setup
+      - build-ui:
+          requires:
+            - setup
 
   develop:
     when:
       equal: [develop, << pipeline.git.branch >>]
     jobs:
       - setup
-      - test:
+      - coverage:
           requires:
             - setup
-      - code-coverage:
-          requires:
-            - test
       - build-app:
           requires:
-            - test
+            - coverage
+      - build-ui:
+          requires:
+            - coverage
 
   deploy:
     when:
       equal: [master, << pipeline.git.branch >>]
     jobs:
       - setup
-      - test:
+      - coverage:
           requires:
             - setup
-      - code-coverage:
+      - build-all:
           requires:
-            - test
-      - build-app:
-          requires:
-            - test
+            - coverage
