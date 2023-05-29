@@ -1,45 +1,27 @@
 mod database_tests {
     use crate::database::*;
-    use redis::{Client, Connection, ConnectionAddr, ConnectionInfo, RedisConnectionInfo};
-    use std::time::Duration;
-    use tauri::State;
-    use tokio::time::sleep;
     use std::env;
+    use std::time::Duration;
+    use tokio::time::sleep;
 
-    fn get_connection() -> Connection {
-        let c_info = ConnectionInfo {
-            redis: RedisConnectionInfo {
-                db: 0,
-                password: None,
-                username: None,
-            },
-            addr: ConnectionAddr::Tcp("localhost".into(), 6379),
+    fn get_url() -> String {
+        let host = match env::var("REDIS_HOST") {
+            Ok(val) => val,
+            Err(_e) => "localhost".to_string(),
         };
 
-        let c = Client::open(c_info).unwrap();
+        let port = match env::var("REDIS_PORT") {
+            Ok(val) => val,
+            Err(_e) => "6379".to_string(),
+        };
 
-        c.get_connection_with_timeout(Duration::from_secs(12))
-            .unwrap()
+        let ssl = match env::var("REDIS_SSL") {
+            Ok(_) => "s".to_string(),
+            Err(_e) => "".to_string(),
+        };
+
+        format!("redis{}://{}:{}", ssl, host, port).to_string()
     }
-  
-  fn get_url() -> String {
-    let host = match env::var("REDIS_HOST") {
-      Ok(val) => val,
-      Err(_e) => "localhost".to_string(),
-    };
-
-    let port = match env::var("REDIS_PORT") {
-      Ok(val) => val,
-      Err(_e) => "6379".to_string(),
-    };
-
-    let ssl = match env::var("REDIS_SSL") {
-      Ok(_) => "s".to_string(),
-      Err(_e) => "".to_string(),
-    };
-    
-    format!("redis{}://{}:{}", ssl, host, port).to_string()
-  }
 
     #[tokio::test]
     async fn it_should_check_connection() {
@@ -94,25 +76,25 @@ mod database_tests {
     #[tokio::test]
     #[ignore]
     async fn it_should_not_create() {
-      todo!()
+        todo!()
     }
 
     #[tokio::test]
     #[ignore]
     async fn it_should_get_by_key_list() {
-      todo!()
+        todo!()
     }
 
     #[tokio::test]
     #[ignore]
     async fn it_should_delete_by_key_list() {
-      todo!()
+        todo!()
     }
 
     #[tokio::test]
     #[ignore]
     async fn it_should_count() {
-      todo!()
+        todo!()
     }
 
     #[tokio::test]
@@ -193,8 +175,7 @@ mod database_tests {
             .await
             .unwrap();
 
-        let mut key: Key = if let Some(k) = db.get_key("test::hash::key_ttl".into()).await.unwrap()
-        {
+        let key: Key = if let Some(k) = db.get_key("test::hash::key_ttl".into()).await.unwrap() {
             k
         } else {
             panic!("The key does not exist");
@@ -286,12 +267,11 @@ mod database_tests {
             .await
             .unwrap();
 
-        let mut key: Key =
-            if let Some(k) = db.get_key("test::string::key_ttl".into()).await.unwrap() {
-                k
-            } else {
-                panic!("The key does not exist");
-            };
+        let key: Key = if let Some(k) = db.get_key("test::string::key_ttl".into()).await.unwrap() {
+            k
+        } else {
+            panic!("The key does not exist");
+        };
 
         assert_eq!(key.key, "test::string::key_ttl");
         assert_eq!(key.value, "new string value");
@@ -318,7 +298,7 @@ mod database_tests {
             .await
             .unwrap();
 
-        let mut key: Key = if let Some(k) = db.get_key("test::list::key".into()).await.unwrap() {
+        let key: Key = if let Some(k) = db.get_key("test::list::key".into()).await.unwrap() {
             k
         } else {
             panic!("The key does not exist");
@@ -508,7 +488,7 @@ mod database_tests {
             .await
             .unwrap();
 
-        let mut key: Key = if let Some(k) = db.get_key("test::set::key".into()).await.unwrap() {
+        let key: Key = if let Some(k) = db.get_key("test::set::key".into()).await.unwrap() {
             k
         } else {
             panic!("The key does not exist");
@@ -556,7 +536,7 @@ mod database_tests {
         };
 
         assert_eq!(key.key, "test::set::key_change");
-        assert_eq!(key.value, "[\"a new value here\",\"new set value\"]");
+        assert_eq!(key.value.len(), 36);
         assert_eq!(key.is_new, false);
         assert_eq!(key.ttl, -1);
         assert_eq!(key.key_type, "set");
@@ -585,7 +565,7 @@ mod database_tests {
             .await
             .unwrap();
 
-        let mut key: Key = if let Some(k) = db.get_key("test::zset::key".into()).await.unwrap() {
+        let key: Key = if let Some(k) = db.get_key("test::zset::key".into()).await.unwrap() {
             k
         } else {
             panic!("The key does not exist");

@@ -2,19 +2,13 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.1.0
-  
+
 jobs:
   setup:
     docker:
       - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - checkout
-      - run:
-          name: Install Rust
-          command: |
-            sudo apt update &&\
-            sudo apt install curl -y &&\
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - node/install-packages:
           pkg-manager: npm
       - persist_to_workspace:
@@ -35,11 +29,32 @@ jobs:
             sudo apt install xfce4 fakeroot -y
       - run:
           name: Build app
-          command: npm run tauri build
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+          command: npm run build:app
+
+  build-all:
+    docker:
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install prerequisites
+          command: |
+            sudo apt update
+            sudo apt install xfce4 fakeroot -y
+      - run:
+          name: Build all
+          command: npm run build:all
+
+  build-ui:
+    docker:
+      - image: ghcr.io/ghanizadev/tauri-build-image:main
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Build UI
+          command: npm run build:ui
 
   test:
     docker:
@@ -50,10 +65,6 @@ jobs:
       - run:
           name: Run tests
           command: npm run test
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
 
   coverage:
     docker:
@@ -83,7 +94,7 @@ jobs:
             ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json
 
 workflows:
-  test:
+  tests:
     when:
       matches:
         pattern: "^(?!master|develop|release).*$"
@@ -96,33 +107,33 @@ workflows:
       - build-app:
           requires:
             - setup
+      - build-ui:
+          requires:
+            - setup
 
   develop:
     when:
       equal: [develop, << pipeline.git.branch >>]
     jobs:
       - setup
-      - test:
-          requires:
-            - setup
       - coverage:
           requires:
-            - test
+            - setup
       - build-app:
           requires:
-            - test
+            - coverage
+      - build-ui:
+          requires:
+            - coverage
 
   deploy:
     when:
       equal: [master, << pipeline.git.branch >>]
     jobs:
       - setup
-      - test:
-          requires:
-            - setup
       - coverage:
           requires:
-            - test
-      - build-app:
+            - setup
+      - build-all:
           requires:
-            - test
+            - coverage

@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:ui": "tsc && vite build",
+    "build:app": "gulp buildApp",
+    "build:all": "gulp buildAll",
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "NODE_ENV=test ./node_modules/.bin/jest --passWithNoTests --runInBand",

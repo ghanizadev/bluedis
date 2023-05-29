@@ -79,7 +79,7 @@ mod persistence_tests {
 
     #[test]
     fn it_should_get_favorite() {
-        let (favorite_a, favorite_b, favorite_c, favorite_d) = get_test_data();
+        let (favorite_a, favorite_b, _, favorite_d) = get_test_data();
         let test_uid = format!("test_{:?}", Uuid::new_v4()).to_string();
 
         let persistence = Persistence::new(Some(test_uid));
