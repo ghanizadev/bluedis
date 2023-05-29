@@ -5,9 +5,14 @@ import path from 'node:path'
 import gulp from 'gulp'
 import { RedisMemoryServer } from 'redis-memory-server'
 
-let redis
-let redisHost = ''
-let redisPort = 0
+let redis;
+let redisHost = '';
+let redisPort = 0;
+
+const env = {
+  ...process.env,
+  PATH: process.env.PATH + `:${process.env.HOME}/.cargo/bin/`,
+}
 
 async function setupTests(cb) {
   redis = new RedisMemoryServer();
@@ -28,19 +33,14 @@ function checkDistFolder(cb) {
   cb();
 }
 
-function testCargo(cb) {
-  const env = {
-    ...process.env,
-    PATH: process.env.PATH + `:${process.env.HOME}/.cargo/bin/`,
-    REDIS_HOST: redisHost,
-    REDIS_PORT: redisPort,
-  };
-
+function spawnTask(cmd, args, env_variables, cb) {
   const handler = spawn(
-    'cargo',
-    ['test', '--jobs', '1', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
-    { env }
-  )
+    cmd,
+    args,
+    {
+      env: env_variables
+    }
+  );
 
   handler.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
@@ -54,58 +54,37 @@ function testCargo(cb) {
     console.log(`child process exited with code ${code}`);
     cb(code);
   });
+}
+
+function testCargo(cb) {
+  spawnTask(
+    'cargo',
+    ['test', '--jobs', '1', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
+    {
+      ...env,
+      REDIS_HOST: redisHost,
+      REDIS_PORT: redisPort,
+    },
+    cb
+  );
 }
 
 function buildCargo(cb) {
-  const env = {
-    ...process.env,
-    PATH: process.env.PATH + `:${process.env.HOME}/.cargo/bin/`,
-  };
-
-  const handler = spawn(
+  spawnTask(
     'cargo',
     ['build', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
-    { env }
-  )
-
-  handler.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  handler.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-  });
-
-  handler.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-    cb(code);
-  });
+    env,
+    cb
+  );
 }
 
 function buildCargoTauri(cb) {
-  const env = {
-    ...process.env,
-    PATH: process.env.PATH + `:${process.env.HOME}/.cargo/bin/`,
-  };
-
-  const handler = spawn(
+  spawnTask(
     'cargo',
     ['tauri', 'build'],
-    { env }
-  )
-
-  handler.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  handler.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-  });
-
-  handler.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-    cb(code);
-  });
+    env,
+    cb,
+  );
 }
 
 function coverageCargo(cb) {
