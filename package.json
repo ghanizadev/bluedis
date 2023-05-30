@@ -12,7 +12,6 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "NODE_ENV=test ./node_modules/.bin/jest --passWithNoTests --runInBand",
-    "posttest": "gulp test",
     "coverage": "NODE_ENV=test ./node_modules/.bin/jest --passWithNoTests --runInBand --collectCoverage --coverageDirectory ./coverage/ui",
     "dist:apple": "node -r dotenv/config ./node_modules/.bin/tauri build --target universal-apple-darwin"
   },

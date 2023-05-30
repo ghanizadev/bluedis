@@ -58,7 +58,7 @@ function spawnTask(cmd, args, env_variables, cb) {
 
 function testCargo(cb) {
   spawnTask(
-    'cargo',
+    '$HOME/.cargo/bin/cargo',
     ['test', '--jobs', '1', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
     {
       ...env,
@@ -71,7 +71,7 @@ function testCargo(cb) {
 
 function buildCargo(cb) {
   spawnTask(
-    'cargo',
+    '$HOME/.cargo/bin/cargo',
     ['build', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
     env,
     cb
@@ -80,7 +80,7 @@ function buildCargo(cb) {
 
 function buildCargoTauri(cb) {
   spawnTask(
-    'cargo',
+    '$HOME/.cargo/bin/cargo',
     ['tauri', 'build'],
     env,
     cb,
@@ -89,7 +89,7 @@ function buildCargoTauri(cb) {
 
 function coverageCargo(cb) {
   spawnTask(
-    'cargo',
+    '$HOME/.cargo/bin/cargo',
     ['tarpaulin', '--out', 'lcov', '--output-dir', '../coverage/app', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
     {
       ...env,
