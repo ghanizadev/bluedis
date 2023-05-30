@@ -1,70 +1,68 @@
 name: ghanizadev/bluedis/tests
+
 on:
   push:
     branches:
-    - develop
-env:
-  CC_TEST_REPORTER_ID: xxxx40bf
-  SNAPCRAFT_CREDENTIALS_KEY: xxxxc03b
+      - develop
+
 jobs:
   setup:
-    if: steps.2b60f664060fc9367062f633922440d8.outputs.match == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
-    - uses: actions/checkout@v3.5.0
-    - id: npm-cache-dir
-      run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3.3.1
-      with:
-        path: "${{ steps.npm-cache-dir.outputs.dir }}"
-        key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-        restore-keys: "${{ runner.os }}-node-"
-    - run: npm ci
-    - uses: actions/upload-artifact@v3.1.1
-      with:
-        path: "./."
+      - uses: actions/checkout@v3.5.0
+      - id: npm-cache-dir
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3.3.1
+        with:
+          path: "${{ steps.npm-cache-dir.outputs.dir }}"
+          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: "${{ runner.os }}-node-"
+      - run: npm ci
+      - uses: actions/upload-artifact@v3.1.1
+        with:
+          path: "./."
+
   test:
-    if: steps.2b60f664060fc9367062f633922440d8.outputs.match == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
-    - setup
+      - setup
     steps:
-    - uses: actions/download-artifact@v3.0.1
-      with:
-        path: "."
-    - name: Run tests
-      run: npm run test
+      - uses: actions/download-artifact@v3.0.1
+        with:
+          path: "."
+      - name: Run tests
+        run: npm run test
+
   build-app:
-    if: steps.2b60f664060fc9367062f633922440d8.outputs.match == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
-    - setup
+      - setup
     steps:
-    - uses: actions/download-artifact@v3.0.1
-      with:
-        path: "."
-    - name: Install prerequisites
-      run: |-
-        sudo apt update
-        sudo apt install xfce4 fakeroot -y
-    - name: Build app
-      run: npm run build:app
+      - uses: actions/download-artifact@v3.0.1
+        with:
+          path: "."
+      - name: Install prerequisites
+        run: |-
+          sudo apt update
+          sudo apt install xfce4 fakeroot -y
+      - name: Build app
+        run: npm run build:app
+
   build-ui:
-    if: steps.2b60f664060fc9367062f633922440d8.outputs.match == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
-    - setup
+      - setup
     steps:
-    - uses: actions/download-artifact@v3.0.1
-      with:
-        path: "."
-    - name: Build UI
-      run: npm run build:ui
+      - uses: actions/download-artifact@v3.0.1
+        with:
+          path: "."
+      - name: Build UI
+        run: npm run build:ui
