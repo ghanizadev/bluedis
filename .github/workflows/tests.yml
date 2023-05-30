@@ -3,6 +3,8 @@ name: ghanizadev/bluedis/tests
 on:
   push:
     branches:
+      - "*"
+      - "*/*"
       - "!master"
       - "!develop"
 
