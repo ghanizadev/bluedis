@@ -3,14 +3,15 @@ name: ghanizadev/bluedis/tests
 on:
   push:
     branches:
-      - '!master'
-      - '!develop'
+      - "!master"
+      - "!develop"
 
 jobs:
   setup:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
+      options: --security-opt seccomp=unconfined
     steps:
       - uses: actions/checkout@v3.5.0
       - id: npm-cache-dir
@@ -42,6 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
+      options: --security-opt seccomp=unconfined
     needs:
       - setup
     steps:
@@ -59,6 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
+      options: --security-opt seccomp=unconfined
     needs:
       - setup
     steps:
