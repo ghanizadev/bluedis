@@ -3,7 +3,8 @@ name: ghanizadev/bluedis/tests
 on:
   push:
     branches:
-      - develop
+      - '!master'
+      - '!develop'
 
 jobs:
   setup:
