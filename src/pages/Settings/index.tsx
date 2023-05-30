@@ -34,6 +34,7 @@ const Settings = () => {
       font_name: s.appearance.fontFamily,
       font_size: parseInt(s.appearance.fontSize),
       language: s.region.language,
+      is_default: false,
     };
     await invoke("save_preference", { pref });
   };

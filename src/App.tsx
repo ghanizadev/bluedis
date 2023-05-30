@@ -45,6 +45,18 @@ const App = () => {
 
       return;
     }
+    
+    let darkMode = false;
+    
+    if(settings.Success.is_default) {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        darkMode = true;
+      }
+    } else {
+      darkMode = settings.Success.dark_mode;
+    }
+    
+    console.log({settings, darkMode})
 
     dispatch(
       actions.updatePreferences({
@@ -52,8 +64,8 @@ const App = () => {
           ...defaultAppearanceSettings,
           fontSize: settings.Success.font_size,
           fontFamily: settings.Success.font_name,
-          darkTheme: settings.Success.dark_mode,
-          ...(settings.Success.dark_mode ? DarkTheme : LightTheme),
+          darkTheme: darkMode,
+          ...(darkMode ? DarkTheme : LightTheme),
         },
         region: {
           language: settings.Success.language as Language,
