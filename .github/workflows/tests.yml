@@ -7,7 +7,7 @@ on:
 
 jobs:
   setup:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
@@ -25,7 +25,7 @@ jobs:
           path: "./."
 
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
@@ -38,7 +38,7 @@ jobs:
         run: npm run test
 
   build-app:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
@@ -55,7 +55,7 @@ jobs:
         run: npm run build:app
 
   build-ui:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
