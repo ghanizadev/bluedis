@@ -65,20 +65,39 @@ jobs:
       - run:
           name: Run tests
           command: npm run test
-
-  coverage:
+          
+  coverage-ui:
     docker:
       - image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
       - attach_workspace:
           at: .
       - run:
-          name: Install Cargo reporter
-          command: |
-            cargo install cargo-tarpaulin
-      - run:
           name: Generate coverage
           command: npm run coverage
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+          
+  coverage-app:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Coverage with docker
+          command: docker run --security-opt seccomp=unconfined -v "${PWD}/project/src-tauri:/" xd009642/tarpaulin 
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+          
+  coverage-report:
+    machine: true
+    steps:
+      - attach_workspace:
+          at: .
       - run:
           name: Download cc-test-reporter
           command: |
@@ -87,11 +106,17 @@ jobs:
             chmod +x ./tmp/cc-test-reporter
       - run:
           name: Make coverage report
-          command: ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.json coverage/lcov.info
+          command: |
+            ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.app.json coverage/app/lcov.info
+            ./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.ui.json coverage/ui/lcov.info
+      - run:
+          name: Join coverage reports
+          command: |
+            ./tmp/cc-test-reporter sum-coverage tmp/codeclimate.*.json -p 2 -o tmp/codeclimate.final.json
       - run:
           name: Upload coverage results to Code Climate
           command: |
-            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.final.json
 
 workflows:
   tests:
@@ -101,24 +126,34 @@ workflows:
         value: << pipeline.git.branch >>
     jobs:
       - setup
-      - test:
+#      - test:
+#          requires:
+#            - setup
+      - coverage-app:
           requires:
             - setup
-      - build-app:
+      - coverage-ui:
           requires:
             - setup
-      - build-ui:
+      - coverage-report:
           requires:
-            - setup
+            - coverage-ui
+            - coverage-app
+#      - build-app:
+#          requires:
+#            - setup
+#      - build-ui:
+#          requires:
+#            - setup
 
   develop:
     when:
       equal: [develop, << pipeline.git.branch >>]
     jobs:
       - setup
-      - coverage:
-          requires:
-            - setup
+#      - coverage:
+#          requires:
+#            - setup
       - build-app:
           requires:
             - coverage
@@ -131,9 +166,9 @@ workflows:
       equal: [master, << pipeline.git.branch >>]
     jobs:
       - setup
-      - coverage:
-          requires:
-            - setup
+#      - coverage:
+#          requires:
+#            - setup
       - build-all:
           requires:
             - coverage
