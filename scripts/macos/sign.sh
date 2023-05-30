@@ -1,4 +1,6 @@
-set -a; source ../../.env; set +a
+if [ -f "$1" ]; then
+    set -a; source $1; set +a
+fi
 
 cp "$CONFIG_FOLDER"/"$PROVISION_PROFILE" "$APP_DIR"/"$APP_NAME"/Contents
 mv "$APP_DIR"/"$APP_NAME"/Contents/"$PROVISION_PROFILE" "$APP_DIR"/"$APP_NAME"/Contents/embedded.provisionprofile

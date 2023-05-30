@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { execSync, spawn } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import { mkdirSync, existsSync } from 'node:fs'
 import path from 'node:path'
 import gulp from 'gulp'
@@ -88,10 +88,16 @@ function buildCargoTauri(cb) {
 }
 
 function coverageCargo(cb) {
-  execSync(
-    `REDIS_HOST="${redisHost}" REDIS_PORT="${redisPort}" cargo tarpaulin --out html --output-dir ../coverage/app --manifest-path ./src-tauri/Cargo.toml`
-  )
-  cb();
+  spawnTask(
+    'cargo',
+    ['tarpaulin', '--out', 'lcov', '--output-dir', '../coverage/app', '--manifest-path', './src-tauri/Cargo.toml', '--verbose'],
+    {
+      ...env,
+      REDIS_HOST: redisHost,
+      REDIS_PORT: redisPort,
+    },
+    cb
+  );
 }
 
 async function teardownTests(cb) {

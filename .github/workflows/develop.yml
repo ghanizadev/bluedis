@@ -2,80 +2,77 @@ name: ghanizadev/bluedis/develop
 on:
   push:
     branches:
-    - develop
-env:
-  CC_TEST_REPORTER_ID: xxxx40bf
-  SNAPCRAFT_CREDENTIALS_KEY: xxxxc03b
+      - develop
+
 jobs:
   setup:
-    if: 'develop' == ${{ github.ref }}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     steps:
-    - uses: actions/checkout@v3.5.0
-    - id: npm-cache-dir
-      run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3.3.1
-      with:
-        path: "${{ steps.npm-cache-dir.outputs.dir }}"
-        key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-        restore-keys: "${{ runner.os }}-node-"
-    - run: npm ci
-    - uses: actions/upload-artifact@v3.1.1
-      with:
-        path: "./."
+      - uses: actions/checkout@v3.5.0
+      - id: npm-cache-dir
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3.3.1
+        with:
+          path: "${{ steps.npm-cache-dir.outputs.dir }}"
+          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+          restore-keys: "${{ runner.os }}-node-"
+      - run: npm ci
+      - uses: actions/upload-artifact@v3.1.1
+        with:
+          path: "./."
+
   coverage:
-    if: 'develop' == ${{ github.ref }}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
-    - setup
+      - setup
     steps:
-    - uses: actions/download-artifact@v3.0.1
-      with:
-        path: "."
-    - name: Install Cargo reporter
-      run: cargo install cargo-tarpaulin
-    - name: Generate coverage
-      run: npm run coverage
-    - name: Download cc-test-reporter
-      run: |-
-        mkdir -p tmp/
-        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
-        chmod +x ./tmp/cc-test-reporter
-    - name: Make coverage report
-      run: "./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.json coverage/lcov.info"
-    - name: Upload coverage results to Code Climate
-      run: "./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json"
+      - uses: actions/download-artifact@v3.0.1
+        with:
+          path: "."
+      - name: Install Cargo reporter
+        run: cargo install cargo-tarpaulin
+      - name: Generate coverage
+        run: npm run coverage
+      - name: Download cc-test-reporter
+        run: |-
+          mkdir -p tmp/
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+          chmod +x ./tmp/cc-test-reporter
+      - name: Make coverage report
+        run: "./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.json coverage/lcov.info"
+      - name: Upload coverage results to Code Climate
+        run: "./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json"
+
   build-app:
-    if: 'develop' == ${{ github.ref }}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
-    - coverage
+      - coverage
     steps:
-    - uses: actions/download-artifact@v3.0.1
-      with:
-        path: "."
-    - name: Install prerequisites
-      run: |-
-        sudo apt update
-        sudo apt install xfce4 fakeroot -y
-    - name: Build app
-      run: npm run build:app
+      - uses: actions/download-artifact@v3.0.1
+        with:
+          path: "."
+      - name: Install prerequisites
+        run: |-
+          sudo apt update
+          sudo apt install xfce4 fakeroot -y
+      - name: Build app
+        run: npm run build:app
+
   build-ui:
-    if: 'develop' == ${{ github.ref }}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
-    - coverage
+      - coverage
     steps:
-    - uses: actions/download-artifact@v3.0.1
-      with:
-        path: "."
-    - name: Build UI
-      run: npm run build:ui
+      - uses: actions/download-artifact@v3.0.1
+        with:
+          path: "."
+      - name: Build UI
+        run: npm run build:ui
