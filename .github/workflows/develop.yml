@@ -50,6 +50,8 @@ jobs:
           fakeroot \
           libclang-dev && \
           apt-get clean
+      - name: Check "./dist" folder
+        run: mkdir -p dist
       - name: Generate App coverage
         run: |-
           cargo tarpaulin --verbose --out lcov --output-dir ./coverage --manifest-path ./src-tauri/Cargo.toml && \
