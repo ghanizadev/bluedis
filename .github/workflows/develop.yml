@@ -10,6 +10,16 @@ jobs:
     container:
       image: xd009642/tarpaulin
       options: --security-opt seccomp=unconfined
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -25,6 +35,9 @@ jobs:
         run: |-
           cargo tarpaulin --verbose --out lcov --output-dir ./coverage --manifest-path ./src-tauri/Cargo.toml && \
           mv ./coverage/lcov.info ./coverage/lcov.app.info
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
       - name: Generate UI coverage
         run: |-
           npm run coverage && \
