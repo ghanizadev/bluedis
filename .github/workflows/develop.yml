@@ -33,8 +33,8 @@ jobs:
           toolchain: stable
       - name: Install prerequisites
         run: |-
-          sudo apt update && \
-          sudo apt install -y libwebkit2gtk-4.0-dev \
+          apt update && \
+          apt install -y libwebkit2gtk-4.0-dev \
           build-essential \
           curl \
           wget \
@@ -49,7 +49,7 @@ jobs:
           xfce4 \
           fakeroot \
           libclang-dev && \
-          sudo apt-get clean
+          apt-get clean
       - name: Generate App coverage
         run: |-
           cargo tarpaulin --verbose --out lcov --output-dir ./coverage --manifest-path ./src-tauri/Cargo.toml && \
