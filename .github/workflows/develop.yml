@@ -80,6 +80,10 @@ jobs:
       - coverage
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "npm"
       - name: Install Rust stable
         uses: actions-rs/toolchain@v1
         with:
@@ -103,5 +107,9 @@ jobs:
           fakeroot \
           libclang-dev && \
           sudo apt-get clean
+      - name: Install node_modules
+        run: npm ci
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
