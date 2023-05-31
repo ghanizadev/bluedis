@@ -11,9 +11,6 @@ on:
 jobs:
   test-ui:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/ghanizadev/tauri-build-image:main
-      options: --security-opt seccomp=unconfined
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
