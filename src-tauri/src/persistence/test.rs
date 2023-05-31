@@ -53,6 +53,7 @@ mod persistence_tests {
             font_name: "font_name".to_string(),
             font_size: 8,
             language: 0,
+            is_default: false
         };
 
         persistence.save_preferences(preferences.clone()).unwrap();
