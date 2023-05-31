@@ -23,19 +23,19 @@ jobs:
           toolchain: stable
       - name: Generate App coverage
         run: |-
-          cargo tarpaulin --verbose --out lcov --output-dir ${{github.workspace}}/coverage --manifest-path ${{github.workspace}}/src-tauri/Cargo.toml && \
-          mv ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov.app.info
+          cargo tarpaulin --verbose --out lcov --output-dir ./coverage --manifest-path ./src-tauri/Cargo.toml && \
+          mv ./coverage/lcov.info ./coverage/lcov.app.info
       - name: Generate UI coverage
         run: |-
           npm run coverage && \
-          mv ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov.ui.info
+          mv ./coverage/lcov.info ./coverage/lcov.ui.info
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v4.0.0
         env:
           CC_TEST_REPORTER_ID: ad33fa5dde6dbc4859527ffc8bef376ad567d031b77b3d6291e712dc0de640bf
         with:
           coverageLocations: |
-            ${{github.workspace}}/coverage/lcov*.info:lcov
+            ./coverage/lcov*.info:lcov
 
   build-tauri-app:
     runs-on: ubuntu-latest
