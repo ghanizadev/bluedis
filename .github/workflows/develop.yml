@@ -50,7 +50,9 @@ jobs:
           xfce4 \
           fakeroot \
           libclang-dev && \
-          apt-get clean
+          sudo apt-get clean
+      - name: Install node_modules
+        run: npm ci
       - name: Install coverage reporter
         run: cargo install cargo-tarpaulin
       - name: Check "./dist" folder
