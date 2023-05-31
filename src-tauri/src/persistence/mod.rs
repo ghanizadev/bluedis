@@ -17,19 +17,21 @@ pub struct Preference {
     font_size: u8,
     font_name: String,
     language: u8,
+    is_default: bool,
 }
 
 impl Preference {
     pub fn new() -> Self {
-      let locale = get_locale().unwrap_or_else(|| String::from("en-US"));
-      let language: u8 = if locale == "pt-BR".to_string() { 1 } else { 0 };
-      
+        let locale = get_locale().unwrap_or_else(|| String::from("en-US"));
+        let language: u8 = if locale == "pt-BR".to_string() { 1 } else { 0 };
+
         Preference {
             id: 0,
             dark_mode: false,
             font_size: 10,
             font_name: "JetBrains Mono".into(),
             language,
+            is_default: true,
         }
     }
 }
@@ -121,6 +123,7 @@ impl Persistence {
                         font_name: row.get(2)?,
                         font_size: row.get(3)?,
                         language: row.get(4)?,
+                        is_default: false,
                     })
                 },
             )
@@ -128,9 +131,7 @@ impl Persistence {
 
         match preference {
             Some(p) => Ok(p),
-            _ => {
-              Ok(Preference::new())
-            },
+            _ => Ok(Preference::new()),
         }
     }
 
