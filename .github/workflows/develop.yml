@@ -31,6 +31,25 @@ jobs:
         with:
           override: true
           toolchain: stable
+      - name: Install prerequisites
+        run: |-
+          sudo apt update && \
+          sudo apt install -y libwebkit2gtk-4.0-dev \
+          build-essential \
+          curl \
+          wget \
+          libssl-dev \
+          libgtk-3-dev \
+          squashfs-tools \
+          libgtksourceview-3.0-dev \
+          libappindicator3-dev \
+          lld \
+          llvm \
+          nsis \
+          xfce4 \
+          fakeroot \
+          libclang-dev && \
+          sudo apt-get clean
       - name: Generate App coverage
         run: |-
           cargo tarpaulin --verbose --out lcov --output-dir ./coverage --manifest-path ./src-tauri/Cargo.toml && \
