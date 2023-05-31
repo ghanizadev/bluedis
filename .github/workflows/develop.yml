@@ -19,19 +19,23 @@ jobs:
       - name: Install Rust stable
         uses: actions-rs/toolchain@v1
         with:
-          overwrite: true
+          override: true
           toolchain: stable
       - name: Generate App coverage
-        run: cargo tarpaulin --verbose --out lcov --output-dir ${{github.workspace}}/coverage/app --manifest-path ./src-tauri/Cargo.toml
+        run: |-
+          cargo tarpaulin --verbose --out lcov --output-dir ${{github.workspace}}/coverage --manifest-path ${{github.workspace}}/src-tauri/Cargo.toml && \
+          mv ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov.app.info
       - name: Generate UI coverage
-        run: npm run coverage
+        run: |-
+          npm run coverage && \
+          mv ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov.ui.info
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v4.0.0
         env:
           CC_TEST_REPORTER_ID: ad33fa5dde6dbc4859527ffc8bef376ad567d031b77b3d6291e712dc0de640bf
         with:
           coverageLocations: |
-            ${{github.workspace}}/coverage/*.lcov:lcov
+            ${{github.workspace}}/coverage/lcov*.info:lcov
 
   build-tauri-app:
     runs-on: ubuntu-latest
@@ -62,7 +66,27 @@ jobs:
           fakeroot \
           libclang-dev && \
           sudo apt-get clean
-      - name: Check "./dist" folder
-        run: mkdir -p dist
-      - name: Build app
-        run: cargo tauri build --target universal-apple-darwin -- --verbose
+      - name: Install Rust targets
+        run: |-
+          rustup target add \
+          i686-pc-windows-gnu \
+          x86_64-pc-windows-gnu \
+          i686-unknown-linux-gnu \
+          x86_64-unknown-linux-gnu \
+          aarch64-apple-darwin \
+          x86_64-apple-darwin\
+      - name: Build Universal MacOS app
+        run: |-
+          cargo tauri build --target universal-apple-darwin -- --verbose
+      - name: Build Windows x86 app
+        run: |-
+          cargo tauri build --target i686-pc-windows-gnu -- --verbose
+      - name: Build Windows x64 app
+        run: |-
+          cargo tauri build --target x86_64-pc-windows-gnu -- --verbose
+      - name: Build Linux x86 app
+        run: |-
+          cargo tauri build --target i686-unknown-linux-gnu -- --verbose
+      - name: Build Linux x86 app
+        run: |-
+          cargo tauri build --target x86_64-unknown-linux-gnu -- --verbose
