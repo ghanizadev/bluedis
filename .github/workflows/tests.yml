@@ -3,10 +3,11 @@ name: ghanizadev/bluedis/tests
 on:
   push:
     branches:
-      - "*"
-      - "*/*"
-      - "!master"
-      - "!develop"
+      # - "*"
+      # - "*/*"
+      # - "!master"
+      # - "!develop"
+      - develop
 
 jobs:
   test-ui:
