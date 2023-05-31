@@ -5,74 +5,66 @@ on:
       - develop
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/ghanizadev/tauri-build-image:main
-    steps:
-      - uses: actions/checkout@v3.5.0
-      - id: npm-cache-dir
-        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3.3.1
-        with:
-          path: "${{ steps.npm-cache-dir.outputs.dir }}"
-          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-          restore-keys: "${{ runner.os }}-node-"
-      - run: npm ci
-      - uses: actions/upload-artifact@v3.1.1
-        with:
-          path: "./."
-
   coverage:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/ghanizadev/tauri-build-image:main
-    needs:
-      - setup
+      image: xd009642/tarpaulin
+      options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/download-artifact@v3.0.1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          path: "."
-      - name: Install Cargo reporter
-        run: cargo install cargo-tarpaulin
-      - name: Generate coverage
-        run: npm run coverage
-      - name: Download cc-test-reporter
+          node-version: 16
+          cache: "npm"
+      - name: Install Rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          toolchain: stable
+      - name: Generate App coverage
         run: |-
-          mkdir -p tmp/
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
-          chmod +x ./tmp/cc-test-reporter
-      - name: Make coverage report
-        run: "./tmp/cc-test-reporter format-coverage -t lcov -o tmp/codeclimate.json coverage/lcov.info"
-      - name: Upload coverage results to Code Climate
-        run: "./tmp/cc-test-reporter upload-coverage -i tmp/codeclimate.json"
+          cargo tarpaulin --verbose --out lcov --output-dir ${{github.workspace}}/coverage --manifest-path ${{github.workspace}}/src-tauri/Cargo.toml && \
+          mv ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov.app.info
+      - name: Generate UI coverage
+        run: |-
+          npm run coverage && \
+          mv ${{github.workspace}}/coverage/lcov.info ${{github.workspace}}/coverage/lcov.ui.info
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v4.0.0
+        env:
+          CC_TEST_REPORTER_ID: ad33fa5dde6dbc4859527ffc8bef376ad567d031b77b3d6291e712dc0de640bf
+        with:
+          coverageLocations: |
+            ${{github.workspace}}/coverage/lcov*.info:lcov
 
-  build-app:
+  build-tauri-app:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/ghanizadev/tauri-build-image:main
     needs:
       - coverage
     steps:
-      - uses: actions/download-artifact@v3.0.1
+      - uses: actions/checkout@v3
+      - name: Install Rust stable
+        uses: actions-rs/toolchain@v1
         with:
-          path: "."
+          toolchain: stable
       - name: Install prerequisites
         run: |-
-          sudo apt update
-          sudo apt install xfce4 fakeroot -y
-      - name: Build app
-        run: npm run build:app
-
-  build-ui:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/ghanizadev/tauri-build-image:main
-    needs:
-      - coverage
-    steps:
-      - uses: actions/download-artifact@v3.0.1
-        with:
-          path: "."
-      - name: Build UI
-        run: npm run build:ui
+          sudo apt update && \
+          sudo apt install -y libwebkit2gtk-4.0-dev \
+          build-essential \
+          curl \
+          wget \
+          libssl-dev \
+          libgtk-3-dev \
+          squashfs-tools \
+          libgtksourceview-3.0-dev \
+          libappindicator3-dev \
+          lld \
+          llvm \
+          nsis \
+          xfce4 \
+          fakeroot \
+          libclang-dev && \
+          sudo apt-get clean
+      - name: Build the app
+        uses: tauri-apps/tauri-action@v0
