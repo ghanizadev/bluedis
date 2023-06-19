@@ -29,3 +29,9 @@ dist-ssr
 .snapcraft
 
 coverage
+
+# Certs
+*.p8
+*.pem
+*.der
+*.jws
