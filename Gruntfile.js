@@ -12,7 +12,7 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON("package.json"),
   });
 
-  function spawnTask(cmd, args, env_variables, cb, log = false) {
+  function spawnTask(cmd, args, env_variables, cb) {
     const handler = spawn(cmd, args, {
       env: {
         ...process.env,
@@ -20,16 +20,18 @@ module.exports = function (grunt) {
       },
     });
 
-    handler.stdout.on("data", (data) => {
-      if (log) grunt.log.write(`stdout: ${data}`);
-    });
+    const logData = (data) => {
+      if (process.env.LOG_LEVEL?.includes("info"))
+        grunt.log.write(`stdout: ${data}`);
+    };
 
-    handler.stderr.on("data", (data) => {
-      if (log) grunt.log.write(`stderr: ${data}`);
-    });
+    handler.stdout.on("data", logData);
+
+    handler.stderr.on("data", logData);
 
     handler.on("close", (code) => {
-      if (code) grunt.log.error(`Child process exited with code ${code}`);
+      if (process.env.LOG_LEVEL?.includes("info"))
+        grunt.log.error(`Child process exited with code ${code}`);
       cb(!code);
     });
   }
