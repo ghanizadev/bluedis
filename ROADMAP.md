@@ -23,7 +23,7 @@
 - [ ] Add support to export to CSV;
 - [ ] Quick setup for AWS, Azure, Redis Labs...;
 - [ ] Support to clusters;
-- [x] AddListMember and AlterListMember can be merger into one;
+- [x] AddListMember and AlterListMember can be merged into one;
 - [ ] Rename files;
 - [x] Add Connect page - split from Database page;
 - [x] Refresh after updating a key;
