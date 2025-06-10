@@ -1,8 +1,10 @@
+use std::time::Duration;
 use crate::database::zset::ZSetKey;
 use crate::state::AppState;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::Window;
+use tokio::time::timeout;
 
 use super::{Database, Key};
 
@@ -68,16 +70,23 @@ pub async fn find_keys(
 
     let db = Database::new(cstr.clone()).with_index(db_index.clone());
 
+    println!("Find Keys");
+
     let result = db.find_keys(pattern, cursor, None);
 
     Ok(match result.await {
         Ok((keys, cursor)) => {
+            println!("Result");
+
             DatabaseResponse::Response(Response::Collection(FindKeyCollectionResult {
                 keys,
                 cursor,
             }))
         }
-        Err(err) => DatabaseResponse::Error(format!("Failed to find keys, reason: {:?}", err)),
+        Err(err) => {
+            println!("Error");
+            DatabaseResponse::Error(format!("Failed to find keys, reason: {:?}", err))
+        }
     })
 }
 
@@ -107,8 +116,8 @@ pub async fn authenticate(
     let db = Database::new(cstr).with_index(0);
     let result = db.check_connection();
 
-    Ok(match result.await {
-        Ok(data) => ConnectionResponse::Success(data),
+    Ok(match timeout(Duration::from_secs(8), result).await {
+        Ok(data) => ConnectionResponse::Success(data.unwrap_or(false)),
         Err(err) => ConnectionResponse::Error(format!("Failed to connect, reason: {:?}", err)),
     })
 }
@@ -401,8 +410,8 @@ pub async fn search(
             )
             .expect("failed to emit search event");
     })
-    .await
-    .expect("failed to search");
+        .await
+        .expect("failed to search");
 
     Ok(())
 }

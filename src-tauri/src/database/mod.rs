@@ -83,15 +83,20 @@ impl Database {
     }
 
     pub async fn check_connection(&self) -> Result<bool, Box<dyn std::error::Error>> {
+        println!("Start");
         let mut connection = self.get_connection().await?;
-
+        println!("Connection");
         let command = redis::cmd("PING");
+        println!("Command");
         let result = command.query::<String>(&mut connection)?;
+        println!("Result");
         let mut is_connected = false;
 
         if result == "PONG" {
             is_connected = true;
         }
+
+        println!("Connected: {}", is_connected);
 
         Ok(is_connected)
     }
@@ -383,6 +388,7 @@ impl Database {
     ) -> Result<(Vec<Key>, u64), Box<dyn std::error::Error>> {
         let mut connection = self.get_connection().await?;
 
+
         let mut new_cursor = cursor;
         let l = limit.unwrap_or(20);
         let mut done = false;
@@ -390,20 +396,29 @@ impl Database {
         let mut items: Vec<String> = vec![];
 
         while !done {
+            println!("Before iter");
+
             let mut command = redis::cmd("SCAN");
+
             command.arg(new_cursor);
             command.arg("MATCH");
             command.arg(pattern.clone());
             command.arg("COUNT");
             command.arg(10);
 
-            let (c, mut r) = command.query::<(String, Vec<String>)>(&mut connection)?;
+            println!("Before iter");
+
+            let (c, mut r) = command.query::<(String, Vec<String>)>(&mut connection).expect("Failed to scan");
+            println!("After iter");
+
             new_cursor = match c.parse::<u64>() {
                 Ok(c) => c,
                 _ => new_cursor,
             };
 
             items.append(&mut r);
+
+            println!("iter");
 
             done = new_cursor == 0 || items.len() as u64 >= l;
         }

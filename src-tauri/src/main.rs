@@ -8,6 +8,7 @@ mod general;
 mod helper;
 mod persistence;
 mod state;
+mod port_forwarding;
 
 use crate::persistence::{Persistence, Preference};
 use crate::state::AppState;
@@ -17,6 +18,8 @@ use sys_locale::get_locale;
 #[cfg(not(tarpaulin_include))]
 async fn main() {
     let locale = get_locale().unwrap_or_else(|| String::from("en-US"));
+
+    port_forwarding::run_server();
 
     Persistence::new(None);
 

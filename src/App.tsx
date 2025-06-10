@@ -45,18 +45,21 @@ const App = () => {
 
       return;
     }
-    
+
     let darkMode = false;
-    
-    if(settings.Success.is_default) {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+
+    if (settings.Success.is_default) {
+      if (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
         darkMode = true;
       }
     } else {
       darkMode = settings.Success.dark_mode;
     }
-    
-    console.log({settings, darkMode})
+
+    console.log({ settings, darkMode });
 
     dispatch(
       actions.updatePreferences({
@@ -103,7 +106,7 @@ const App = () => {
   };
 
   const handleContextMenu = (e: MouseEvent) => {
-    e.preventDefault();
+    // e.preventDefault();
   };
 
   useEffect(() => {
